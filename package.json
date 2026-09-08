@@ -9,6 +9,7 @@
   "dev": "concurrently \"npm run server\" \"npm run tailwind\""
 },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.11.1",
     "concurrently": "^10.0.5",
     "cookie-parser": "^1.4.7",

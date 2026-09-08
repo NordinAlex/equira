@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equira | Logga in</title>
+</head>
+<body>
+    <header>
+        <img src="/images/login-background.jpg" alt="Häst">
+    </header>
+
+<main>
+    <h1>Equira</h1>
+    <h2>Välkommen tillbaka</h2>
+
+    <form action="/login" method="POST">
+        <div>
+            <label for="username">Användarnamn</label>
+            <input
+            placeholder="Användarnamn"
+            type="text"
+            id="username"
+            name="username"
+            required>
+        </div>
+
+        <div>
+            <label for="password">Lösenord</label>
+            <input
+            placeholder="Lösenord"
+            type="password"
+            id="password"
+            name="password"
+            required>
+        </div>
+
+        <div>
+            <label>Kom ihåg mig</label>
+            <input type="checkbox">
+        </div>
+
+        <button type="submit">Logga in</button>
+    </form>
+
+    <p>Inget konto? Kontakta administratör.</p>
+</main>
+    
+</body>
+</html>
