@@ -1,24 +1,202 @@
 <!DOCTYPE html>
 <html lang="sv">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/stylesheets/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <title>Uppgifter</title>
 </head>
 
-<body>
+<body class="bg-[#f5f0eb]">
   <div class="flex">
-    <%- include("partials/sidebar-staff.ejs") %>
-    
+    <!-- Sidebar - dold på mobil -->
+    <div class="hidden md:block">
+      <%- include("Partials/sidebar-staff.ejs") %>
+    </div>
+
     <div class="flex flex-1 flex-col">
-      <%- include("partials/topbar-staff.ejs") %>
-      
-      <main class="p-8">
-        <h1 class="text-2xl font-bold">Uppgifter</h1>
-      </main>
+      <%- include("Partials/topbar-staff.ejs") %>
+
+        <main class="p-4 md:p-8 pb-20 md:pb-8">
+
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <img src="/images/avatar.jpg" class="size-10 rounded-full object-cover" />
+              <h1 class="text-2xl md:text-3xl font-bold">Dagens uppgifter</h1>
+            </div>
+            <button class="border rounded-lg p-2 hover:bg-gray-100 bg-white">
+              <i class="fa-regular fa-calendar"></i>
+            </button>
+          </div>
+
+          <!-- Filter-knappar -->
+          <div class="flex gap-3 mb-6">
+            <button class="bg-[#2c1a0e] text-white px-4 py-2 rounded-full text-sm font-semibold">Alla</button>
+            <button class="border px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-100 bg-white">Mina</button>
+            <button
+              class="border px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-100 bg-white">Akuta</button>
+            <button
+              class="border px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-100 bg-white">Klara</button>
+          </div>
+
+          <!-- Rubrik -->
+          <h2 class="font-bold text-lg mb-4">Aktuella Uppgifter</h2>
+
+          <!-- Uppgiftskort grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- Kort 1 -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex justify-between items-start mb-1">
+                <h3 class="font-bold text-lg">Testuppgift Grovfoder</h3>
+                <span class="text-xs text-gray-500 border px-2 py-1 rounded-md">NORMAL</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-3">Stall 2</p>
+              <p class="text-sm italic text-gray-600 mb-4">"Ge 3 kg hö per häst i boxarna."</p>
+              <div class="flex justify-between items-center text-sm text-gray-400 mb-4">
+                <span><i class="fa-regular fa-clock mr-1"></i>06:30 • Kommande</span>
+                <a href="#" class="hover:text-gray-700">Detaljer →</a>
+              </div>
+              <button class="w-full bg-[#2c1a0e] text-white py-2 rounded-xl hover:bg-[#3d2512]">
+                <i class="fa-regular fa-circle-check mr-2"></i>Markera som klar
+              </button>
+            </div>
+
+            <!-- Kort 2 -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex justify-between items-start mb-1">
+                <h3 class="font-bold text-lg">Testuppgift Grovfoder</h3>
+                <span class="text-xs text-gray-500 border px-2 py-1 rounded-md">NORMAL</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-3">Stall 2</p>
+              <p class="text-sm italic text-gray-600 mb-4">"Ge 3 kg hö per häst i boxarna."</p>
+              <div class="flex justify-between items-center text-sm text-gray-400 mb-4">
+                <span><i class="fa-regular fa-clock mr-1"></i>06:30 • Kommande</span>
+                <a href="#" class="hover:text-gray-700">Detaljer →</a>
+              </div>
+              <button class="w-full bg-[#2c1a0e] text-white py-2 rounded-xl hover:bg-[#3d2512]">
+                <i class="fa-regular fa-circle-check mr-2"></i>Markera som klar
+              </button>
+            </div>
+
+            <!-- Kort 3 -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex justify-between items-start mb-1">
+                <h3 class="font-bold text-lg">Morgonfodring, grovfoder & tillsyn</h3>
+                <span class="text-xs text-gray-500 border px-2 py-1 rounded-md">NORMAL</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-3">Stall 1 & Hagområde</p>
+              <p class="text-sm italic text-gray-600 mb-4">"Hej"</p>
+              <div class="flex justify-between items-center text-sm text-gray-400 mb-4">
+                <span><i class="fa-regular fa-clock mr-1"></i>07:00 • Kommande</span>
+                <a href="#" class="hover:text-gray-700">Detaljer →</a>
+              </div>
+              <button class="w-full bg-[#2c1a0e] text-white py-2 rounded-xl hover:bg-[#3d2512]">
+                <i class="fa-regular fa-circle-check mr-2"></i>Markera som klar
+              </button>
+            </div>
+
+            <!-- Kort 4 - Viktig -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex justify-between items-start mb-1">
+                <h3 class="font-bold text-lg">Mockning Box 4</h3>
+                <span
+                  class="text-xs text-yellow-600 bg-yellow-100 border border-yellow-300 px-2 py-1 rounded-md">VIKTIG</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-3">Stall 1 • Box 4</p>
+              <p class="text-sm italic text-gray-600 mb-4">"Torv, extra spån i bakre halvan. Sopa rent i stallgången
+                efter avslutad mockning."</p>
+              <div class="flex justify-between items-center text-sm text-gray-400 mb-4">
+                <span><i class="fa-regular fa-clock mr-1"></i>09:15 • Pågår</span>
+                <a href="#" class="hover:text-gray-700">Detaljer →</a>
+              </div>
+              <button class="w-full bg-[#2c1a0e] text-white py-2 rounded-xl hover:bg-[#3d2512]">
+                <i class="fa-regular fa-circle-check mr-2"></i>Markera som klar
+              </button>
+            </div>
+
+          </div>
+          <!-- Klara uppgifter -->
+          <h2 class="font-bold text-lg mb-4 mt-20">Klara Uppgifter</h2>
+
+          <div class="flex flex-col gap-3">
+
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between border">
+              <div class="flex items-center gap-4">
+                <div class="bg-green-100 rounded-full p-2">
+                  <i class="fa-solid fa-check text-green-500"></i>
+                </div>
+                <div>
+                  <p class="font-bold">Morgonfodring & Vattenkontroll</p>
+                  <p class="text-sm text-gray-400">Klar 12:00</p>
+                </div>
+              </div>
+              <button class="border px-4 py-1 rounded-lg text-sm hover:bg-gray-100">Slutförd</button>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between border">
+              <div class="flex items-center gap-4">
+                <div class="bg-green-100 rounded-full p-2">
+                  <i class="fa-solid fa-check text-green-500"></i>
+                </div>
+                <div>
+                  <p class="font-bold">Morgonfodring Stall 1</p>
+                  <p class="text-sm text-gray-400">Klar 08:48</p>
+                </div>
+              </div>
+              <button class="border px-4 py-1 rounded-lg text-sm hover:bg-gray-100">Slutförd</button>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between border">
+              <div class="flex items-center gap-4">
+                <div class="bg-green-100 rounded-full p-2">
+                  <i class="fa-solid fa-check text-green-500"></i>
+                </div>
+                <div>
+                  <p class="font-bold">Utsläpp i hagar</p>
+                  <p class="text-sm text-gray-400">Klar 12:06</p>
+                </div>
+              </div>
+              <button class="border px-4 py-1 rounded-lg text-sm hover:bg-gray-100">Slutförd</button>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between border">
+              <div class="flex items-center gap-4">
+                <div class="bg-green-100 rounded-full p-2">
+                  <i class="fa-solid fa-check text-green-500"></i>
+                </div>
+                <div>
+                  <p class="font-bold">Utsläpp Bella</p>
+                  <p class="text-sm text-gray-400">Klar 10:18</p>
+                </div>
+              </div>
+              <button class="border px-4 py-1 rounded-lg text-sm hover:bg-gray-100">Slutförd</button>
+            </div>
+
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between border">
+              <div class="flex items-center gap-4">
+                <div class="bg-green-100 rounded-full p-2">
+                  <i class="fa-solid fa-check text-green-500"></i>
+                </div>
+                <div>
+                  <p class="font-bold">Fodring Stall 2</p>
+                  <p class="text-sm text-gray-400">Klar 15:03</p>
+                </div>
+              </div>
+              <button class="border px-4 py-1 rounded-lg text-sm hover:bg-gray-100">Slutförd</button>
+            </div>
+
+          </div>
+        </main>
     </div>
   </div>
+
+  <!-- Bottom navbar - visas bara på mobil -->
+  <%- include("Partials/bottomnav-staff.ejs") %>
+
 </body>
 
 </html>
