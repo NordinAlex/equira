@@ -1,0 +1,29 @@
+<a href="/student/horses/<%= horse.id %>"
+class="block w-full overflow-hidden rounded-xl border border-[#B0A696] bg-white">
+
+  <!-- Horse image -->
+  <img src="<%= horse.image %>" alt="<%= horse.name %>" class="h-80 w-full object-cover">
+
+  <!-- Horse information -->
+  <div class="p-4">
+
+    <!-- Name + age -->
+    <div class="flex items-center justify-between my-2">
+      <h2 class="text-xl font-semibold"><%= horse.name %><h2>
+          <p class="font-semibold text-[#4A3226]">
+            <%= new Date().getFullYear() - horse.birthYear %> år
+          </p>
+    </div>
+
+    <!-- Breed -->
+    <p class="text-[#4A3226] text-lg"><%= horse.breed %></p>
+
+    <!-- Temper + level-->
+    <div class="flex gap-2 mt-4">
+      <p class="rounded-md bg-[#F2EFEB] px-2 py-1 text-[#4A3226] font-semibold"><%= horse.temper %></p>
+      <p class="rounded-md bg-[#F2EFEB] px-2 py-1 text-[#4A3226] font-semibold"><%= horse.level %></p>
+    </div>
+
+  </div>
+
+</a>

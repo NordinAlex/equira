@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equira | Hästar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+</head>
+
+<body class="bg-[#F2EFEB]">
+  <header>
+    <%-include('../Partials/topbar-student.ejs')%>
+  </header>
+
+  <main>
+    <!-- Title -->
+    <div class="px-6 py-8">
+      <h1 class="text-3xl font-bold">Hästar</h1>
+      <p class="py-4">Utforska och lär känna stallets hästar.</p>
+    </div>
+
+    <!-- Search bar -->
+    <form class="relative mx-6 mb-15">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="absolute left-2 top-1/2 -translate-y-1/2 w-5 h-5 text-[#B0A696]">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.5-4.5m0 0A7.5 7.5 0 1 0 6 6a7.5 7.5 0 0 0 10.5 10.5Z" />
+      </svg>
+
+      <input type="text" placeholder="Sök häst..." class="w-full h-12 bg-white border border-[#B0A696] rounded placeholder-[#B0A696] pl-8">
+    </form>
+
+    <!-- Hästkort -->
+     <div class="mx-6 space-y-8">
+    <% horses.forEach(horse => { %>
+    <%- include('../partials/horsecard-student', { horse }) %>
+    <% }) %>
+    </div>
+
+    <!-- Navbar -->
+    <p class="mt-30">Bottom navigation</p>
+  </main>
+</body>
+
+</html>
