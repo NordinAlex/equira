@@ -8,8 +8,9 @@ const session = require('express-session');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const tasksRouter = require('./routes/tasks');
+const tasksRouter = require('./routes/Staff/tasks');
 const authRouter = require('./routes/auth');
+const overviewStaffRouter = require('./routes/Staff/overview');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/tasks', tasksRouter);
 app.use('/', authRouter);
+app.use('/overview', overviewStaffRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
