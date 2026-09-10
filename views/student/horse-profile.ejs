@@ -1,11 +1,159 @@
 <!DOCTYPE html>
 <html lang="sv">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equira | Hästprofil </title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equira | <%= horse.name %> </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
 </head>
-<body>
-    <h1><%= horse.name %></h1>
+
+<body class="bg-[#F2EFEB]">
+  <header>
+    <%-include('../Partials/topbar-student.ejs')%>
+  </header>
+
+  <main>
+    <div class="relative w-full">
+      <img src="<%= horse.image %>" alt="<%= horse.name %>" class="w-full h-[450px] object-cover">
+
+      <!-- Basic information -->
+      <div class="absolute bottom-6 left-6 text-white">
+        <p class="text-2xl font-semibold drop-shadow-lg">
+          <%= horse.name %>
+        </p>
+
+        <!-- Info boxes -->
+        <div class="flex flex-wrap gap-x-3 gap-y-1 max-w-[300px] mt-3">
+          <p class="bg-black/20 backdrop-blur-md px-3 py-2 rounded-3xl text-s">
+            <%= new Date().getFullYear() - horse.birthYear %> år
+          </p>
+          <p class="bg-black/20 backdrop-blur-md px-3 py-2 rounded-3xl text-s">
+            <%= horse.breed %>
+          </p>
+          <p class="bg-black/20 backdrop-blur-md px-3 py-2 rounded-3xl text-s">
+            <%= horse.temper %>
+          </p>
+          <p class="bg-black/20 backdrop-blur-md px-3 py-2 rounded-3xl text-s">
+            <%= horse.level %>
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Description area -->
+    <div class="m-6">
+      <h2 class="text-2xl font-semibold">
+        Om <%= horse.name %>
+      </h2>
+      <p class="mt-4"><%= horse.description %></p>
+    </div>
+
+    <!-- Temper & riding boxes -->
+    <div class="grid grid-cols-1 gap-4 m-6">
+      <div class="bg-white rounded-2xl border border-[#B0A696] p-6 drop-shadow-sm">
+
+        <!-- Temper icon & title -->
+        <div class="flex items-center gap-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 18h6
+           M10 21h4
+           M8.25 14.25
+           A6 6 0 1 1 15.75 14.25
+           C15.2 15.05 15 15.6 15 16.5
+           H9
+           C9 15.6 8.8 15.05 8.25 14.25Z" />
+          </svg>
+
+          <h3 class="text-xl font-semibold">Temperament</h3>
+        </div>
+
+        <!-- Textarea -->
+        <p class="text-lg"><%= horse.temperDescription %></p>
+      </div>
+
+      <!-- Riding icon & title -->
+      <div class="bg-white rounded-2xl border border-[#B0A696] p-6 drop-shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+            <path d="
+        M11.3 4.5
+        C11.3 3.5 11.8 3 12.5 3
+        C13.2 3 13.7 3.5 13.7 4.5
+
+        C16.9 5.1 19 7.9 19 12
+
+        C18.5 12.8 17.8 13.3 17 14.2
+        C17 17 15.5 19 13 19
+        H10
+
+        M17 14.2
+        H12
+        C9 14.2 6.5 13.8 5 12.5
+
+        C3.8 12.3 2.8 12.5 2 13
+        C4.5 13.8 7 13.8 9.5 13.5
+        H17
+
+        M5 12.5
+        C5 7.5 8.2 4.5 12 4.5
+    " />
+          </svg>
+
+          <h3 class="text-xl font-semibold">Ridning</h3>
+        </div>
+
+        <!-- Textarea -->
+        <p class="text-lg"><%= horse.riding %></p>
+      </div>
+    </div>
+
+    <!-- Fits for... -->
+    <div class="mx-6 my-10">
+      <h2 class="text-2xl font-semibold mb-4">Passar bäst för</h2>
+
+      <ul class="flex flex-col gap-2">
+        <li class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-[#4A3226]">
+            <circle cx="12" cy="12" r="10" />
+            <path d="m8 12 2.5 2.5L16 9" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <p class="text-lg">Level</p>
+        </li>
+
+        <li class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-[#4A3226]">
+            <circle cx="12" cy="12" r="10" />
+            <path d="m8 12 2.5 2.5L16 9" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <p class="text-lg">Inriktning</p>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Important information-->
+    <div class="m-6 bg-[#E0DCD6] rounded-2xl border border-[#B0A696] p-6 drop-shadow-sm">
+      <div class="flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-7 h-7">
+          <mask id="info-mask">
+            <rect width="24" height="24" fill="white" />
+            <path d="M12 10.5v5" stroke="black" stroke-width="2" stroke-linecap="round" />
+
+            <circle cx="12" cy="7.5" r="1" fill="black" />
+          </mask>
+
+          <circle cx="12" cy="12" r="10" fill="#4A3226" mask="url(#info-mask)" />
+        </svg>
+
+        <h3 class="text-xl font-semibold">Viktig information</h3>
+      </div>
+      
+      <p class="text-lg mt-4">Här står eventuellt viktig information.</p>
+    </div>
+  </main>
+
 </body>
+
 </html>
