@@ -1,1 +1,53 @@
-<i class="fa-solid fa-horse-head"></i>
+<div class="flex flex-col h-screen w-64 border-r sticky top-0">
+
+    <!-- Logga -->
+    <div class="flex items-start gap-2 ml-4 mt-7">
+        <div class="text-5xl">
+            <i class="fa-solid fa-horse-head"></i>
+        </div>
+        <div class="flex flex-col">
+            <h1 class="text-3xl font-bold">Equira</h1>
+            <p class="text-gray-500 text-sm">Stallportal</p>
+        </div>
+    </div>
+
+    <!-- Meny -->
+    <nav
+        class="flex flex-col font-bold text-gray-500 gap-7 mt-6 ml-4 [&>a]:rounded-lg [&>a]:hover:bg-gray-200 [&>a]:py-2 [&>a]:px-2">
+        <a href="/overview/staff"
+            class="<%= currentPage === 'overview-staff' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
+            <i class="mr-2 fa-regular fa-calendar-days"></i>Översikt
+        </a>
+        <a href="/tasks/staff"
+            class="<%= currentPage === 'tasks' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
+            <i class="mr-2 fa-solid fa-list-check"></i>Uppgifter
+        </a>
+        <a href="/horses"
+            class="<%= currentPage === 'horses' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
+            <i class="mr-2 fa-solid fa-horse-head"></i>Hästar
+        </a>
+        <a href="/schedule"
+            class="<%= currentPage === 'schedule' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
+            <i class="mr-2 fa-regular fa-calendar-days"></i>Schema
+        </a>
+        <a href="/profile"
+            class="<%= currentPage === 'profile' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
+            <i class="mr-2 fa-regular fa-circle-user"></i>Profil
+        </a>
+    </nav>
+
+    <!-- Användare längst ner -->
+    <div class="mt-auto pb-6 flex flex-col gap-3 ml-4">
+        <div class="flex items-center gap-3">
+            <img src="/images/avatar.jpg" alt="avatar" class="size-10 rounded-full object-cover" />
+            <div>
+                <p class="text-sm font-semibold text-gray-900">Johan Svensson</p>
+                <p class="text-xs text-gray-500">Stallpersonal</p>
+            </div>
+        </div>
+        <a href="/logout" class="text-sm hover:text-red-700">
+            <i class="mr-2 fa-solid fa-right-from-bracket"></i>Logga ut
+        </a>
+    </div>
+
+</div>

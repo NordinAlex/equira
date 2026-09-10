@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <title>Översikt</title>
+</head>
+
+<body class="bg-[#f5f0eb]">
+  <div class="flex">
+    <div class="hidden md:block">
+      <%- include("../Partials/sidebar-staff.ejs") %>
+    </div>
+
+    <div class="flex flex-1 flex-col">
+      <%- include("../Partials/topbar-staff.ejs") %>
+
+      <main class="p-4 md:p-8 pb-20 md:pb-8">
+
+        <!-- Hälsning -->
+        <h1 class="text-3xl font-bold">God morgon, Johan</h1>
+        <p class="text-gray-400 mb-6">Torsdag 10 sep.</p>
+
+        <!-- Statistik-kort -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div class="bg-green-100 rounded-2xl p-5 flex justify-between items-center">
+            <div>
+              <p class="text-xs font-bold uppercase text-gray-500 mb-2">Att göra idag</p>
+              <p class="text-4xl font-bold">2</p>
+            </div>
+            <div class="bg-green-200 rounded-full p-3">
+              <i class="fa-solid fa-list-check text-green-600 text-xl"></i>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-5 flex justify-between items-center">
+            <div>
+              <p class="text-xs font-bold uppercase text-gray-500 mb-2">Avklarade</p>
+              <p class="text-4xl font-bold">0</p>
+            </div>
+            <div class="bg-green-500 rounded-full p-3">
+              <i class="fa-solid fa-check text-white text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dagens uppgifter -->
+        <h2 class="text-xl font-bold mb-4">Dagens uppgifter</h2>
+
+        <!-- 07:00 Morgonfodring -->
+        <div class="mb-6">
+          <p class="flex items-center gap-2 text-sm font-semibold mb-3">
+            <span class="size-3 rounded-full bg-gray-800 inline-block"></span>
+            07:00 Morgonfodring
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="bg-gray-100 rounded-lg p-2">
+                  <i class="fa-solid fa-utensils text-gray-500"></i>
+                </div>
+                <div>
+                  <p class="font-semibold">Fodra stall 1</p>
+                  <p class="text-xs text-gray-400">Hästar: 12</p>
+                </div>
+              </div>
+              <input type="checkbox" checked class="size-5 accent-blue-500" />
+            </div>
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="bg-gray-100 rounded-lg p-2">
+                  <i class="fa-solid fa-utensils text-gray-500"></i>
+                </div>
+                <div>
+                  <p class="font-semibold">Fodra stall 2</p>
+                  <p class="text-xs text-gray-400">Hästar: 8</p>
+                </div>
+              </div>
+              <input type="checkbox" checked class="size-5 accent-blue-500" />
+            </div>
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="bg-blue-100 rounded-lg p-2">
+                  <i class="fa-solid fa-droplet text-blue-500"></i>
+                </div>
+                <div>
+                  <p class="font-semibold">Kontrollera vatten</p>
+                  <p class="text-xs text-gray-400">Båda stallen</p>
+                </div>
+              </div>
+              <input type="checkbox" class="size-5" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 09:00 Utsläpp -->
+        <div class="mb-6">
+          <p class="flex items-center gap-2 text-sm font-semibold mb-3">
+            <span class="size-3 rounded-full bg-orange-400 inline-block"></span>
+            09:00 Utsläpp
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="bg-white rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <img src="/images/bella.jpg" class="size-10 rounded-full object-cover" />
+                  <div>
+                    <p class="font-semibold">Bella</p>
+                    <p class="text-xs text-gray-400">Hage 3</p>
+                  </div>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
+              </div>
+              <p class="text-sm text-gray-500"><i class="fa-solid fa-shirt mr-2 text-gray-400"></i>Ta på täcke (Regn)</p>
+            </div>
+            <div class="bg-white rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <img src="/images/luna.jpg" class="size-10 rounded-full object-cover" />
+                  <div>
+                    <p class="font-semibold">Luna</p>
+                    <p class="text-xs text-gray-400">Hage 4</p>
+                  </div>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
+              </div>
+              <p class="text-sm text-gray-500"><i class="fa-solid fa-shield mr-2 text-gray-400"></i>Borsta hovar</p>
+            </div>
+            <div class="bg-white rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <img src="/images/max.jpg" class="size-10 rounded-full object-cover" />
+                  <div>
+                    <p class="font-semibold">Max</p>
+                    <p class="text-xs text-gray-400">Hage 1</p>
+                  </div>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
+              </div>
+              <p class="text-sm text-gray-500"><i class="fa-regular fa-circle mr-2 text-gray-400"></i>Inga extra uppgifter</p>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <%- include("../Partials/bottomnav-staff.ejs") %>
+</body>
+</html>
