@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <title>Hästar</title>
+</head>
+
+<body class="bg-[#f5f0eb]">
+  <div class="flex">
+    <div class="hidden md:block">
+      <%- include("../Partials/sidebar-staff.ejs") %>
+    </div>
+
+    <div class="flex flex-1 flex-col">
+      <%- include("../Partials/topbar-staff.ejs") %>
+
+      <main class="p-4 md:p-8 pb-20 md:pb-8">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-bold">Hästar som kräver åtgärd</h1>
+            <p class="text-gray-400 text-sm">Översikt över dagens prioriterade insatser.</p>
+          </div>
+          <button class="border bg-white rounded-lg px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-100">
+            <i class="fa-solid fa-sliders"></i> Filtrera
+          </button>
+        </div>
+
+        <!-- Hästkort grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+
+          <!-- Bella -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
+            <div class="relative">
+              <img src="/images/bella.jpg" class="w-full h-48 object-cover" />
+              <span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                <i class="fa-solid fa-circle-exclamation"></i> Prioritet hög
+              </span>
+            </div>
+            <div class="p-4">
+              <h3 class="font-bold text-lg">Bella</h3>
+              <p class="text-gray-400 text-sm mb-3">Box 12 • Foderstat B</p>
+              <p class="text-xs font-bold uppercase text-gray-400 mb-2">Åtgärder</p>
+              <div class="flex gap-2 flex-wrap">
+                <span class="bg-[#2c1a0e] text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <i class="fa-solid fa-utensils"></i> Fodring
+                </span>
+                <span class="border text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <i class="fa-solid fa-door-open"></i> Utsläpp
+                </span>
+                <span class="border text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <i class="fa-solid fa-broom"></i> Mockning
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Luna -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
+            <div class="relative">
+              <img src="/images/luna.jpg" class="w-full h-48 object-cover" />
+              <span class="absolute top-3 left-3 bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                <i class="fa-regular fa-clock"></i> Pågående
+              </span>
+            </div>
+            <div class="p-4">
+              <h3 class="font-bold text-lg">Luna</h3>
+              <p class="text-gray-400 text-sm mb-3">Sjukruta • Rehab schema</p>
+              <p class="text-xs font-bold uppercase text-gray-400 mb-2">Åtgärder</p>
+              <div class="flex gap-2 flex-wrap">
+                <span class="bg-[#2c1a0e] text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <i class="fa-solid fa-utensils"></i> Fodring
+                </span>
+                <span class="border text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <i class="fa-solid fa-gear"></i> Kontroll
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Max -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
+            <div class="relative">
+              <img src="/images/max.jpg" class="w-full h-48 object-cover" />
+              <span class="absolute top-3 left-3 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                <i class="fa-regular fa-calendar"></i> Kommande
+              </span>
+            </div>
+            <div class="p-4">
+              <h3 class="font-bold text-lg">Max</h3>
+              <p class="text-gray-400 text-sm mb-3">Hage 4 • Skning 14:00</p>
+              <p class="text-xs font-bold uppercase text-gray-400 mb-2">Åtgärder</p>
+              <div class="flex gap-2 flex-wrap">
+                <span class="border text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <i class="fa-solid fa-door-open"></i> Utsläpp
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Mobil häst-lista -->
+        <div class="flex flex-col gap-3 md:hidden">
+          <div class="bg-white rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <img src="/images/bella.jpg" class="size-10 rounded-full object-cover" />
+                <div>
+                  <p class="font-semibold">Bella</p>
+                  <p class="text-xs text-gray-400">Hage 3</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
+            </div>
+            <p class="text-sm text-gray-500"><i class="fa-solid fa-shirt mr-2 text-gray-400"></i>Ta på täcke (Regn)</p>
+          </div>
+          <div class="bg-white rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <img src="/images/luna.jpg" class="size-10 rounded-full object-cover" />
+                <div>
+                  <p class="font-semibold">Luna</p>
+                  <p class="text-xs text-gray-400">Hage 4</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
+            </div>
+            <p class="text-sm text-gray-500"><i class="fa-solid fa-shield mr-2 text-gray-400"></i>Borsta hovar</p>
+          </div>
+          <div class="bg-white rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <img src="/images/max.jpg" class="size-10 rounded-full object-cover" />
+                <div>
+                  <p class="font-semibold">Max</p>
+                  <p class="text-xs text-gray-400">Hage 1</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
+            </div>
+            <p class="text-sm text-gray-500"><i class="fa-regular fa-circle mr-2 text-gray-400"></i>Inga extra uppgifter</p>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <%- include("../Partials/bottomnav-staff.ejs") %>
+</body>
+</html>
