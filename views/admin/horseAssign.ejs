@@ -1,0 +1,268 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+  <!-- Top Navigation & Title Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/overview" class="hover:text-stone-700">Equira</a>
+        <span>&bull;</span>
+        <span>Hästtilldelning</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight mt-1">
+        Tilldela häst: <%= data.lesson.title %>
+      </h2>
+      <p class="text-xs text-stone-500 mt-0.5">
+        <i class="fa-regular fa-clock mr-1"></i> <%= data.lesson.date %> <%= data.lesson.time %> &bull; <%= data.lesson.level %> &bull; <%= data.lesson.arenaName %>
+      </p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/lessons" class="px-3.5 sm:px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <a href="/admin/lessons" class="px-4 sm:px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition inline-flex items-center gap-1.5">
+        <i class="fa-solid fa-check text-xs"></i>
+        <span>Klar &amp; Lektioner</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Mobile Quick Jump Bar (Visible on mobile/tablet) -->
+  <div class="flex lg:hidden items-center gap-2 p-1.5 bg-stone-200/60 rounded-xl text-xs font-semibold">
+    <a href="#section-elever" class="flex-1 text-center py-2 px-2 bg-white rounded-lg shadow-xs text-stone-900">1. Elever</a>
+    <a href="#section-tilldelning" class="flex-1 text-center py-2 px-2 text-stone-600 hover:text-stone-900">2. Tilldelning</a>
+    <a href="#section-hastar" class="flex-1 text-center py-2 px-2 text-stone-600 hover:text-stone-900">3. Hästar</a>
+  </div>
+
+  <!-- Prominent Error Banner if assignment failed -->
+  <% if (locals.error) { %>
+    <div class="p-4 bg-rose-50 border-2 border-rose-300 rounded-2xl flex items-start gap-3 shadow-sm">
+      <div class="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-circle-exclamation text-lg"></i>
+      </div>
+      <div class="flex-1">
+        <h4 class="text-xs font-bold text-rose-900 uppercase tracking-wide">Tilldelningen nekades</h4>
+        <p class="text-xs text-rose-800 mt-0.5 font-semibold"><%= locals.error %></p>
+        <p class="text-[11px] text-rose-600 mt-1">
+          Regelverk: En häst kan inte tilldelas två elever samtidigt eller till en lektion vid överlappande tid. Hästen måste även ha status Aktiv & Tjänstbar.
+        </p>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Success Banner -->
+  <% if (locals.success) { %>
+    <div class="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl flex items-start gap-3 shadow-sm">
+      <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-circle-check text-lg"></i>
+      </div>
+      <div class="flex-1">
+        <h4 class="text-xs font-bold text-emerald-900 uppercase tracking-wide">Genomfört</h4>
+        <p class="text-xs text-emerald-800 mt-0.5 font-medium"><%= locals.success %></p>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- 3 Column Matrix / Drag-and-Drop Area (Matching PDF 3 page 3) -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- Column 1: Elever List (3 cols) -->
+    <div id="section-elever" class="lg:col-span-3 bg-white rounded-2xl border border-stone-200 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-stone-100">
+        <h3 class="text-xs font-bold text-stone-900 uppercase tracking-wider">
+          <i class="fa-solid fa-user-group text-stone-400 mr-1.5"></i> Elever (<%= data.bookings.length %>)
+        </h3>
+        <span class="text-[11px] text-stone-400 font-medium">Klicka för att välja</span>
+      </div>
+
+      <div class="space-y-1.5">
+        <% data.bookings.forEach(b => { %>
+          <a href="/admin/assign/<%= data.lesson.id %>?studentId=<%= b.studentId %>"
+            class="block p-3 rounded-xl border transition <%= b.isSelected ? 'border-emerald-600 bg-emerald-50/60 shadow-sm ring-1 ring-emerald-500' : 'border-stone-200 hover:bg-stone-50' %>">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full <%= b.isSelected ? 'bg-emerald-600 text-white shadow-xs' : 'bg-stone-100 text-stone-700' %> flex items-center justify-center font-bold text-xs">
+                  <%= b.initial %>
+                </div>
+                <div>
+                  <h4 class="text-xs font-bold text-stone-900 leading-tight"><%= b.name %></h4>
+                  <div class="text-[11px] mt-0.5">
+                    <% if (b.assignedHorse) { %>
+                      <span class="text-emerald-700 font-medium flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Tilldelad: <%= b.assignedHorse.name %>
+                      </span>
+                    <% } else { %>
+                      <span class="text-rose-600 font-medium flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        Saknar häst
+                      </span>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-xs <%= b.isSelected ? 'text-emerald-600 font-bold' : 'text-stone-300' %>"></i>
+            </div>
+          </a>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Column 2: Active Student & Interactive Dropzone (5 cols) -->
+    <div id="section-tilldelning" class="lg:col-span-5 space-y-4">
+      <% if (data.activeStudent) { %>
+        <!-- Student Info Header -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-4 shadow-sm flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg border border-emerald-200">
+              <%= data.activeStudent.initial %>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-stone-900"><%= data.activeStudent.name %></h3>
+              <p class="text-xs text-stone-500">
+                Nivå: <strong class="text-stone-700"><%= data.activeStudent.level %></strong> |
+                Längd: <strong class="text-stone-700"><%= data.activeStudent.heightCm %> cm</strong> |
+                Vikt: <strong class="text-stone-700"><%= data.activeStudent.weightKg %> kg</strong>
+              </p>
+            </div>
+          </div>
+          <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg font-bold">Vald ryttare</span>
+        </div>
+
+        <!-- SvRF Warning Alert if present on this student's booking -->
+        <% if (data.activeStudent.warning) { %>
+          <div class="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl flex items-start gap-3 shadow-sm">
+            <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg mt-0.5"></i>
+            <div>
+              <h4 class="text-xs font-bold text-amber-900 uppercase tracking-wide">Hästvälfärdsvarning (SvRF)</h4>
+              <p class="text-xs text-amber-800 mt-0.5 font-medium"><%= data.activeStudent.warning %></p>
+              <p class="text-[11px] text-amber-700 mt-1">
+                Tilldelningen är godkänd av instruktör men registrerad med notering enligt Svenska Ridsportförbundets rekommendationer.
+              </p>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Big Drag-and-Drop Zone (Matching PDF 3 page 3) -->
+        <div data-dropzone-allocation
+          class="border-2 border-dashed border-stone-300 rounded-3xl p-8 text-center bg-stone-50/70 hover:bg-stone-50 transition flex flex-col items-center justify-center min-h-[340px]">
+
+          <% if (data.activeStudent.assignedHorse) { %>
+            <div class="space-y-4">
+              <div class="w-24 h-24 rounded-full overflow-hidden mx-auto shadow-md border-2 border-emerald-600">
+                <img src="<%= data.activeStudent.assignedHorse.photoUrl %>" alt="<%= data.activeStudent.assignedHorse.name %>" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <span class="text-xs uppercase tracking-wider font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+                  Tilldelad häst
+                </span>
+                <h3 class="text-2xl font-black text-stone-900 mt-2"><%= data.activeStudent.assignedHorse.name %></h3>
+                <p class="text-xs text-stone-500 mt-1">Hästen är tilldelad till <%= data.activeStudent.name %> för denna lektion.</p>
+              </div>
+
+              <!-- Clear Assignment Form -->
+              <form action="/admin/assign" method="POST" class="pt-2">
+                <input type="hidden" name="bookingId" value="<%= data.activeStudent.bookingId %>">
+                <input type="hidden" name="studentId" value="<%= data.activeStudent.studentId %>">
+                <input type="hidden" name="action" value="unassign">
+                <input type="hidden" name="horseId" value="">
+                <input type="hidden" name="lessonId" value="<%= data.lesson.id %>">
+                <button type="submit" class="px-4 py-2 border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-semibold rounded-xl transition">
+                  <i class="fa-solid fa-xmark mr-1"></i> Ta bort tilldelning
+                </button>
+              </form>
+            </div>
+          <% } else { %>
+            <div class="space-y-3">
+              <div class="w-16 h-16 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-400 text-2xl mx-auto shadow-sm">
+                <i class="fa-solid fa-horseshoe"></i>
+              </div>
+              <h4 class="text-base font-bold text-stone-800">Dra och släpp en häst hit</h4>
+              <p class="text-xs text-stone-500 max-w-xs mx-auto">
+                eller klicka på en tillgänglig häst i listan till höger för att tilldela till <%= data.activeStudent.name %>.
+              </p>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Dedicated Form for Allocation Submissions with explicit input IDs -->
+        <form id="assignmentForm" action="/admin/assign" method="POST" class="hidden">
+          <input type="hidden" id="assignFormBookingId" name="bookingId" value="<%= data.activeStudent.bookingId %>">
+          <input type="hidden" id="assignFormStudentId" name="studentId" value="<%= data.activeStudent.studentId %>">
+          <input type="hidden" id="assignFormHorseId" name="horseId" value="<%= (data.activeStudent && data.activeStudent.assignedHorse) ? data.activeStudent.assignedHorse.id : '' %>">
+          <input type="hidden" id="assignFormLessonId" name="lessonId" value="<%= data.lesson.id %>">
+        </form>
+
+      <% } else { %>
+        <div class="p-12 text-center bg-white rounded-2xl border border-stone-200 text-stone-400">
+          Ingen elev vald.
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Column 3: Tillgängliga Hästar (4 cols) -->
+    <div id="section-hastar" class="lg:col-span-4 bg-white rounded-2xl border border-stone-200 p-4 shadow-sm space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-stone-100">
+        <h3 class="text-xs font-bold text-stone-900 uppercase tracking-wider">
+          <i class="fa-solid fa-horseshoe text-stone-400 mr-1"></i> Hästar (<%= data.availableHorses.length %>)
+        </h3>
+        <span class="text-[11px] text-stone-400">Dra eller klicka</span>
+      </div>
+
+      <div class="space-y-2.5 max-h-[560px] overflow-y-auto pr-1">
+        <% data.availableHorses.forEach(h => { %>
+          <% const hasErrors = h.errors && h.errors.length > 0; %>
+          <% const hasWarnings = h.warnings && h.warnings.length > 0; %>
+
+          <div data-draggable-horse
+            data-horse-id="<%= h.id %>"
+            data-has-error="<%= hasErrors %>"
+            data-error-message="<%= hasErrors ? h.primaryMessage : '' %>"
+            draggable="<%= !hasErrors %>"
+            class="p-3 rounded-xl border transition flex items-center justify-between shadow-xs <%= hasErrors ? 'border-rose-200 bg-rose-50/25 opacity-70 cursor-not-allowed' : (hasWarnings ? 'border-amber-200 hover:border-amber-400 bg-amber-50/20 hover:bg-amber-50/40 cursor-grab active:cursor-grabbing' : 'border-stone-200 hover:border-emerald-500 bg-white hover:bg-emerald-50/30 cursor-grab active:cursor-grabbing') %>">
+
+            <div class="flex items-center gap-3 min-w-0">
+              <img src="<%= h.photoUrl %>" alt="<%= h.name %>" class="w-11 h-11 rounded-xl object-cover border border-stone-200 shrink-0">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <h4 class="text-xs font-bold text-stone-900 leading-tight"><%= h.name %></h4>
+                  <span class="text-[10px] text-stone-400">&bull; <%= h.breed %></span>
+                </div>
+                <p class="text-[10px] text-stone-500 mt-0.5">
+                  Maxvikt: <strong class="text-stone-700"><%= h.maxRiderWeightKg %> kg</strong>
+                </p>
+
+                <!-- Specific Status Note -->
+                <% if (hasErrors) { %>
+                  <p class="text-[11px] text-rose-700 font-semibold mt-0.5 truncate max-w-[190px]" title="<%= h.primaryMessage %>">
+                    <i class="fa-solid fa-ban mr-1 text-[10px]"></i><%= h.primaryMessage %>
+                  </p>
+                <% } else if (hasWarnings) { %>
+                  <p class="text-[11px] text-amber-800 font-medium mt-0.5 truncate max-w-[190px]" title="<%= h.primaryMessage %>">
+                    <i class="fa-solid fa-triangle-exclamation mr-1 text-[10px]"></i><%= h.primaryMessage %>
+                  </p>
+                <% } else { %>
+                  <p class="text-[11px] text-emerald-700 font-medium mt-0.5">
+                    <i class="fa-solid fa-check mr-1 text-[10px]"></i>Lämplig för ryttaren
+                  </p>
+                <% } %>
+              </div>
+            </div>
+
+            <div class="text-right shrink-0 ml-2">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border <%= h.badgeClass %>">
+                <% if (h.statusCategory === 'error') { %>
+                  <i class="fa-solid fa-lock mr-1 text-[9px]"></i>
+                <% } else if (h.statusCategory === 'warning') { %>
+                  <i class="fa-solid fa-triangle-exclamation mr-1 text-[9px]"></i>
+                <% } else { %>
+                  <i class="fa-solid fa-check mr-1 text-[9px]"></i>
+                <% } %>
+                <%= h.badgeText %>
+              </span>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+  </div>
+</div>

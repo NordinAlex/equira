@@ -1,0 +1,326 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
+
+  <!-- Top Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-stone-200/70">
+    <div>
+      <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-1.5 border border-emerald-200">
+        <i class="fa-solid fa-crown text-emerald-600"></i>
+        <span><%= data.roleBadge %></span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">Min Profil &amp; Inställningar</h1>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1">Hantera dina personliga kontaktuppgifter, din roll i stallet och säkerhet.</p>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <a href="/admin/overview" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-stone-50 text-stone-700 text-xs sm:text-sm font-semibold rounded-xl border border-stone-200 shadow-xs transition hover-lift">
+        <i class="fa-solid fa-arrow-left text-xs"></i>
+        <span>Tillbaka till översikt</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 2-Column Responsive Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+
+    <!-- LEFT COLUMN: Identity Card & Stable System Summary (5 cols) -->
+    <div class="lg:col-span-5 space-y-6">
+
+      <!-- Identity Card with Multer Avatar Upload -->
+      <div class="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-xs text-center space-y-5 relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-[#1B3B2B] to-[#25523d] opacity-90"></div>
+
+        <div class="relative pt-6">
+          <div class="relative group w-28 h-28 rounded-full overflow-hidden mx-auto border-4 border-white shadow-md bg-stone-100">
+            <img id="adminAvatarPreview" src="<%= data.avatarUrl %>" alt="<%= data.fullName %>" class="w-full h-full object-cover">
+            
+            <button type="button" 
+                    onclick="document.getElementById('adminAvatarFileInput').click()"
+                    class="absolute inset-0 bg-black/50 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                    title="Klicka för att välja ny profilbild">
+              <i class="fa-solid fa-camera text-xl mb-1"></i>
+              <span class="text-[10px] font-bold">Byt bild</span>
+            </button>
+          </div>
+
+          <!-- Hidden Upload Form -->
+          <form id="adminAvatarUploadForm" action="/admin/profile/avatar" method="POST" enctype="multipart/form-data" class="hidden">
+            <input type="file" 
+                   id="adminAvatarFileInput" 
+                   name="avatar" 
+                   accept="image/jpeg,image/png,image/webp,image/gif" 
+                   onchange="document.getElementById('adminAvatarUploadForm').submit()">
+          </form>
+
+          <div class="mt-4">
+            <h2 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
+              <%= data.fullName %>
+            </h2>
+            <div class="flex items-center justify-center gap-2 mt-1.5 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-md bg-stone-100 text-stone-600 text-xs font-mono font-medium">
+                @<%= data.username %>
+              </span>
+              <span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
+                <%= data.role %>
+              </span>
+            </div>
+            
+            <p class="text-sm font-semibold text-[#1B3B2B] mt-2">
+              <%= data.title %>
+            </p>
+            <p class="text-xs text-stone-400 mt-1 flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-location-dot text-emerald-600"></i>
+              <span>Mälardalen Ridcenter</span>
+              <span>&bull;</span>
+              <span><%= data.createdAtFormatted %></span>
+            </p>
+          </div>
+
+          <div class="pt-4 border-t border-stone-100 mt-5 flex justify-center">
+            <button type="button" 
+                    onclick="document.getElementById('adminAvatarFileInput').click()"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-[#1B3B2B] hover:bg-[#142e21] text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift">
+              <i class="fa-solid fa-camera text-xs"></i>
+              <span>Ladda upp ny profilbild</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stable System Statistics & Permissions -->
+      <div class="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-sm border border-emerald-200">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="text-sm font-bold text-stone-900">Systemöversikt &amp; Stallkapacitet</h3>
+          </div>
+          <span class="text-[10px] uppercase tracking-wider font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            Aktiv
+          </span>
+        </div>
+
+        <!-- 4-Stat Grid -->
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div class="p-3.5 bg-stone-50 rounded-2xl border border-stone-100">
+            <span class="text-xs text-stone-500 font-medium block">Hästar</span>
+            <span class="text-2xl font-black text-stone-900 mt-1 block"><%= data.stats.totalHorses %></span>
+            <span class="text-[10px] text-stone-400">I anläggningen</span>
+          </div>
+
+          <div class="p-3.5 bg-stone-50 rounded-2xl border border-stone-100">
+            <span class="text-xs text-stone-500 font-medium block">Elever</span>
+            <span class="text-2xl font-black text-stone-900 mt-1 block"><%= data.stats.totalStudents %></span>
+            <span class="text-[10px] text-stone-400">Inskrivna ryttare</span>
+          </div>
+
+          <div class="p-3.5 bg-stone-50 rounded-2xl border border-stone-100">
+            <span class="text-xs text-stone-500 font-medium block">Personal</span>
+            <span class="text-2xl font-black text-stone-900 mt-1 block"><%= data.stats.totalStaff %></span>
+            <span class="text-[10px] text-stone-400">Instruktörer &amp; stall</span>
+          </div>
+
+          <div class="p-3.5 bg-stone-50 rounded-2xl border border-stone-100">
+            <span class="text-xs text-stone-500 font-medium block">Lektioner</span>
+            <span class="text-2xl font-black text-stone-900 mt-1 block"><%= data.stats.totalLessons %></span>
+            <span class="text-[10px] text-stone-400">Schemalagda pass</span>
+          </div>
+        </div>
+
+        <div class="p-3 bg-stone-50 rounded-xl text-[11px] text-stone-500 leading-relaxed">
+          <i class="fa-solid fa-lock text-stone-400 mr-1"></i>
+          Som administratör har du behörighet att redigera alla stallmoduler, hästar, lektionstilldelningar och användarkonton.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Profile Edit & Security Forms (7 cols) -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- Card 1: Kontaktuppgifter & Stallprofil -->
+      <div class="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-xs space-y-6">
+        <div class="pb-4 border-b border-stone-100">
+          <h2 class="text-lg font-bold text-stone-900">Person- och kontaktuppgifter</h2>
+          <p class="text-xs text-stone-500 mt-0.5">Uppdatera ditt namn, kontaktuppgifter och din instruktörstitel.</p>
+        </div>
+
+        <form action="/admin/profile" method="POST" class="space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Full Name -->
+            <div>
+              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                Fullständigt namn <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <i class="fa-regular fa-user text-sm"></i>
+                </span>
+                <input type="text" name="fullName" required value="<%= data.fullName %>"
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+              </div>
+            </div>
+
+            <!-- Username (Read-only) -->
+            <div>
+              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                Användarnamn
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <i class="fa-solid fa-at text-sm"></i>
+                </span>
+                <input type="text" value="<%= data.username %>" readonly disabled
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-sm text-stone-500 cursor-not-allowed">
+              </div>
+              <span class="text-[10px] text-stone-400 mt-1 block">Användarnamnet är permanent kopplat till kontot.</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Email -->
+            <div>
+              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                E-postadress <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <i class="fa-regular fa-envelope text-sm"></i>
+                </span>
+                <input type="email" name="email" required value="<%= data.email %>"
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                Telefonnummer
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <i class="fa-solid fa-phone text-sm"></i>
+                </span>
+                <input type="tel" name="phone" value="<%= data.phone %>" placeholder="070-123 45 67"
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+              </div>
+            </div>
+          </div>
+
+          <!-- Title / Position -->
+          <div>
+            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              Befattning / Titel i stallet
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <i class="fa-solid fa-id-badge text-sm"></i>
+              </span>
+              <input type="text" name="title" value="<%= data.title %>" placeholder="t.ex. Ridskolechef & Huvudinstruktör"
+                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+            </div>
+          </div>
+
+          <!-- Specializations -->
+          <div>
+            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              Specialiseringar &amp; Ansvarsområden
+            </label>
+            <textarea name="specializations" rows="2" placeholder="t.ex. Dressyrdomare, Pedagogik, Hopptränare"
+              class="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900"><%= data.specializations %></textarea>
+            <span class="text-[10px] text-stone-400 mt-1 block">Visas i personallistan och instruktörsöversikten.</span>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button type="submit"
+              class="w-full sm:w-auto px-6 py-2.5 bg-[#1B3B2B] hover:bg-[#142e21] text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check text-xs"></i>
+              <span>Spara ändringar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Card 2: Säkerhet & Byt lösenord -->
+      <div class="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-xs space-y-6">
+        <div class="pb-4 border-b border-stone-100 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-stone-900">Säkerhet &amp; Lösenord</h2>
+            <p class="text-xs text-stone-500 mt-0.5">Byt ut ditt lösenord regelbundet för att skydda anläggningsdatan.</p>
+          </div>
+          <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-sm border border-amber-200">
+            <i class="fa-solid fa-key"></i>
+          </div>
+        </div>
+
+        <form action="/admin/profile/password" method="POST" class="space-y-4" id="adminPasswordForm">
+          <!-- Current Password -->
+          <div>
+            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              Nuvarande lösenord <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <i class="fa-solid fa-lock text-sm"></i>
+              </span>
+              <input type="password" name="currentPassword" required placeholder="Ditt nuvarande lösenord"
+                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- New Password -->
+            <div>
+              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                Nytt lösenord <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <i class="fa-solid fa-shield-halved text-sm"></i>
+                </span>
+                <input type="password" id="newPassword" name="newPassword" required minlength="6" placeholder="Minst 6 tecken"
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+              </div>
+            </div>
+
+            <!-- Confirm New Password -->
+            <div>
+              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+                Bekräfta nytt lösenord <span class="text-rose-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <i class="fa-solid fa-shield-halved text-sm"></i>
+                </span>
+                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Upprepa nytt lösenord"
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button type="submit"
+              class="w-full sm:w-auto px-6 py-2.5 bg-[#3d2314] hover:bg-[#2c190e] text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
+              <i class="fa-solid fa-lock text-xs"></i>
+              <span>Uppdatera lösenord</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  document.getElementById('adminPasswordForm').addEventListener('submit', function(e) {
+    const np = document.getElementById('newPassword').value;
+    const cp = document.getElementById('confirmPassword').value;
+    if (np !== cp) {
+      e.preventDefault();
+      alert('De nya lösenorden matchar inte! Kontrollera båda fälten.');
+    }
+  });
+</script>

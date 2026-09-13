@@ -1,0 +1,265 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+  <!-- Header & Actions -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/staff" class="hover:text-stone-700">Personal</a>
+        <span>&bull;</span>
+        <span>Redigera personal</span>
+      </div>
+      <div class="flex items-center gap-3 mt-1">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight"><%= staff.fullName %></h2>
+        <% if (typeof currentUserId !== 'undefined' && currentUserId === staff.id) { %>
+          <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800">Inloggad som du</span>
+        <% } %>
+      </div>
+      <p class="text-xs text-stone-500 mt-0.5">Uppdatera kontaktuppgifter, befattning, behörigheter och kompetenser.</p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/staff" class="px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <button type="submit" form="staffEditForm" class="px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-xs transition hover-lift">
+        Spara ändringar
+      </button>
+    </div>
+  </div>
+
+  <% if (locals.error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm rounded-xl flex items-center gap-3">
+      <i class="fa-solid fa-triangle-exclamation text-rose-500 text-base"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <% 
+    const profile = staff.staffProfile || {};
+    const specializationsVal = profile.specializationsRaw || (Array.isArray(profile.specializations) ? profile.specializations.join(', ') : profile.specializations || '');
+    const currentTitle = profile.title || 'Stallpersonal';
+  %>
+
+  <form id="staffEditForm" action="/admin/staff/<%= staff.id %>/edit" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- 1. Person- och inloggningsuppgifter -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-regular fa-user text-stone-400"></i> Person- och inloggningsuppgifter
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Fullständigt namn *</label>
+              <input type="text" name="fullName" value="<%= staff.fullName || '' %>" required
+                class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white transition">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Användarnamn</label>
+              <input type="text" value="<%= staff.username || '' %>" disabled
+                class="w-full px-3.5 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-xs sm:text-sm text-stone-500 cursor-not-allowed">
+              <p class="text-[10px] text-stone-400 mt-1">Användarnamnet kan inte ändras för befintliga konton.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">E-postadress *</label>
+              <input type="email" name="email" value="<%= staff.email || '' %>" required
+                class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white transition">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Telefonnummer</label>
+              <input type="tel" name="phone" value="<%= staff.phone || profile.phone || '' %>" placeholder="070-123 45 67"
+                class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white transition">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Ändra lösenord</label>
+              <input type="password" name="password" placeholder="Lämna tomt för oförändrat"
+                class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white transition">
+              <p class="text-[10px] text-stone-400 mt-1">Fyll i endast om du vill sätta ett nytt lösenord.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Befattning & Specialistområden -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-solid fa-id-badge text-stone-400"></i> Befattning & Kompetenser
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Titel / Befattning *</label>
+              <select name="title" class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white transition">
+                <option value="Huvudinstruktör" <%= currentTitle === 'Huvudinstruktör' ? 'selected' : '' %>>Huvudinstruktör</option>
+                <option value="Ridlärare / Instruktör" <%= currentTitle === 'Ridlärare / Instruktör' || currentTitle === 'Ridlärare' || currentTitle === 'Instruktör' ? 'selected' : '' %>>Ridlärare / Instruktör</option>
+                <option value="Stallansvarig" <%= currentTitle === 'Stallansvarig' ? 'selected' : '' %>>Stallansvarig</option>
+                <option value="Stallpersonal" <%= currentTitle === 'Stallpersonal' ? 'selected' : '' %>>Stallpersonal</option>
+                <option value="Hästskötare" <%= currentTitle === 'Hästskötare' ? 'selected' : '' %>>Hästskötare</option>
+                <option value="Unghästutbildare" <%= currentTitle === 'Unghästutbildare' ? 'selected' : '' %>>Unghästutbildare</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Systembehörighet *</label>
+              <select name="role" class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white transition">
+                <option value="STAFF" <%= staff.role === 'STAFF' ? 'selected' : '' %>>Personal / Instruktör (Staff-vy & Schema)</option>
+                <option value="ADMIN" <%= staff.role === 'ADMIN' ? 'selected' : '' %>>Administratör (Full åtkomst till Adminpanelen)</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Specialistområden & Kompetenser</label>
+              <input type="text" name="specializations" value="<%= specializationsVal %>" placeholder="t.ex. Hoppning & Markarbete, Hovvård, Unghästar, Foderstater"
+                class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white transition">
+              <p class="text-[10px] text-stone-400 mt-1">Kommaseparerad lista över kompetenser och grenar.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Raderingszon -->
+        <div class="bg-rose-50/50 rounded-2xl border border-rose-200 p-6 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="text-xs font-bold text-rose-900 uppercase tracking-wider">Ta bort personalmedlem</h4>
+              <p class="text-xs text-rose-700/80 mt-0.5">Raderar personalen och profilen. Eventuella lektioner och stalluppgifter avlänkas säkert.</p>
+            </div>
+            <% if (typeof currentUserId !== 'undefined' && currentUserId === staff.id) { %>
+              <button type="button" disabled class="px-4 py-2 bg-stone-200 text-stone-400 text-xs font-semibold rounded-xl cursor-not-allowed" title="Du kan inte ta bort ditt eget konto">
+                Kan inte ta bort dig själv
+              </button>
+            <% } else { %>
+              <button type="button" onclick="confirmDelete()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-xs transition hover-lift">
+                <i class="fa-regular fa-trash-can mr-1.5"></i>
+                Ta bort personal
+              </button>
+            <% } %>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column (4 cols) -->
+      <div class="lg:col-span-4 space-y-6">
+        <!-- Profilbild (Multer Upload & Live Preview) -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-regular fa-image text-stone-400"></i> Profilbild
+          </h3>
+
+          <div class="flex flex-col items-center gap-4">
+            <div class="relative group">
+              <div class="w-28 h-28 rounded-full bg-[#1B3B2B] text-emerald-100 flex items-center justify-center font-bold text-2xl shadow-sm border-2 border-stone-200 overflow-hidden">
+                <img id="avatarPreviewImg" 
+                     src="<%= staff.avatarUrl || '/images/default-staff.jpg' %>" 
+                     alt="<%= staff.fullName %>" 
+                     class="w-full h-full object-cover">
+              </div>
+              <button type="button" 
+                      onclick="document.getElementById('avatarFileInput').click()"
+                      class="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer">
+                <i class="fa-solid fa-camera text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">Byt bild</span>
+              </button>
+            </div>
+
+            <div class="w-full text-center space-y-3">
+              <input type="file" 
+                     id="avatarFileInput" 
+                     name="avatar" 
+                     accept="image/jpeg,image/png,image/webp,image/gif" 
+                     class="hidden">
+
+              <button type="button" 
+                      onclick="document.getElementById('avatarFileInput').click()"
+                      class="w-full py-2.5 px-4 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-xl border border-stone-200 flex items-center justify-center gap-2 transition hover-lift">
+                <i class="fa-solid fa-arrow-up-from-bracket text-xs text-stone-500"></i>
+                <span id="uploadButtonText">Ladda upp ny bildfil</span>
+              </button>
+
+              <div class="relative flex items-center justify-center my-2">
+                <div class="border-t border-stone-200 w-full"></div>
+                <span class="bg-white px-2 text-[10px] text-stone-400 uppercase font-semibold">eller URL</span>
+              </div>
+
+              <div>
+                <input type="text" 
+                       id="avatarUrlInput"
+                       name="avatarUrl" 
+                       value="<%= staff.avatarUrl || '' %>" 
+                       placeholder="/images/default-staff.jpg"
+                       class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white">
+                <p class="text-[10px] text-stone-400 mt-1">Stöd för JPG, PNG, WebP och GIF (max 5 MB).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Snabböversikt -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs space-y-3">
+          <h4 class="text-xs font-bold text-stone-800 uppercase tracking-wider">Kontoinformation</h4>
+          <div class="space-y-2 text-xs text-stone-600">
+            <div class="flex items-center justify-between py-1 border-b border-stone-100">
+              <span class="text-stone-400">Medarbetar-ID</span>
+              <span class="font-mono font-bold text-stone-800">#<%= staff.id %></span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-stone-100">
+              <span class="text-stone-400">Systemroll</span>
+              <span class="font-semibold text-stone-800"><%= staff.role %></span>
+            </div>
+            <div class="flex items-center justify-between py-1">
+              <span class="text-stone-400">Befattning</span>
+              <span class="font-semibold text-stone-800"><%= currentTitle %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Hidden Delete Form -->
+  <form id="deleteStaffForm" action="/admin/staff/<%= staff.id %>/delete" method="POST" class="hidden"></form>
+</div>
+
+<script>
+  function confirmDelete() {
+    if (confirm('Är du säker på att du vill ta bort personalen "<%= staff.fullName %>"?\n\nHänvisningar i schemalagda lektioner och stalluppgifter avlänkas säkert.')) {
+      document.getElementById('deleteStaffForm').submit();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('avatarFileInput');
+    const previewImg = document.getElementById('avatarPreviewImg');
+    const buttonText = document.getElementById('uploadButtonText');
+    const urlInput = document.getElementById('avatarUrlInput');
+
+    if (fileInput && previewImg) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            previewImg.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+
+          if (buttonText) {
+            buttonText.textContent = file.name.length > 20 ? file.name.slice(0, 18) + '...' : file.name;
+          }
+        }
+      });
+    }
+
+    if (urlInput && previewImg) {
+      urlInput.addEventListener('input', (e) => {
+        const url = e.target.value.trim();
+        if (url && (!fileInput || !fileInput.files.length)) {
+          previewImg.src = url;
+        }
+      });
+    }
+  });
+</script>

@@ -2,12 +2,12 @@
   "name": "Equira",
   "version": "0.0.0",
   "private": true,
- "scripts": {
-  "start": "node ./bin/www",
-  "server": "liverun ./bin/www",
-  "tailwind": "npx @tailwindcss/cli -i ./src/input.css -o ./public/stylesheets/styles.css --watch",
-  "dev": "concurrently \"npm run server\" \"npm run tailwind\""
-},
+  "scripts": {
+    "start": "node ./bin/www",
+    "server": "liverun ./bin/www",
+    "tailwind": "npx @tailwindcss/cli -i ./input.css -o ./public/stylesheets/styles.css --watch",
+    "dev": "concurrently \"npm run server\" \"npm run tailwind\""
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.11.1",
@@ -21,6 +21,7 @@
     "http-errors": "^2.0.1",
     "mime-types": "^3.0.2",
     "morgan": "^1.12.0",
+    "multer": "^2.3.0",
     "tailwindcss": "^4.3.3",
     "typeorm": "^1.1.1"
   },

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="sv" class="h-full bg-[#faf9f6]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Equira - Ridskolehantering' %></title>
+  <!-- Tailwind CSS -->
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+  <!-- Font Awesome / Heroicons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Custom Equira styling -->
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            equira: {
+              green: {
+                950: '#0f241a',
+                900: '#142e21',
+                800: '#1B3B2B',
+                700: '#25523d',
+                600: '#326a4f',
+                100: '#e3efe7',
+                50: '#f0f7f3',
+              },
+              cognac: {
+                900: '#2a160d',
+                800: '#3d2314',
+                700: '#4a2828',
+                600: '#5c3528',
+              },
+              sand: {
+                50: '#fdfbf7',
+                100: '#f7f4ed',
+                200: '#ede8dd',
+              }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full flex flex-col lg:flex-row overflow-hidden text-slate-800 bg-[#faf9f6]">
+
+  <!-- Mobile Top Header (Visible on < lg, hidden on desktop) -->
+  <header class="lg:hidden bg-[#1B3B2B] text-white px-4 py-3 flex items-center justify-between border-b border-emerald-900/50 z-30 shadow-sm shrink-0">
+    <div class="flex items-center gap-3">
+      <button type="button" id="admin-mobile-menu-btn" aria-label="Öppna navigationsmeny" class="p-2 -ml-1.5 text-emerald-200 hover:text-white hover:bg-white/10 rounded-xl transition">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+      <a href="/admin/overview" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
+          <i class="fa-solid fa-horse-head text-emerald-300 text-sm"></i>
+        </div>
+        <div>
+          <span class="font-bold text-base tracking-tight text-white block leading-tight">Equira</span>
+          <span class="text-[9px] tracking-widest text-emerald-300 uppercase font-semibold block leading-none">Admin</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Quick Switch & Avatar -->
+    <div class="flex items-center gap-2">
+      <div class="hidden sm:flex items-center gap-1 bg-black/20 px-2 py-1 rounded-lg text-xs">
+        <a href="/login/quick/staff" class="px-1.5 py-0.5 rounded hover:bg-white/15 text-[10px] text-emerald-100">Personal</a>
+        <a href="/login/quick/student" class="px-1.5 py-0.5 rounded hover:bg-white/15 text-[10px] text-emerald-100">Elev</a>
+      </div>
+      <a href="/admin/profile" title="Min profil" class="block shrink-0">
+        <img src="<%= (currentUser && currentUser.avatarUrl) ? currentUser.avatarUrl : '/images/default-staff.jpg' %>" alt="Admin" class="w-8 h-8 rounded-full object-cover border border-white/25 hover:border-emerald-300 transition">
+      </a>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Backdrop Overlay -->
+  <div id="admin-mobile-drawer-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden transition-opacity duration-300 opacity-0 lg:hidden"></div>
+
+  <!-- Mobile Off-Canvas Drawer Navigation -->
+  <aside id="admin-mobile-drawer" class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-[#1B3B2B] text-white z-50 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden">
+    <div class="flex-1 flex flex-col min-h-0">
+      <!-- Drawer Header with Close Button -->
+      <div class="h-16 flex items-center justify-between px-5 border-b border-emerald-900/50">
+        <a href="/admin/overview" class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
+            <i class="fa-solid fa-horse-head text-emerald-300 text-base"></i>
+          </div>
+          <div>
+            <span class="font-bold text-xl tracking-tight text-white block leading-tight">Equira</span>
+            <span class="text-[9px] tracking-widest text-emerald-300 uppercase font-medium">Ridskolesystem</span>
+          </div>
+        </a>
+        <button type="button" id="admin-mobile-menu-close" aria-label="Stäng meny" class="p-2 text-emerald-300 hover:text-white hover:bg-white/10 rounded-xl transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Quick Switch Banner in Drawer -->
+      <div class="px-4 py-2.5 bg-black/20 text-xs border-b border-white/5 flex items-center justify-between text-emerald-200">
+        <span class="text-[11px] font-medium"><i class="fa-solid fa-shield-halved mr-1"></i> Adminläge</span>
+        <div class="flex gap-1">
+          <a href="/login/quick/staff" class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-white">Personal</a>
+          <a href="/login/quick/student" class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-white">Elev</a>
+        </div>
+      </div>
+
+      <!-- Navigation Links (Scrollable if needed) -->
+      <nav class="p-4 space-y-1 text-sm font-medium overflow-y-auto flex-1">
+        <a href="/admin/overview" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath === '/admin/overview' ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-table-cells-large w-5 text-center text-base"></i>
+          <span>Översikt</span>
+        </a>
+
+        <a href="/admin/schedule" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/schedule') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-regular fa-calendar w-5 text-center text-base"></i>
+          <span>Schema</span>
+        </a>
+
+        <a href="/admin/lessons" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/lessons') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-book-open w-5 text-center text-base"></i>
+          <span>Lektioner</span>
+        </a>
+
+        <a href="/admin/students" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/students') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-user-group w-5 text-center text-base"></i>
+          <span>Elever</span>
+        </a>
+
+        <a href="/admin/staff" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/staff') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-id-badge w-5 text-center text-base"></i>
+          <span>Personal</span>
+        </a>
+
+        <a href="/admin/horses" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/horses') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-horseshoe w-5 text-center text-base"></i>
+          <span>Hästar</span>
+        </a>
+
+        <a href="/admin/assign" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/assign') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-arrows-split-up-and-left w-5 text-center text-base"></i>
+          <span>Hästtilldelning</span>
+        </a>
+
+        <a href="/admin/tasks" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/tasks') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-tractor w-5 text-center text-base"></i>
+          <span>Stalluppgifter</span>
+        </a>
+
+        <a href="/admin/quizzes" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/quizzes') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-clipboard-question w-5 text-center text-base"></i>
+          <span>Quiz & Teori</span>
+        </a>
+
+        <a href="/admin/profile" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/profile') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-user-gear w-5 text-center text-base"></i>
+          <span>Min Profil</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Drawer User Footer -->
+    <div class="p-4 border-t border-emerald-900/50 bg-black/10">
+      <div class="flex items-center justify-between">
+        <a href="/admin/profile" class="flex items-center gap-3 group min-w-0 flex-1 hover:opacity-90 transition">
+          <img src="<%= (currentUser && currentUser.avatarUrl) ? currentUser.avatarUrl : '/images/default-staff.jpg' %>" alt="Admin" class="w-10 h-10 rounded-full object-cover border border-white/20 group-hover:border-emerald-400 transition">
+          <div class="overflow-hidden">
+            <p class="text-sm font-semibold text-white truncate group-hover:text-emerald-200 transition"><%= currentUser ? currentUser.fullName : 'Admin' %></p>
+            <p class="text-xs text-emerald-300 truncate">Riding School Admin</p>
+          </div>
+        </a>
+        <a href="/logout" title="Logga ut" class="p-2 text-emerald-300 hover:text-white hover:bg-white/10 rounded-lg transition shrink-0 ml-2">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Admin Desktop Sidebar (Hidden on < lg, visible on lg and above) -->
+  <aside class="hidden lg:flex lg:w-64 bg-[#1B3B2B] flex-col justify-between flex-shrink-0 text-white z-20 shadow-xl select-none">
+    <div>
+      <!-- Brand Logo Header -->
+      <div class="h-20 flex items-center px-6 border-b border-emerald-900/50">
+        <a href="/admin/overview" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition">
+            <i class="fa-solid fa-horse-head text-emerald-300 text-xl"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-2xl tracking-tight text-white">Equira</h1>
+            <p class="text-[10px] tracking-widest text-emerald-300 uppercase font-medium">Ridskolesystem</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Quick Switch Banner (Dev/Demo convenience) -->
+      <div class="px-4 py-2 bg-black/20 text-xs border-b border-white/5 flex items-center justify-between text-emerald-200">
+        <span class="text-[11px] font-medium"><i class="fa-solid fa-shield-halved mr-1"></i> Adminläge</span>
+        <div class="flex gap-1">
+          <a href="/login/quick/staff" class="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-white">Personal</a>
+          <a href="/login/quick/student" class="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-white">Elev</a>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-4 space-y-1 text-sm font-medium">
+        <a href="/admin/overview" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath === '/admin/overview' ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-table-cells-large w-5 text-center text-base"></i>
+          <span>Översikt</span>
+        </a>
+
+        <a href="/admin/schedule" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/schedule') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-regular fa-calendar w-5 text-center text-base"></i>
+          <span>Schema</span>
+        </a>
+
+        <a href="/admin/lessons" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/lessons') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-book-open w-5 text-center text-base"></i>
+          <span>Lektioner</span>
+        </a>
+
+        <a href="/admin/students" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/students') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-user-group w-5 text-center text-base"></i>
+          <span>Elever</span>
+        </a>
+
+        <a href="/admin/staff" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/staff') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-id-badge w-5 text-center text-base"></i>
+          <span>Personal</span>
+        </a>
+
+        <a href="/admin/horses" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/horses') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-horseshoe w-5 text-center text-base"></i>
+          <span>Hästar</span>
+        </a>
+
+        <a href="/admin/assign" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/assign') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-arrows-split-up-and-left w-5 text-center text-base"></i>
+          <span>Hästtilldelning</span>
+        </a>
+
+        <a href="/admin/tasks" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/tasks') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-tractor w-5 text-center text-base"></i>
+          <span>Stalluppgifter</span>
+        </a>
+
+        <a href="/admin/quizzes" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/quizzes') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-clipboard-question w-5 text-center text-base"></i>
+          <span>Quiz & Teori</span>
+        </a>
+
+        <a href="/admin/profile" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/profile') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+          <i class="fa-solid fa-user-gear w-5 text-center text-base"></i>
+          <span>Min Profil</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Admin User Footer -->
+    <div class="p-4 border-t border-emerald-900/50 bg-black/10">
+      <div class="flex items-center justify-between">
+        <a href="/admin/profile" class="flex items-center gap-3 group min-w-0 flex-1 hover:opacity-90 transition">
+          <img src="<%= (currentUser && currentUser.avatarUrl) ? currentUser.avatarUrl : '/images/default-staff.jpg' %>" alt="Admin" class="w-10 h-10 rounded-full object-cover border border-white/20 group-hover:border-emerald-400 transition">
+          <div class="overflow-hidden">
+            <p class="text-sm font-semibold text-white truncate group-hover:text-emerald-200 transition"><%= currentUser ? currentUser.fullName : 'Admin' %></p>
+            <p class="text-xs text-emerald-300 truncate">Riding School Admin</p>
+          </div>
+        </a>
+        <a href="/logout" title="Logga ut" class="p-2 text-emerald-300 hover:text-white hover:bg-white/10 rounded-lg transition shrink-0 ml-2">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper (scrollable, responsive padding) -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[#faf9f6] pb-20 lg:pb-0">
+    <% if (typeof flash !== 'undefined' && flash) { %>
+      <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4">
+        <div class="p-4 rounded-2xl border flex items-center justify-between shadow-xs transition duration-300
+          <%= flash.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : (flash.type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-blue-50 border-blue-200 text-blue-900') %>">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid <%= flash.type === 'success' ? 'fa-circle-check text-emerald-600' : (flash.type === 'error' ? 'fa-circle-exclamation text-rose-600' : 'fa-circle-info text-blue-600') %> text-lg"></i>
+            <span class="text-sm font-medium"><%= flash.message %></span>
+          </div>
+          <button type="button" onclick="this.parentElement.remove()" class="text-stone-400 hover:text-stone-600 p-1">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+    <% } %>
+    <%- body %>
+  </main>
+
+  <!-- Mobile Bottom Quick Navigation (Visible on < lg screens) -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-stone-200 px-2 py-1.5 flex justify-around items-center z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+    <a href="/admin/overview" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath === '/admin/overview' ? 'text-emerald-800 font-bold' : 'text-stone-400 hover:text-stone-700' %>">
+      <i class="fa-solid fa-table-cells-large text-base"></i>
+      <span class="text-[10px]">Översikt</span>
+    </a>
+
+    <a href="/admin/schedule" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/schedule') ? 'text-emerald-800 font-bold' : 'text-stone-400 hover:text-stone-700' %>">
+      <i class="fa-regular fa-calendar text-base"></i>
+      <span class="text-[10px]">Schema</span>
+    </a>
+
+    <a href="/admin/lessons" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/lessons') ? 'text-emerald-800 font-bold' : 'text-stone-400 hover:text-stone-700' %>">
+      <i class="fa-solid fa-book-open text-base"></i>
+      <span class="text-[10px]">Lektioner</span>
+    </a>
+
+    <a href="/admin/horses" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/horses') ? 'text-emerald-800 font-bold' : 'text-stone-400 hover:text-stone-700' %>">
+      <i class="fa-solid fa-horseshoe text-base"></i>
+      <span class="text-[10px]">Hästar</span>
+    </a>
+
+    <button type="button" id="admin-bottom-menu-btn" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl text-stone-400 hover:text-emerald-800 transition">
+      <i class="fa-solid fa-bars text-base"></i>
+      <span class="text-[10px]">Meny</span>
+    </button>
+  </nav>
+
+  <script src="/javascripts/main.js"></script>
+  <%- script %>
+</body>
+</html>

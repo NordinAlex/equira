@@ -1,0 +1,345 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/horses" class="hover:text-stone-700">Hästar</a>
+        <span>&bull;</span>
+        <span>Redigera <%= horse.name %></span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight mt-1">Redigera häst: <%= horse.name %></h2>
+      <p class="text-xs text-stone-500 mt-0.5">Uppdatera information, härstamning, maxvikt, foto och stallstatus.</p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/horses" class="px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <button type="submit" form="horseEditForm" class="px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5">
+        <i class="fa-solid fa-floppy-disk text-xs"></i>
+        <span>Spara ändringar</span>
+      </button>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <form id="horseEditForm" action="/admin/horses/<%= horse.id %>/edit" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Main Info (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- 1. Grundläggande information -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-regular fa-id-badge text-stone-400"></i> Grundläggande information
+            </h3>
+            <span class="text-[11px] text-stone-400 font-medium">* Obligatoriska fält</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Hästens officiella namn *</label>
+              <input type="text" name="officialName" value="<%= horse.officialName || '' %>" placeholder="t.ex. Belle Époque" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Smeknamn / Stallnamn *</label>
+              <input type="text" name="name" value="<%= horse.name || '' %>" placeholder="t.ex. Bella" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white font-medium text-stone-900">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Ras / Härstamning *</label>
+              <input type="text" name="breed" value="<%= horse.breed || '' %>" placeholder="t.ex. Svenskt Varmblod (SWB)" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Kön *</label>
+              <select name="gender" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+                <option value="Sto" <%= horse.gender === 'Sto' ? 'selected' : '' %>>Sto</option>
+                <option value="Valack" <%= horse.gender === 'Valack' ? 'selected' : '' %>>Valack</option>
+                <option value="Hingst" <%= horse.gender === 'Hingst' ? 'selected' : '' %>>Hingst</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Födelseår *</label>
+              <input type="number" name="birthYear" value="<%= horse.birthYear || 2014 %>" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Passnr / Chipnummer</label>
+              <input type="text" name="chipNumber" value="<%= horse.chipNumber || '' %>" placeholder="752098100123456"
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Kategori, Fysiska mått & Bärighet (SvRF) -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-solid fa-weight-hanging text-stone-400"></i> Kategori, Fysiska mått & Bärighet
+            </h3>
+            <span class="text-[11px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded">SvRF Hästvälfärdsdirektiv</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Kategori</label>
+              <select name="category" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]">
+                <option value="A-ponny" <%= horse.category === 'A-ponny' ? 'selected' : '' %>>A-ponny (upp till 107 cm)</option>
+                <option value="B-ponny" <%= horse.category === 'B-ponny' ? 'selected' : '' %>>B-ponny (108-130 cm)</option>
+                <option value="C-ponny" <%= horse.category === 'C-ponny' ? 'selected' : '' %>>C-ponny (131-140 cm)</option>
+                <option value="D-ponny" <%= horse.category === 'D-ponny' ? 'selected' : '' %>>D-ponny (141-148 cm)</option>
+                <option value="Storhäst" <%= horse.category === 'Storhäst' ? 'selected' : '' %>>Storhäst (148+ cm)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Mankhöjd (cm)</label>
+              <input type="number" name="heightCm" value="<%= horse.heightCm || 165 %>"
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Max ryttarvikt (kg) *</label>
+              <input type="number" name="maxRiderWeightKg" value="<%= horse.maxRiderWeightKg || 75 %>" required
+                class="w-full px-3.5 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 font-bold rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Byggnad / Bärighet</label>
+            <select name="build" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]">
+              <option value="Kraftig / Viktbärande" <%= horse.build === 'Kraftig / Viktbärande' ? 'selected' : '' %>>Kraftig / Viktbärande (robust stomme)</option>
+              <option value="Normal" <%= horse.build === 'Normal' ? 'selected' : '' %>>Normal</option>
+              <option value="Ädel" <%= horse.build === 'Ädel' ? 'selected' : '' %>>Ädel / Känslig stomme</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3. Utbildningsnivå & Discipliner -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-solid fa-graduation-cap text-stone-400"></i> Utbildningsnivå & Discipliner
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Huvudsaklig inriktning</label>
+              <select name="mainDiscipline" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+                <option value="Allround" <%= horse.mainDiscipline === 'Allround' ? 'selected' : '' %>>Allround</option>
+                <option value="Dressyr" <%= horse.mainDiscipline === 'Dressyr' ? 'selected' : '' %>>Dressyr</option>
+                <option value="Hoppning" <%= horse.mainDiscipline === 'Hoppning' ? 'selected' : '' %>>Hoppning</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Nivå Dressyr</label>
+              <input type="text" name="dressurLevel" value="<%= horse.dressurLevel || '' %>" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Nivå Hoppning</label>
+              <input type="text" name="jumpingLevel" value="<%= horse.jumpingLevel || '' %>" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Om hästen / Beskrivning</label>
+            <textarea name="description" rows="3" placeholder="Beskrivning av hästen, historik och bakgrund..."
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]"><%= horse.description || '' %></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Varningar, bett & särskilda instruktioner</label>
+            <textarea name="warningsInstructions" rows="2" placeholder="T.ex. Känslig i munnen, rids med tvådelat bett..."
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]"><%= horse.warningsInstructions || '' %></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Operational Status & Stabling (4 cols) -->
+      <div class="lg:col-span-4 space-y-6">
+
+        <!-- Hästbild (Multer Upload & Live Preview) -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-regular fa-image text-stone-400"></i> Hästbild
+          </h3>
+
+          <div class="flex flex-col items-center gap-4">
+            <div class="relative group w-full h-44 rounded-2xl bg-stone-100 overflow-hidden border border-stone-200 shadow-xs">
+              <img id="horsePhotoPreview" 
+                   src="<%= horse.photoUrl || '/images/default-horse.jpg' %>" 
+                   alt="<%= horse.name %>" 
+                   class="w-full h-full object-cover">
+              <button type="button" 
+                      onclick="document.getElementById('horsePhotoFileInput').click()"
+                      class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer">
+                <i class="fa-solid fa-camera text-2xl mb-1"></i>
+                <span class="text-xs font-bold">Byt bild</span>
+              </button>
+            </div>
+
+            <div class="w-full text-center space-y-3">
+              <input type="file" 
+                     id="horsePhotoFileInput" 
+                     name="photo" 
+                     accept="image/jpeg,image/png,image/webp,image/gif" 
+                     class="hidden">
+
+              <button type="button" 
+                      onclick="document.getElementById('horsePhotoFileInput').click()"
+                      class="w-full py-2.5 px-4 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-xl border border-stone-200 flex items-center justify-center gap-2 transition hover-lift">
+                <i class="fa-solid fa-arrow-up-from-bracket text-xs text-stone-500"></i>
+                <span id="horseUploadButtonText">Ladda upp ny bildfil</span>
+              </button>
+
+              <div class="relative flex items-center justify-center my-2">
+                <div class="border-t border-stone-200 w-full"></div>
+                <span class="bg-white px-2 text-[10px] text-stone-400 uppercase font-semibold">eller URL</span>
+              </div>
+
+              <div>
+                <input type="text" 
+                       id="horsePhotoUrlInput"
+                       name="photoUrl" 
+                       value="<%= horse.photoUrl || '' %>" 
+                       placeholder="/images/default-horse.jpg eller https://..."
+                       class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white">
+                <p class="text-[10px] text-stone-400 mt-1">Stöd för JPG, PNG, WebP och GIF (max 5 MB).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operativ status -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3">Operativ status</h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Status</label>
+            <select name="status" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium">
+              <option value="Aktiv & Tjänstbar" <%= horse.status === 'Aktiv & Tjänstbar' ? 'selected' : '' %>>Aktiv & Tjänstbar</option>
+              <option value="Konvalescens / Skadad" <%= horse.status === 'Konvalescens / Skadad' ? 'selected' : '' %>>Konvalescens / Skadad</option>
+              <option value="Vila / Bete" <%= horse.status === 'Vila / Bete' ? 'selected' : '' %>>Vila / Bete</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Statusinfo (om vila/skadad)</label>
+            <input type="text" name="statusInfo" value="<%= horse.statusInfo || '' %>" placeholder="t.ex. Hälta, Vet. besök imorgon"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-stone-700 mb-1">Max pass/dag</label>
+              <input type="number" name="maxLessonsPerDay" value="<%= horse.maxLessonsPerDay || 2 %>" min="1" max="4"
+                class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-stone-700 mb-1">Max hoppass/vecka</label>
+              <input type="number" name="maxJumpLessonsPerWeek" value="<%= horse.maxJumpLessonsPerWeek || 2 %>" min="0" max="4"
+                class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Stallplats & Skötsel -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3">Stallplats & Skötsel</h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Box / Stallavdelning</label>
+            <input type="text" name="boxNumber" value="<%= horse.boxNumber || '' %>" placeholder="Box 14 - Stallänga B"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Hagtilldelning</label>
+            <input type="text" name="paddockNumber" value="<%= horse.paddockNumber || '' %>" placeholder="Hage 4 (Gräshage)"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Utrustning & Täcke</label>
+            <textarea name="equipmentNotes" rows="2" placeholder="Regntäcke vid regn, senskydd fram..."
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm"><%= horse.equipmentNotes || '' %></textarea>
+          </div>
+        </div>
+
+        <!-- Farlig zon / Ta bort häst -->
+        <div class="bg-white rounded-2xl border border-rose-200 p-6 shadow-sm space-y-3">
+          <h3 class="text-sm font-bold text-rose-800 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Farlig zon
+          </h3>
+          <p class="text-xs text-stone-500">
+            Om hästen tas bort raderas hästprofilen permanent från registret.
+          </p>
+          <button type="button" onclick="confirmDeleteHorse()" class="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-regular fa-trash-can"></i>
+            <span>Ta bort denna häst</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </form>
+
+  <!-- Hidden Delete Form -->
+  <form id="deleteHorseForm" action="/admin/horses/<%= horse.id %>/delete" method="POST" class="hidden"></form>
+</div>
+
+<!-- Horse Photo Live Preview & Delete Scripts -->
+<script>
+  function confirmDeleteHorse() {
+    if (confirm('Är du säker på att du vill ta bort hästen "<%= horse.name %>"?\n\nDetta raderar hästprofilen permanent.')) {
+      document.getElementById('deleteHorseForm').submit();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('horsePhotoFileInput');
+    const previewImg = document.getElementById('horsePhotoPreview');
+    const buttonText = document.getElementById('horseUploadButtonText');
+    const urlInput = document.getElementById('horsePhotoUrlInput');
+
+    if (fileInput && previewImg) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            previewImg.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+
+          if (buttonText) {
+            buttonText.textContent = file.name.length > 20 ? file.name.slice(0, 18) + '...' : file.name;
+          }
+        }
+      });
+    }
+
+    if (urlInput && previewImg) {
+      urlInput.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val) {
+          previewImg.src = val;
+        } else {
+          previewImg.src = '/images/default-horse.jpg';
+        }
+      });
+    }
+  });
+</script>
