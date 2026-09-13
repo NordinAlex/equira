@@ -48,6 +48,8 @@ class AdminController {
       res.render('admin/horses', {
         title: 'Equira - Hästar',
         data,
+        success: req.query.success || null,
+        error: req.query.error || null,
         layout: 'layouts/adminLayout',
       });
     } catch (err) {
@@ -65,21 +67,74 @@ class AdminController {
     res.render('admin/horseCreate', {
       title: 'Equira - Registrera Häst',
       error: null,
+      formData: {},
       layout: 'layouts/adminLayout',
     });
   }
 
   async postHorseCreate(req, res) {
     try {
+      if (req.file) {
+        req.body.photoUrl = '/images/uploads/horses/' + req.file.filename;
+      }
       await horsesService.createHorse(req.body);
-      res.redirect('/admin/horses');
+      res.redirect('/admin/horses?success=' + encodeURIComponent('Ny häst har registrerats!'));
     } catch (err) {
       console.error('Error creating horse:', err);
       res.render('admin/horseCreate', {
         title: 'Equira - Registrera Häst',
         error: 'Kunde inte spara hästen: ' + err.message,
+        formData: req.body,
         layout: 'layouts/adminLayout',
       });
+    }
+  }
+
+  async getHorseEdit(req, res) {
+    try {
+      const horse = await horsesService.getHorseById(req.params.id);
+      if (!horse) {
+        return res.redirect('/admin/horses?error=' + encodeURIComponent('Hästen kunde inte hittas.'));
+      }
+
+      res.render('admin/horseEdit', {
+        title: `Equira - Redigera ${horse.name}`,
+        horse,
+        error: null,
+        layout: 'layouts/adminLayout',
+      });
+    } catch (err) {
+      console.error('Error loading horse for edit:', err);
+      res.redirect('/admin/horses?error=' + encodeURIComponent(err.message));
+    }
+  }
+
+  async postHorseEdit(req, res) {
+    try {
+      if (req.file) {
+        req.body.photoUrl = '/images/uploads/horses/' + req.file.filename;
+      }
+      await horsesService.updateHorse(req.params.id, req.body);
+      res.redirect('/admin/horses?success=' + encodeURIComponent('Hästens uppgifter har uppdaterats!'));
+    } catch (err) {
+      console.error('Error updating horse:', err);
+      const horse = await horsesService.getHorseById(req.params.id);
+      res.render('admin/horseEdit', {
+        title: 'Equira - Redigera häst',
+        horse: horse || { id: req.params.id, ...req.body },
+        error: 'Kunde inte uppdatera hästen: ' + err.message,
+        layout: 'layouts/adminLayout',
+      });
+    }
+  }
+
+  async postHorseDelete(req, res) {
+    try {
+      await horsesService.deleteHorse(req.params.id);
+      res.redirect('/admin/horses?success=' + encodeURIComponent('Hästen har tagits bort från systemet.'));
+    } catch (err) {
+      console.error('Error deleting horse:', err);
+      res.redirect('/admin/horses?error=' + encodeURIComponent('Kunde inte ta bort hästen: ' + err.message));
     }
   }
 
@@ -242,7 +297,7 @@ class AdminController {
   async postStudentCreate(req, res) {
     try {
       if (req.file) {
-        req.body.avatarUrl = '/uploads/avatars/' + req.file.filename;
+        req.body.avatarUrl = '/images/uploads/avatars/' + req.file.filename;
       }
       await studentsService.createStudent(req.body);
       res.redirect(
@@ -286,7 +341,7 @@ class AdminController {
   async postStudentEdit(req, res) {
     try {
       if (req.file) {
-        req.body.avatarUrl = '/uploads/avatars/' + req.file.filename;
+        req.body.avatarUrl = '/images/uploads/avatars/' + req.file.filename;
       }
       await studentsService.updateStudent(req.params.id, req.body);
       res.redirect(
@@ -367,7 +422,7 @@ class AdminController {
   async postStaffCreate(req, res) {
     try {
       if (req.file) {
-        req.body.avatarUrl = '/uploads/avatars/' + req.file.filename;
+        req.body.avatarUrl = '/images/uploads/avatars/' + req.file.filename;
       }
       await staffService.createStaff(req.body);
       res.redirect(
@@ -411,7 +466,7 @@ class AdminController {
   async postStaffEdit(req, res) {
     try {
       if (req.file) {
-        req.body.avatarUrl = '/uploads/avatars/' + req.file.filename;
+        req.body.avatarUrl = '/images/uploads/avatars/' + req.file.filename;
       }
       await staffService.updateStaff(req.params.id, req.body);
       res.redirect(
@@ -889,7 +944,7 @@ class AdminController {
   async postProfileAvatar(req, res) {
     try {
       if (req.file && req.session.user) {
-        const avatarUrl = '/uploads/avatars/' + req.file.filename;
+        const avatarUrl = '/images/uploads/avatars/' + req.file.filename;
         await profileService.updateAvatar(req.session.user.id, avatarUrl);
         req.session.user.avatarUrl = avatarUrl;
         if (req.setFlash) {

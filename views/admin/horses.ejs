@@ -13,6 +13,20 @@
     </div>
   </div>
 
+  <!-- Success / Error Alert Banners -->
+  <% if (locals.success) { %>
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm rounded-xl flex items-center gap-3">
+      <i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>
+      <span><%= success %></span>
+    </div>
+  <% } %>
+  <% if (locals.error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm rounded-xl flex items-center gap-3">
+      <i class="fa-solid fa-triangle-exclamation text-rose-500 text-base"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
   <!-- KPI Metrics Bar (Matching PDF 3 page 2) -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
     <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
@@ -88,9 +102,9 @@
                 <h3 class="text-xl font-bold text-stone-900 tracking-tight"><%= horse.name %></h3>
                 <p class="text-xs text-stone-500 mt-0.5"><%= horse.breed %> • <%= horse.age %></p>
               </div>
-              <button class="text-stone-400 hover:text-stone-600 p-1">
+              <a href="/admin/horses/<%= horse.id %>/edit" class="text-stone-400 hover:text-stone-600 p-1 rounded-lg hover:bg-stone-100 transition" title="Redigera <%= horse.name %>">
                 <i class="fa-solid fa-ellipsis-vertical"></i>
-              </button>
+              </a>
             </div>
 
             <!-- Horse Attributes -->
@@ -119,7 +133,7 @@
             <a href="/admin/schedule" class="py-2 text-center border border-stone-200 hover:bg-stone-50 font-medium rounded-xl text-stone-700 transition">
               Schema
             </a>
-            <a href="/admin/horses/create" class="py-2 text-center bg-[#f7f4ed] hover:bg-[#ede8dd] font-semibold rounded-xl text-[#3d2314] transition">
+            <a href="/admin/horses/<%= horse.id %>/edit" class="py-2 text-center bg-[#f7f4ed] hover:bg-[#ede8dd] font-semibold rounded-xl text-[#3d2314] transition">
               Redigera
             </a>
           </div>

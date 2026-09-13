@@ -2,14 +2,17 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const { requireLogin, requireRole } = require('../middleware/authMiddleware');
-const { uploadAvatar } = require('../middleware/uploadMiddleware');
+const { uploadAvatar, uploadHorse } = require('../middleware/uploadMiddleware');
 
 router.use(requireLogin, requireRole('ADMIN'));
 
 router.get('/overview', (req, res) => adminController.getOverview(req, res));
 router.get('/horses', (req, res) => adminController.getHorses(req, res));
 router.get('/horses/create', (req, res) => adminController.getHorseCreate(req, res));
-router.post('/horses/create', (req, res) => adminController.postHorseCreate(req, res));
+router.post('/horses/create', uploadHorse.single('photo'), (req, res) => adminController.postHorseCreate(req, res));
+router.get('/horses/:id/edit', (req, res) => adminController.getHorseEdit(req, res));
+router.post('/horses/:id/edit', uploadHorse.single('photo'), (req, res) => adminController.postHorseEdit(req, res));
+router.post('/horses/:id/delete', (req, res) => adminController.postHorseDelete(req, res));
 
 router.get('/assign', (req, res) => adminController.getHorseAssign(req, res));
 router.get('/assign/:lessonId', (req, res) => adminController.getHorseAssign(req, res));

@@ -3,9 +3,15 @@ const path = require('path');
 const fs = require('fs');
 
 // Ensure upload directory exists
-const uploadDir = path.join(__dirname, '../public/uploads/avatars');
+const uploadDir = path.join(__dirname, '../public/images/uploads/avatars');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Ensure horse upload directory exists
+const horseUploadDir = path.join(__dirname, '../public/images/uploads/horses');
+if (!fs.existsSync(horseUploadDir)) {
+  fs.mkdirSync(horseUploadDir, { recursive: true });
 }
 
 // Configure disk storage for avatars
@@ -24,6 +30,22 @@ const storage = multer.diskStorage({
   },
 });
 
+// Configure disk storage for horses
+const horseStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, horseUploadDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const safeBaseName = path.basename(file.originalname, ext)
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .slice(0, 20);
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `horse-${safeBaseName}-${uniqueSuffix}${ext}`);
+  },
+});
+
 // File filter: image files only
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
@@ -34,7 +56,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Multer upload instance
+// Multer upload instances
 const upload = multer({
   storage,
   fileFilter,
@@ -43,7 +65,17 @@ const upload = multer({
   },
 });
 
+const uploadHorse = multer({
+  storage: horseStorage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB max limit
+  },
+});
+
 module.exports = {
   uploadAvatar: upload,
+  uploadHorse,
   uploadDir,
+  horseUploadDir,
 };

@@ -90,6 +90,87 @@ class HorsesService {
     const saved = await horseRepo.save(horse);
     return AdminMapper.toHorseDTO(saved);
   }
+
+  /**
+   * Retrieves a single horse by ID.
+   * 
+   * @param {number|string} id - Horse ID
+   * @returns {Promise<Object|null>} Horse DTO or null
+   */
+  async getHorseById(id) {
+    const horseRepo = await this._getRepository('Horse');
+    const horse = await horseRepo.findOne({ where: { id: parseInt(id, 10) } });
+    return horse ? AdminMapper.toHorseDTO(horse) : null;
+  }
+
+  /**
+   * Updates an existing horse.
+   * 
+   * @param {number|string} id - Horse ID
+   * @param {Object} body - Updated horse fields
+   * @returns {Promise<Object>} Updated horse DTO
+   */
+  async updateHorse(id, body) {
+    const horseRepo = await this._getRepository('Horse');
+    const horse = await horseRepo.findOne({ where: { id: parseInt(id, 10) } });
+    if (!horse) {
+      throw new Error('Hästen kunde inte hittas.');
+    }
+
+    const formatArray = (val, current) => {
+      if (Array.isArray(val)) return JSON.stringify(val);
+      if (typeof val === 'string' && val.trim().length > 0) return JSON.stringify([val]);
+      return current;
+    };
+
+    if (body.name !== undefined) horse.name = body.name;
+    if (body.officialName !== undefined) horse.officialName = body.officialName;
+    if (body.breed !== undefined) horse.breed = body.breed;
+    if (body.gender !== undefined) horse.gender = body.gender;
+    if (body.birthYear !== undefined) horse.birthYear = parseInt(body.birthYear, 10) || horse.birthYear;
+    if (body.chipNumber !== undefined) horse.chipNumber = body.chipNumber;
+    if (body.passportNumber !== undefined) horse.passportNumber = body.passportNumber;
+    if (body.status !== undefined) horse.status = body.status;
+    if (body.statusInfo !== undefined) horse.statusInfo = body.statusInfo;
+    if (body.maxLessonsPerDay !== undefined) horse.maxLessonsPerDay = parseInt(body.maxLessonsPerDay, 10) || horse.maxLessonsPerDay;
+    if (body.maxJumpLessonsPerWeek !== undefined) horse.maxJumpLessonsPerWeek = parseInt(body.maxJumpLessonsPerWeek, 10) || horse.maxJumpLessonsPerWeek;
+    if (body.boxNumber !== undefined) horse.boxNumber = body.boxNumber;
+    if (body.paddockNumber !== undefined) horse.paddockNumber = body.paddockNumber;
+    if (body.category !== undefined) horse.category = body.category;
+    if (body.heightCm !== undefined) horse.heightCm = parseInt(body.heightCm, 10) || horse.heightCm;
+    if (body.maxRiderWeightKg !== undefined) horse.maxRiderWeightKg = parseInt(body.maxRiderWeightKg, 10) || horse.maxRiderWeightKg;
+    if (body.build !== undefined) horse.build = body.build;
+    if (body.mainDiscipline !== undefined) horse.mainDiscipline = body.mainDiscipline;
+    if (body.dressurLevel !== undefined) horse.dressurLevel = body.dressurLevel;
+    if (body.jumpingLevel !== undefined) horse.jumpingLevel = body.jumpingLevel;
+    if (body.suitableLevels !== undefined) horse.suitableLevels = formatArray(body.suitableLevels, horse.suitableLevels);
+    if (body.temperamentTraits !== undefined) horse.temperamentTraits = formatArray(body.temperamentTraits, horse.temperamentTraits);
+    if (body.temperamentDescription !== undefined) horse.temperamentDescription = body.temperamentDescription;
+    if (body.ridingDescription !== undefined) horse.ridingDescription = body.ridingDescription;
+    if (body.description !== undefined) horse.description = body.description;
+    if (body.importantInfo !== undefined) horse.importantInfo = body.importantInfo;
+    if (body.warningsInstructions !== undefined) horse.warningsInstructions = body.warningsInstructions;
+    if (body.equipmentNotes !== undefined) horse.equipmentNotes = body.equipmentNotes;
+    if (body.healthNotes !== undefined) horse.healthNotes = body.healthNotes;
+    if (body.lastVaccination !== undefined) horse.lastVaccination = body.lastVaccination;
+    if (body.lastShoeing !== undefined) horse.lastShoeing = body.lastShoeing;
+    if (body.photoUrl) horse.photoUrl = body.photoUrl;
+
+    const saved = await horseRepo.save(horse);
+    return AdminMapper.toHorseDTO(saved);
+  }
+
+  /**
+   * Deletes a horse by ID.
+   * 
+   * @param {number|string} id - Horse ID
+   * @returns {Promise<boolean>}
+   */
+  async deleteHorse(id) {
+    const horseRepo = await this._getRepository('Horse');
+    const result = await horseRepo.delete(parseInt(id, 10));
+    return result.affected > 0;
+  }
 }
 
 module.exports = new HorsesService();
