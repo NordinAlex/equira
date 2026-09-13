@@ -1,0 +1,375 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
+  <!-- Top Header & Actions -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/overview" class="hover:text-stone-700">Admin</a>
+        <span>&bull;</span>
+        <span>Personal</span>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight mt-1">Personal & Instruktörer</h2>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1">Hantera ridskolans personal, behörigheter, instruktörer och hästskötare.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/admin/staff/create" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#3d2314] hover:bg-[#2c190e] text-white px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm shadow-sm transition hover-lift">
+        <i class="fa-solid fa-plus text-xs"></i>
+        <span>Lägg till Personal</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Success / Error Alert Banners -->
+  <% if (locals.success) { %>
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm rounded-2xl flex items-center justify-between shadow-xs">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+        <span><%= success %></span>
+      </div>
+      <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+  <% } %>
+
+  <% if (locals.error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm rounded-2xl flex items-center justify-between shadow-xs">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base"></i>
+        <span><%= error %></span>
+      </div>
+      <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+  <% } %>
+
+  <!-- KPI Overview Cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <!-- Totalt -->
+    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-stone-100 text-stone-700 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div>
+        <p class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Totalt anställda</p>
+        <h3 class="text-2xl font-black text-stone-900 mt-0.5"><%= data?.kpis?.total || 0 %></h3>
+      </div>
+    </div>
+
+    <!-- Instruktörer -->
+    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+      <div>
+        <p class="text-xs font-semibold text-purple-900/60 uppercase tracking-wider">Instruktörer</p>
+        <h3 class="text-2xl font-black text-purple-950 mt-0.5"><%= data?.kpis?.instructors || 0 %></h3>
+      </div>
+    </div>
+
+    <!-- Stallansvariga -->
+    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <p class="text-xs font-semibold text-emerald-900/60 uppercase tracking-wider">Ansvariga & Admin</p>
+        <h3 class="text-2xl font-black text-emerald-950 mt-0.5"><%= data?.kpis?.managers || 0 %></h3>
+      </div>
+    </div>
+
+    <!-- Stallpersonal -->
+    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-broom"></i>
+      </div>
+      <div>
+        <p class="text-xs font-semibold text-amber-900/60 uppercase tracking-wider">Hästskötare & Skötsel</p>
+        <h3 class="text-2xl font-black text-amber-950 mt-0.5"><%= data?.kpis?.stableStaff || 0 %></h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Search Controls Container -->
+  <div class="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden">
+    <div class="p-4 border-b border-stone-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- Search Form -->
+      <form id="staffSearchForm" action="/admin/staff" method="GET" class="relative flex-1 max-w-md w-full">
+        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+          <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        </span>
+        <input type="text" 
+               id="staffSearchInput"
+               name="q"
+               value="<%= data?.searchQuery || '' %>"
+               autocomplete="off"
+               placeholder="Sök personal på namn, titel, e-post eller specialisering..."
+               class="w-full pl-9 pr-10 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#3d2314] focus:bg-white transition">
+        
+        <% if (data?.searchQuery) { %>
+          <a href="/admin/staff<%= data?.roleFilter ? '?role=' + data.roleFilter : '' %>" 
+             class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-stone-400 hover:text-stone-600 transition" 
+             title="Rensa sökning">
+            <i class="fa-solid fa-circle-xmark text-sm"></i>
+          </a>
+        <% } else { %>
+          <button type="button" 
+                  id="clearStaffSearchBtn" 
+                  class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-stone-400 hover:text-stone-600 transition" 
+                  title="Rensa sökning">
+            <i class="fa-solid fa-circle-xmark text-sm"></i>
+          </button>
+        <% } %>
+
+        <% if (data?.roleFilter) { %>
+          <input type="hidden" name="role" value="<%= data.roleFilter %>">
+        <% } %>
+      </form>
+
+      <!-- Role Filter Tabs -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+        <a href="/admin/staff<%= data?.searchQuery ? '?q=' + encodeURIComponent(data.searchQuery) : '' %>"
+           class="px-3 py-1.5 rounded-xl text-xs font-semibold transition <%= (!data?.roleFilter || data.roleFilter === 'all') ? 'bg-[#3d2314] text-white shadow-xs' : 'bg-stone-50 hover:bg-stone-100 text-stone-600' %>">
+          <span>Alla</span>
+        </a>
+        <a href="/admin/staff?role=instructor<%= data?.searchQuery ? '&q=' + encodeURIComponent(data.searchQuery) : '' %>"
+           class="px-3 py-1.5 rounded-xl text-xs font-semibold transition <%= (data?.roleFilter === 'instructor') ? 'bg-purple-700 text-white shadow-xs' : 'bg-stone-50 hover:bg-stone-100 text-stone-600' %>">
+          <i class="fa-solid fa-chalkboard-user mr-1 text-[10px]"></i>
+          <span>Instruktörer</span>
+        </a>
+        <a href="/admin/staff?role=manager<%= data?.searchQuery ? '&q=' + encodeURIComponent(data.searchQuery) : '' %>"
+           class="px-3 py-1.5 rounded-xl text-xs font-semibold transition <%= (data?.roleFilter === 'manager') ? 'bg-emerald-700 text-white shadow-xs' : 'bg-stone-50 hover:bg-stone-100 text-stone-600' %>">
+          <i class="fa-solid fa-shield-halved mr-1 text-[10px]"></i>
+          <span>Ansvariga</span>
+        </a>
+        <a href="/admin/staff?role=care<%= data?.searchQuery ? '&q=' + encodeURIComponent(data.searchQuery) : '' %>"
+           class="px-3 py-1.5 rounded-xl text-xs font-semibold transition <%= (data?.roleFilter === 'care') ? 'bg-amber-700 text-white shadow-xs' : 'bg-stone-50 hover:bg-stone-100 text-stone-600' %>">
+          <i class="fa-solid fa-broom mr-1 text-[10px]"></i>
+          <span>Hästskötare</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile Scroll Hint -->
+    <div class="block lg:hidden px-4 py-2 bg-stone-50 border-b border-stone-100 text-[11px] text-stone-500 flex items-center gap-1.5">
+      <i class="fa-solid fa-arrows-left-right text-stone-400"></i>
+      <span>Svep i sidled för att se alla personaluppgifter</span>
+    </div>
+
+    <!-- Staff Table View -->
+    <% const staffList = data?.staff || []; %>
+    <div id="staffTableContainer" class="overflow-x-auto touch-scroll <%= staffList.length === 0 ? 'hidden' : '' %>">
+      <table class="w-full text-left border-collapse text-xs min-w-[760px]">
+        <thead>
+          <tr class="bg-stone-50 text-stone-500 font-bold uppercase tracking-wider border-b border-stone-200">
+            <th class="py-3.5 px-6">Personal</th>
+            <th class="py-3.5 px-6">Titel & Befattning</th>
+            <th class="py-3.5 px-6">Kontakt</th>
+            <th class="py-3.5 px-6">Specialistområden</th>
+            <th class="py-3.5 px-6">Systemroll</th>
+            <th class="py-3.5 px-6 text-right">Åtgärder</th>
+          </tr>
+        </thead>
+        <tbody id="staffTableBody" class="divide-y divide-stone-100">
+          <% staffList.forEach(s => { %>
+            <tr class="staff-row hover:bg-stone-50/80 transition"
+                data-name="<%= (s.fullName || '').toLowerCase() %>"
+                data-username="<%= (s.username || '').toLowerCase() %>"
+                data-email="<%= (s.email || '').toLowerCase() %>"
+                data-phone="<%= (s.phone || '').toLowerCase() %>"
+                data-title="<%= (s.title || '').toLowerCase() %>"
+                data-specs="<%= (s.specializations || []).join(' ').toLowerCase() %>">
+              
+              <!-- Personal (Avatar & Name) -->
+              <td class="py-4 px-6 whitespace-nowrap">
+                <div class="flex items-center gap-3">
+                  <% if (s.avatarUrl && !s.avatarUrl.includes('default-')) { %>
+                    <img src="<%= s.avatarUrl %>" alt="<%= s.fullName %>" class="w-10 h-10 rounded-full object-cover border border-stone-200">
+                  <% } else { %>
+                    <div class="w-10 h-10 rounded-full bg-[#1B3B2B] text-emerald-100 flex items-center justify-center font-bold text-xs shadow-xs">
+                      <%= s.initials %>
+                    </div>
+                  <% } %>
+                  <div>
+                    <div class="font-bold text-stone-900 text-sm flex items-center gap-1.5">
+                      <span><%= s.fullName %></span>
+                      <% if (typeof currentUserId !== 'undefined' && currentUserId === s.id) { %>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">Du</span>
+                      <% } %>
+                    </div>
+                    <div class="text-stone-400 text-[11px]">@<%= s.username %></div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Titel & Befattning -->
+              <td class="py-4 px-6 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-semibold border <%= s.roleBadge.class %>">
+                  <%= s.title %>
+                </span>
+              </td>
+
+              <!-- Kontakt -->
+              <td class="py-4 px-6 whitespace-nowrap">
+                <div class="text-stone-800 font-medium"><%= s.phone %></div>
+                <div class="text-stone-400 text-[11px]"><%= s.email %></div>
+              </td>
+
+              <!-- Specialistområden -->
+              <td class="py-4 px-6">
+                <% if (s.specializations && s.specializations.length > 0) { %>
+                  <div class="flex flex-wrap gap-1.5 max-w-xs">
+                    <% s.specializations.forEach(spec => { %>
+                      <span class="px-2 py-0.5 bg-stone-100 text-stone-700 text-[11px] font-medium rounded-lg border border-stone-200">
+                        <%= spec %>
+                      </span>
+                    <% }) %>
+                  </div>
+                <% } else { %>
+                  <span class="text-stone-400 italic">Inga angivna</span>
+                <% } %>
+              </td>
+
+              <!-- Systemroll -->
+              <td class="py-4 px-6 whitespace-nowrap">
+                <% if (s.role === 'ADMIN') { %>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-[#1B3B2B] text-emerald-200">
+                    <i class="fa-solid fa-shield text-[10px]"></i>
+                    <span>ADMIN</span>
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-stone-100 text-stone-700">
+                    <i class="fa-solid fa-user text-[10px]"></i>
+                    <span>PERSONAL</span>
+                  </span>
+                <% } %>
+              </td>
+
+              <!-- Åtgärder -->
+              <td class="py-4 px-6 text-right whitespace-nowrap">
+                <div class="flex items-center justify-end gap-2">
+                  <a href="/admin/staff/<%= s.id %>/edit" 
+                     class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-xl transition" 
+                     title="Redigera personal">
+                    <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                    <span>Redigera</span>
+                  </a>
+                  
+                  <% if (typeof currentUserId !== 'undefined' && currentUserId === s.id) { %>
+                    <button type="button" 
+                            disabled 
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-stone-300 bg-stone-50 border border-stone-100 rounded-xl cursor-not-allowed" 
+                            title="Du kan inte ta bort ditt eget inloggade administratörskonto">
+                      <i class="fa-regular fa-trash-can text-[11px]"></i>
+                      <span>Ta bort</span>
+                    </button>
+                  <% } else { %>
+                    <form action="/admin/staff/<%= s.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Är du säker på att du vill ta bort personalen <%= s.fullName %>?\n\nHänvisningar i lektioner och uppgifter tas bort automatiskt.');">
+                      <button type="submit" 
+                              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition" 
+                              title="Ta bort personal">
+                        <i class="fa-regular fa-trash-can text-[11px]"></i>
+                        <span>Ta bort</span>
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State Container -->
+    <div id="noStaffState" class="p-12 text-center space-y-4 <%= staffList.length === 0 ? '' : 'hidden' %>">
+      <div class="w-16 h-16 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-id-badge"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-stone-800">Ingen personal hittades</h3>
+        <p id="noStaffText" class="text-xs text-stone-500 mt-1">
+          <%= data?.searchQuery ? `Ingen personal matchade sökningen "${data.searchQuery}".` : 'Inga personalmedlemmar registrerade för tillfället.' %>
+        </p>
+      </div>
+      <div>
+        <a href="/admin/staff" class="inline-flex items-center gap-2 px-4 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift">
+          <i class="fa-solid fa-rotate-left text-[11px]"></i>
+          <span>Återställ sökning</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Instant Live Search & Filter Client Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('staffSearchInput');
+    const clearBtn = document.getElementById('clearStaffSearchBtn');
+    const tableContainer = document.getElementById('staffTableContainer');
+    const noStaffState = document.getElementById('noStaffState');
+    const noStaffText = document.getElementById('noStaffText');
+    const rows = document.querySelectorAll('.staff-row');
+
+    if (!searchInput) return;
+
+    function filterStaffLive() {
+      const q = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      if (clearBtn) {
+        if (q.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+
+      rows.forEach(row => {
+        const name = row.dataset.name || '';
+        const username = row.dataset.username || '';
+        const email = row.dataset.email || '';
+        const phone = row.dataset.phone || '';
+        const title = row.dataset.title || '';
+        const specs = row.dataset.specs || '';
+
+        const matches = !q ||
+          name.includes(q) ||
+          username.includes(q) ||
+          email.includes(q) ||
+          phone.includes(q) ||
+          title.includes(q) ||
+          specs.includes(q);
+
+        if (matches) {
+          row.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          row.classList.add('hidden');
+        }
+      });
+
+      if (visibleCount === 0 && rows.length > 0) {
+        tableContainer.classList.add('hidden');
+        noStaffState.classList.remove('hidden');
+        if (noStaffText) {
+          noStaffText.textContent = q ? `Ingen personal matchade "${searchInput.value.trim()}".` : 'Ingen personal hittades.';
+        }
+      } else {
+        tableContainer.classList.remove('hidden');
+        noStaffState.classList.add('hidden');
+      }
+    }
+
+    searchInput.addEventListener('input', filterStaffLive);
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        filterStaffLive();
+        searchInput.focus();
+      });
+    }
+  });
+</script>

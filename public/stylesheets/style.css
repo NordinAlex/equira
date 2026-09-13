@@ -1,8 +1,99 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --equira-green-900: #142e21;
+  --equira-green-800: #1B3B2B;
+  --equira-green-700: #26503b;
+  --equira-green-600: #32674c;
+  --equira-green-50: #f0f7f3;
+  --equira-sand-50: #fdfbf7;
+  --equira-sand-100: #f7f4ed;
+  --equira-brown-800: #3d2314;
+  --equira-brown-700: #4a2828;
+  --equira-brown-600: #5c3528;
 }
 
-a {
-  color: #00B7FF;
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #27272a;
+  background-color: #faf9f6;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Custom transitions and interactive states */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+/* Drag-and-drop dropzone highlight */
+.drag-over {
+  border-color: #10b981 !important;
+  background-color: #ecfdf5 !important;
+  transform: scale(1.01);
+}
+
+/* Clean mobile screen container wrapper */
+.mobile-app-frame {
+  max-width: 480px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: #fdfbf7;
+  position: relative;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.06);
+}
+
+/* Custom radio option button for quizzes */
+.quiz-option-btn.selected {
+  border-color: #10b981;
+  background-color: #ecfdf5;
+}
+
+/* Bottom safe spacing for mobile navigation */
+.pb-mobile-nav {
+  padding-bottom: 5.5rem;
+}
+
+/* Custom Horseshoe Icon for Hästar */
+.fa-horseshoe,
+i.fa-horseshoe {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask-image: url('/images/horseshoe.svg');
+  mask-image: url('/images/horseshoe.svg');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  vertical-align: -0.125em;
+}
+
+.fa-horseshoe::before,
+i.fa-horseshoe::before {
+  content: "" !important;
+  display: none !important;
+}
+
+/* Responsive & Touch Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth horizontal touch scroll */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+

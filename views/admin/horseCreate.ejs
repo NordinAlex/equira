@@ -1,0 +1,230 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/horses" class="hover:text-stone-700">Hästar</a>
+        <span>&bull;</span>
+        <span>Lägg till häst</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight mt-1">Lägg till häst</h2>
+      <p class="text-xs text-stone-500 mt-0.5">Registrera en ny häst eller ponny med härstamning, maxvikt, utbildningsnivå och temperament.</p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/horses" class="px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <button type="submit" form="horseForm" class="px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition">
+        Spara häst
+      </button>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
+      <%= error %>
+    </div>
+  <% } %>
+
+  <form id="horseForm" action="/admin/horses/create" method="POST" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Main Info (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- 1. Grundläggande information -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-regular fa-id-badge text-stone-400"></i> Grundläggande information
+            </h3>
+            <span class="text-[11px] text-stone-400 font-medium">* Obligatoriska fält</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Hästens officiella namn *</label>
+              <input type="text" name="officialName" placeholder="t.ex. Belle Époque" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Smeknamn / Stallnamn *</label>
+              <input type="text" name="name" placeholder="t.ex. Bella" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white font-medium text-stone-900">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Ras / Härstamning *</label>
+              <input type="text" name="breed" placeholder="t.ex. Svenskt Varmblod (SWB)" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Kön *</label>
+              <select name="gender" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+                <option value="Sto">Sto</option>
+                <option value="Valack" selected>Valack</option>
+                <option value="Hingst">Hingst</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Födelseår *</label>
+              <input type="number" name="birthYear" value="2014" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Passnr / Chipnummer</label>
+              <input type="text" name="chipNumber" placeholder="752098100123456"
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Kategori, Fysiska mått & Bärighet (SvRF) -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-solid fa-weight-hanging text-stone-400"></i> Kategori, Fysiska mått & Bärighet
+            </h3>
+            <span class="text-[11px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded">SvRF Hästvälfärdsdirektiv</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Kategori</label>
+              <select name="category" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]">
+                <option value="A-ponny">A-ponny (upp till 107 cm)</option>
+                <option value="B-ponny">B-ponny (108-130 cm)</option>
+                <option value="C-ponny">C-ponny (131-140 cm)</option>
+                <option value="D-ponny">D-ponny (141-148 cm)</option>
+                <option value="Storhäst" selected>Storhäst (148+ cm)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Mankhöjd (cm)</label>
+              <input type="number" name="heightCm" value="167"
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Max ryttarvikt (kg) *</label>
+              <input type="number" name="maxRiderWeightKg" value="78" required
+                class="w-full px-3.5 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 font-bold rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Byggnad / Bärighet</label>
+            <select name="build" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]">
+              <option value="Kraftig / Viktbärande">Kraftig / Viktbärande (robust stomme)</option>
+              <option value="Normal" selected>Normal</option>
+              <option value="Ädel">Ädel / Känslig stomme</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3. Utbildningsnivå & Discipliner -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-solid fa-graduation-cap text-stone-400"></i> Utbildningsnivå & Discipliner
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Huvudsaklig inriktning</label>
+              <select name="mainDiscipline" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+                <option value="Allround" selected>Allround</option>
+                <option value="Dressyr">Dressyr</option>
+                <option value="Hoppning">Hoppning</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Nivå Dressyr</label>
+              <input type="text" name="dressurLevel" value="Lätt A (Skolor & samling)" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Nivå Hoppning</label>
+              <input type="text" name="jumpingLevel" value="90-100 cm (Stabil)" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Om hästen / Beskrivning</label>
+            <textarea name="description" rows="3" placeholder="Beskrivning av hästen, historik och bakgrund..."
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Varningar, bett & särskilda instruktioner</label>
+            <textarea name="warningsInstructions" rows="2" placeholder="T.ex. Känslig i munnen, rids med tvådelat bett..."
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Operational Status & Stabling (4 cols) -->
+      <div class="lg:col-span-4 space-y-6">
+
+        <!-- Operativ status -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3">Operativ status</h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Status</label>
+            <select name="status" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium">
+              <option value="Aktiv & Tjänstbar" selected>Aktiv & Tjänstbar</option>
+              <option value="Konvalescens / Skadad">Konvalescens / Skadad</option>
+              <option value="Vila / Bete">Vila / Bete</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Statusinfo (om vila/skadad)</label>
+            <input type="text" name="statusInfo" placeholder="t.ex. Hälta, Vet. besök imorgon"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-stone-700 mb-1">Max pass/dag</label>
+              <input type="number" name="maxLessonsPerDay" value="2" min="1" max="4"
+                class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-stone-700 mb-1">Max hoppass/vecka</label>
+              <input type="number" name="maxJumpLessonsPerWeek" value="2" min="0" max="4"
+                class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Stallplats & Skötsel -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3">Stallplats & Skötsel</h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Box / Stallavdelning</label>
+            <input type="text" name="boxNumber" value="Box 14 - Stallänga B"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Hagtilldelning</label>
+            <input type="text" name="paddockNumber" value="Hage 4 (Gräshage)"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Utrustning & Täcke</label>
+            <textarea name="equipmentNotes" rows="2" placeholder="Regntäcke vid regn, senskydd fram..."
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </form>
+</div>

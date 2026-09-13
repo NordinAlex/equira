@@ -1,0 +1,130 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
+  <!-- Title & Action Bar -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">Hästar</h2>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1">Hantera stallets hästar, deras status och schema.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/admin/horses/create" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#3d2314] hover:bg-[#2c190e] text-white px-5 py-2.5 rounded-xl font-medium text-sm shadow-sm transition hover-lift">
+        <i class="fa-solid fa-plus text-xs"></i>
+        <span>Lägg till häst</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Metrics Bar (Matching PDF 3 page 2) -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">TOTALT ANTAL</p>
+        <p class="text-3xl sm:text-4xl font-black text-stone-900 mt-2"><%= data.kpis.total %></p>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-stone-100 flex items-center justify-center text-stone-600 text-xl shrink-0">
+        <i class="fa-solid fa-horseshoe"></i>
+      </div>
+    </div>
+
+    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">LEDIGA NU</p>
+        <p class="text-3xl sm:text-4xl font-black text-emerald-600 mt-2"><%= data.kpis.available %></p>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+    </div>
+
+    <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold text-stone-400 uppercase tracking-wider">BEHÖVER VILA</p>
+        <p class="text-3xl sm:text-4xl font-black text-amber-600 mt-2"><%= data.kpis.resting %></p>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-bed"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Pills Bar (Matching PDF 3 page 2) -->
+  <div class="flex items-center gap-2 overflow-x-auto no-scrollbar touch-scroll pb-1 text-xs font-medium">
+    <a href="/admin/horses?filter=all" class="px-4 py-2 rounded-xl whitespace-nowrap transition <%= data.currentFilter === 'all' ? 'bg-stone-800 text-white font-semibold shadow-sm' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50' %>">
+      Alla hästar
+    </a>
+    <a href="/admin/horses?filter=ledig" class="px-4 py-2 rounded-xl whitespace-nowrap transition <%= data.currentFilter === 'ledig' ? 'bg-stone-800 text-white font-semibold shadow-sm' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50' %>">
+      Ledig
+    </a>
+    <a href="/admin/horses?filter=vila" class="px-4 py-2 rounded-xl whitespace-nowrap transition <%= data.currentFilter === 'vila' ? 'bg-stone-800 text-white font-semibold shadow-sm' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50' %>">
+      Vila
+    </a>
+    <a href="/admin/horses?filter=nyborjare" class="px-4 py-2 rounded-xl whitespace-nowrap transition <%= data.currentFilter === 'nyborjare' ? 'bg-stone-800 text-white font-semibold shadow-sm' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50' %>">
+      Nybörjare
+    </a>
+    <a href="/admin/horses?filter=erfarna" class="px-4 py-2 rounded-xl whitespace-nowrap transition <%= data.currentFilter === 'erfarna' ? 'bg-stone-800 text-white font-semibold shadow-sm' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50' %>">
+      Erfarna
+    </a>
+  </div>
+
+  <!-- Horse Cards Grid (Matching PDF 3 page 2) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+    <% data.horses.forEach(horse => { %>
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col hover-lift">
+        <!-- Horse Image with floating status pill -->
+        <div class="relative h-48 bg-stone-100 overflow-hidden">
+          <img src="<%= horse.photoUrl %>" alt="<%= horse.name %>" class="w-full h-full object-cover">
+          <div class="absolute top-3 right-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold shadow-sm backdrop-blur-md <%= horse.statusBadgeClass %>">
+              <span class="w-2 h-2 rounded-full <%= horse.status === 'Aktiv & Tjänstbar' ? 'bg-emerald-500' : 'bg-amber-500' %>"></span>
+              <%= horse.statusLabel %>
+            </span>
+          </div>
+        </div>
+
+        <!-- Horse Content -->
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between">
+              <div>
+                <h3 class="text-xl font-bold text-stone-900 tracking-tight"><%= horse.name %></h3>
+                <p class="text-xs text-stone-500 mt-0.5"><%= horse.breed %> • <%= horse.age %></p>
+              </div>
+              <button class="text-stone-400 hover:text-stone-600 p-1">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+            </div>
+
+            <!-- Horse Attributes -->
+            <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-stone-100 text-xs">
+              <div>
+                <span class="text-stone-400 block font-medium uppercase text-[10px]">Nivå</span>
+                <span class="font-semibold text-stone-800 mt-0.5 block"><%= horse.levelText %></span>
+              </div>
+              <div>
+                <span class="text-stone-400 block font-medium uppercase text-[10px]">Maxvikt (SvRF)</span>
+                <span class="font-semibold text-stone-800 mt-0.5 block"><%= horse.maxRiderWeightKg %> kg</span>
+              </div>
+            </div>
+
+            <% if (horse.traits && horse.traits.length > 0) { %>
+              <div class="flex flex-wrap gap-1.5 mt-3">
+                <% horse.traits.forEach(t => { %>
+                  <span class="px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 text-[11px] font-medium"><%= t %></span>
+                <% }); %>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Card Actions -->
+          <div class="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-stone-100 text-xs">
+            <a href="/admin/schedule" class="py-2 text-center border border-stone-200 hover:bg-stone-50 font-medium rounded-xl text-stone-700 transition">
+              Schema
+            </a>
+            <a href="/admin/horses/create" class="py-2 text-center bg-[#f7f4ed] hover:bg-[#ede8dd] font-semibold rounded-xl text-[#3d2314] transition">
+              Redigera
+            </a>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</div>
