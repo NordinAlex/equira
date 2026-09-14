@@ -440,9 +440,6 @@
   .mx-6 {
     margin-inline: calc(var(--spacing) * 6);
   }
-  .mx-12 {
-    margin-inline: calc(var(--spacing) * 12);
-  }
   .mx-auto {
     margin-inline: auto;
   }
@@ -1121,9 +1118,6 @@
   .border-purple-600 {
     border-color: var(--color-purple-600);
   }
-  .border-red-200 {
-    border-color: var(--color-red-200);
-  }
   .border-rose-200 {
     border-color: var(--color-rose-200);
   }
@@ -1399,9 +1393,6 @@
   }
   .bg-purple-700 {
     background-color: var(--color-purple-700);
-  }
-  .bg-red-50 {
-    background-color: var(--color-red-50);
   }
   .bg-red-500 {
     background-color: var(--color-red-500);
@@ -2010,9 +2001,6 @@
   }
   .text-purple-950 {
     color: var(--color-purple-950);
-  }
-  .text-red-700 {
-    color: var(--color-red-700);
   }
   .text-rose-400 {
     color: var(--color-rose-400);
