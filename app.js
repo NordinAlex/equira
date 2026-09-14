@@ -20,6 +20,7 @@ const horsesRouter = require('./routes/Staff/horses');
 const searchRouter = require('./routes/search');
 const adminRouter = require('./routes/adminRoutes');
 const apiRouter = require('./routes/apiRoutes');
+const profileRouter = require('./routes/Staff/profile');
 
 const app = express();
 
@@ -69,6 +70,7 @@ app.use('/horses', horsesRouter);
 app.use('/search', searchRouter);
 app.use('/admin', adminRouter);
 app.use('/api', apiRouter);
+app.use('/profile', profileRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
