@@ -30,121 +30,56 @@
           </button>
         </div>
 
-        <!-- Hästkort grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-
-          <!-- Bella -->
+        <!-- Hästkort grid - dold på mobil -->
+        <div class="hidden md:grid grid-cols-3 gap-4 mb-8">
+          <% horses.forEach(horse => { %>
           <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
             <div class="relative">
-              <img src="/images/bella.jpg" class="w-full h-48 object-cover" />
-              <span class="absolute top-3 left-3 bg-red-500 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                <i class="fa-solid fa-circle-exclamation"></i> Prioritet hög
+              <img src="<%= horse.image %>" class="w-full h-48 object-cover" />
+              <span class="absolute top-3 left-3 text-xs px-3 py-1 rounded-full flex items-center gap-1
+                <%= horse.statusColor === 'red' ? 'bg-red-500 text-white' : '' %>
+                <%= horse.statusColor === 'yellow' ? 'bg-yellow-100 text-yellow-700' : '' %>
+                <%= horse.statusColor === 'green' ? 'bg-green-100 text-green-700' : '' %>">
+                <i class="fa-solid fa-circle-exclamation"></i> <%= horse.status %>
               </span>
             </div>
             <div class="p-4">
-              <h3 class="font-bold text-lg">Bella</h3>
-              <p class="text-gray-400 text-sm mb-3">Box 12 • Foderstat B</p>
+              <h3 class="font-bold text-lg"><%= horse.name %></h3>
+              <p class="text-gray-400 text-sm mb-3"><%= horse.location %></p>
               <p class="text-xs font-bold uppercase text-gray-400 mb-2">Åtgärder</p>
               <div class="flex gap-2 flex-wrap">
-                <span class="bg-[#2c1a0e] text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <i class="fa-solid fa-utensils"></i> Fodring
+                <% horse.tasks.forEach((task, index) => { %>
+                <span class="<%= index === 0 ? 'bg-[#2c1a0e] text-white' : 'border' %> text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                  <%= task %>
                 </span>
-                <span class="border text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <i class="fa-solid fa-door-open"></i> Utsläpp
-                </span>
-                <span class="border text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <i class="fa-solid fa-broom"></i> Mockning
-                </span>
+                <% }) %>
               </div>
             </div>
           </div>
-
-          <!-- Luna -->
-          <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
-            <div class="relative">
-              <img src="/images/luna.jpg" class="w-full h-48 object-cover" />
-              <span class="absolute top-3 left-3 bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                <i class="fa-regular fa-clock"></i> Pågående
-              </span>
-            </div>
-            <div class="p-4">
-              <h3 class="font-bold text-lg">Luna</h3>
-              <p class="text-gray-400 text-sm mb-3">Sjukruta • Rehab schema</p>
-              <p class="text-xs font-bold uppercase text-gray-400 mb-2">Åtgärder</p>
-              <div class="flex gap-2 flex-wrap">
-                <span class="bg-[#2c1a0e] text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <i class="fa-solid fa-utensils"></i> Fodring
-                </span>
-                <span class="border text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <i class="fa-solid fa-gear"></i> Kontroll
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Max -->
-          <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
-            <div class="relative">
-              <img src="/images/max.jpg" class="w-full h-48 object-cover" />
-              <span class="absolute top-3 left-3 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                <i class="fa-regular fa-calendar"></i> Kommande
-              </span>
-            </div>
-            <div class="p-4">
-              <h3 class="font-bold text-lg">Max</h3>
-              <p class="text-gray-400 text-sm mb-3">Hage 4 • Skning 14:00</p>
-              <p class="text-xs font-bold uppercase text-gray-400 mb-2">Åtgärder</p>
-              <div class="flex gap-2 flex-wrap">
-                <span class="border text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <i class="fa-solid fa-door-open"></i> Utsläpp
-                </span>
-              </div>
-            </div>
-          </div>
-
+          <% }) %>
         </div>
 
         <!-- Mobil häst-lista -->
         <div class="flex flex-col gap-3 md:hidden">
+          <% horses.forEach(horse => { %>
           <div class="bg-white rounded-xl p-4">
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-3">
-                <img src="/images/bella.jpg" class="size-10 rounded-full object-cover" />
+                <img src="<%= horse.image %>" class="size-10 rounded-full object-cover" />
                 <div>
-                  <p class="font-semibold">Bella</p>
-                  <p class="text-xs text-gray-400">Hage 3</p>
+                  <p class="font-semibold"><%= horse.name %></p>
+                  <p class="text-xs text-gray-400"><%= horse.location %></p>
                 </div>
               </div>
               <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
             </div>
-            <p class="text-sm text-gray-500"><i class="fa-solid fa-shirt mr-2 text-gray-400"></i>Ta på täcke (Regn)</p>
-          </div>
-          <div class="bg-white rounded-xl p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <img src="/images/luna.jpg" class="size-10 rounded-full object-cover" />
-                <div>
-                  <p class="font-semibold">Luna</p>
-                  <p class="text-xs text-gray-400">Hage 4</p>
-                </div>
-              </div>
-              <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
+            <div class="flex gap-2 flex-wrap">
+              <% horse.tasks.forEach(task => { %>
+              <span class="border text-xs px-3 py-1 rounded-full"><%= task %></span>
+              <% }) %>
             </div>
-            <p class="text-sm text-gray-500"><i class="fa-solid fa-shield mr-2 text-gray-400"></i>Borsta hovar</p>
           </div>
-          <div class="bg-white rounded-xl p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <img src="/images/max.jpg" class="size-10 rounded-full object-cover" />
-                <div>
-                  <p class="font-semibold">Max</p>
-                  <p class="text-xs text-gray-400">Hage 1</p>
-                </div>
-              </div>
-              <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
-            </div>
-            <p class="text-sm text-gray-500"><i class="fa-regular fa-circle mr-2 text-gray-400"></i>Inga extra uppgifter</p>
-          </div>
+          <% }) %>
         </div>
 
       </main>
