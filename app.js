@@ -17,6 +17,7 @@ const authRouter = require('./routes/auth');
 const studentRouter = require('./routes/studentRoutes');
 const overviewStaffRouter = require('./routes/Staff/overview');
 const horsesRouter = require('./routes/Staff/horses');
+const searchRouter = require('./routes/search');
 const adminRouter = require('./routes/adminRoutes');
 const apiRouter = require('./routes/apiRoutes');
 
@@ -65,6 +66,7 @@ app.use('/tasks', tasksRouter);
 app.use('/student', studentRouter);
 app.use('/overview', overviewStaffRouter);
 app.use('/horses', horsesRouter);
+app.use('/search', searchRouter);
 app.use('/admin', adminRouter);
 app.use('/api', apiRouter);
 

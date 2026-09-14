@@ -701,6 +701,9 @@
   .w-11 {
     width: calc(var(--spacing) * 11);
   }
+  .w-16 {
+    width: calc(var(--spacing) * 16);
+  }
   .w-12 {
     width: calc(var(--spacing) * 12);
   }
@@ -721,6 +724,9 @@
   }
   .w-full {
     width: 100%;
+  }
+  .max-w-\[300px\] {
+    max-width: 300px;
   }
   .max-w-2xl {
     max-width: var(--container-2xl);
@@ -818,6 +824,8 @@
   .grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -880,9 +888,6 @@
   }
   .gap-5 {
     gap: calc(var(--spacing) * 5);
-  }
-  .gap-6 {
-    gap: calc(var(--spacing) * 6);
   }
   .gap-7 {
     gap: calc(var(--spacing) * 7);
@@ -1562,6 +1567,9 @@
     --tw-gradient-to: var(--color-white);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
+  .object-contain {
+    object-fit: contain;
+  }
   .object-cover {
     object-fit: cover;
   }
@@ -2090,6 +2098,23 @@
   .accent-blue-500 {
     accent-color: var(--color-blue-500);
   }
+  .opacity-50 {
+    opacity: 50%;
+  }
+  .opacity-60 {
+    opacity: 60%;
+  }
+  .opacity-70 {
+    opacity: 70%;
+  }
+  .opacity-80 {
+    opacity: 80%;
+  }
+  .opacity-100 {
+    opacity: 100%;
+  }
+  .opacity-200 {
+    opacity: 200%;
   .opacity-0 {
     opacity: 0%;
   }
@@ -2755,6 +2780,9 @@
     }
     .md\:block {
       display: block;
+    }
+    .md\:grid {
+      display: grid;
     }
     .md\:hidden {
       display: none;
