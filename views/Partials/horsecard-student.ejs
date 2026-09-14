@@ -1,4 +1,5 @@
-<a href="/student/horses/<%= horse.id %>" class="block w-full overflow-hidden rounded-xl border border-[#B0A696] bg-white">
+<a href="/student/horses/<%= horse.id %>" class="horse-card block w-full overflow-hidden rounded-xl border border-[#B0A696] bg-white"
+  data-name="<%= horse.name.toLowerCase() %>">
 
   <!-- Horse image -->
   <img src="<%= horse.photoUrl %>" alt="<%= horse.name %>" class="h-100 w-full object-cover">
