@@ -16,7 +16,7 @@
 
   <main>
     <div class="relative w-full">
-      <img src="<%= horse.image %>" alt="<%= horse.name %>" class="w-full h-[450px] object-cover">
+      <img src="<%= horse.photoUrl %>" alt="<%= horse.name %>" class="w-full h-[450px] object-cover">
 
       <!-- Basic information -->
       <div class="absolute bottom-6 left-6 text-white">
@@ -32,12 +32,28 @@
           <p class="bg-black/20 backdrop-blur-md px-3 py-2 rounded-3xl text-s">
             <%= horse.breed %>
           </p>
+
+          <% if (horse.temperamentTraits) { %>
+          <% const traits = JSON.parse(horse.temperamentTraits); %>
+
+          <% traits.slice(0, 2).forEach(trait => { %>
           <p class="bg-black/20 backdrop-blur-md px-3 py-2 rounded-3xl text-s">
-            <%= horse.temper %>
+            <%= trait %>
           </p>
+          <% }) %>
+          <% } %>
+
+
+          <% if (horse.suitableLevels) { %>
+          <% const levels = JSON.parse(horse.suitableLevels); %>
+
+          <% levels.slice(0, 1).forEach(level => { %>
           <p class="bg-black/20 backdrop-blur-md px-3 py-2 rounded-3xl text-s">
-            <%= horse.level %>
+            Från: <%= level %>
           </p>
+          <% }) %>
+          <% } %>
+
         </div>
 
       </div>
@@ -71,7 +87,7 @@
         </div>
 
         <!-- Textarea -->
-        <p class="text-lg"><%= horse.temperDescription %></p>
+        <p class="text-lg"><%= horse.temperamentDescription %></p>
       </div>
 
       <!-- Riding icon & title -->
@@ -106,7 +122,7 @@
         </div>
 
         <!-- Textarea -->
-        <p class="text-lg"><%= horse.riding %></p>
+        <p class="text-lg"><%= horse.ridingDescription %></p>
       </div>
     </div>
 
@@ -114,33 +130,37 @@
     <div class="mx-6 my-10">
       <h2 class="text-2xl font-semibold mb-4">Passar bäst för</h2>
 
-      <ul class="flex flex-col gap-2">
-        <li class="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-[#4A3226]">
-            <circle cx="12" cy="12" r="10" />
-            <path d="m8 12 2.5 2.5L16 9" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-          <p class="text-lg">Level</p>
-        </li>
+      <% if (horse.bestSuitedFor) { %>
+      <% const bestSuitedFor = JSON.parse(horse.bestSuitedFor); %>
 
+      <% if (bestSuitedFor.length > 0) { %>
+      <ul class="flex flex-col gap-2">
+
+        <% bestSuitedFor.forEach(item => { %>
         <li class="flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-[#4A3226]">
             <circle cx="12" cy="12" r="10" />
             <path d="m8 12 2.5 2.5L16 9" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
-          <p class="text-lg">Inriktning</p>
+
+          <p class="text-lg"><%= item %></p>
         </li>
+        <% }) %>
+
       </ul>
+      <% } %>
+      <% } %>
+
     </div>
 
     <!-- Important information-->
+    <% if (horse.importantInfo) { %>
     <div class="m-6 bg-[#E0DCD6] rounded-2xl border border-[#B0A696] p-6 drop-shadow-sm">
       <div class="flex items-center gap-3">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-7 h-7">
           <mask id="info-mask">
             <rect width="24" height="24" fill="white" />
             <path d="M12 10.5v5" stroke="black" stroke-width="2" stroke-linecap="round" />
-
             <circle cx="12" cy="7.5" r="1" fill="black" />
           </mask>
 
@@ -149,9 +169,10 @@
 
         <h3 class="text-xl font-semibold">Viktig information</h3>
       </div>
-      
-      <p class="text-lg mt-4">Här står eventuellt viktig information.</p>
+
+      <p class="text-lg mt-4"><%= horse.importantInfo %></p>
     </div>
+    <% } %>
   </main>
 
 </body>

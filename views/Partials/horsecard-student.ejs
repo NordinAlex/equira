@@ -1,8 +1,7 @@
-<a href="/student/horses/<%= horse.id %>"
-class="block w-full overflow-hidden rounded-xl border border-[#B0A696] bg-white">
+<a href="/student/horses/<%= horse.id %>" class="block w-full overflow-hidden rounded-xl border border-[#B0A696] bg-white">
 
   <!-- Horse image -->
-  <img src="<%= horse.image %>" alt="<%= horse.name %>" class="h-80 w-full object-cover">
+  <img src="<%= horse.photoUrl %>" alt="<%= horse.name %>" class="h-100 w-full object-cover">
 
   <!-- Horse information -->
   <div class="p-4">
@@ -20,8 +19,25 @@ class="block w-full overflow-hidden rounded-xl border border-[#B0A696] bg-white"
 
     <!-- Temper + level-->
     <div class="flex gap-2 mt-4">
-      <p class="rounded-md bg-[#F2EFEB] px-2 py-1 text-[#4A3226] font-semibold"><%= horse.temper %></p>
-      <p class="rounded-md bg-[#F2EFEB] px-2 py-1 text-[#4A3226] font-semibold"><%= horse.level %></p>
+
+      <% if (horse.temperamentTraits) { %>
+      <% const traits = JSON.parse(horse.temperamentTraits); %>
+
+      <% traits.slice(0, 2).forEach(trait => { %>
+      <p class="rounded-md bg-[#F2EFEB] px-2 py-1 text-[#4A3226] font-semibold"><%= trait %></p>
+      <% }) %>
+      <% } %>
+
+      <% if (horse.suitableLevels) { %>
+      <% const levels = JSON.parse(horse.suitableLevels); %>
+
+      <% levels.slice(0, 1).forEach(level => { %>
+      <p class="rounded-md bg-[#F2EFEB] px-2 py-1 text-[#4A3226] font-semibold">
+       Från: <%= level %>
+      </p>
+      <% }) %>
+      <% } %>
+
     </div>
 
   </div>
