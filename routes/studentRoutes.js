@@ -3,6 +3,11 @@ const { getDataSource } = require('../config/database');
 
 const router = express.Router();
 
+router.use((req, res, next) => {
+    res.locals.currentPath = req.path;
+    next();
+});
+
 router.get("/horses", async (req, res, next) => {
     try {
         const dataSource = await getDataSource();
