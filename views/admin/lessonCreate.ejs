@@ -1,0 +1,204 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/lessons" class="hover:text-stone-700">Lektioner</a>
+        <span>&bull;</span>
+        <span>Skapa ny lektion</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight mt-1">Skapa ny lektion</h2>
+      <p class="text-xs text-stone-500 mt-0.5">Planera in ett nytt ridpass, tilldela ridlärare, arena och hantera elevkapacitet.</p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/lessons" class="px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <button type="submit" form="lessonCreateForm" class="px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition">
+        Spara lektion
+      </button>
+    </div>
+  </div>
+
+  <form id="lessonCreateForm" action="/admin/lessons/create" method="POST">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: 3-Step Wizard Inputs (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- Step 1: Grundläggande information -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-black">1</span>
+              Grundläggande information
+            </h3>
+            <span class="text-[10px] uppercase font-bold text-stone-400 tracking-wider">STEG 1 AV 3</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Lektionens namn / Rubrik *</label>
+            <input type="text" name="title" value="Hoppning Medel & Avancerad" required
+              class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Lektionstyp *</label>
+              <select name="lessonType" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+                <option value="Hoppning" selected>Hoppning</option>
+                <option value="Dressyr">Dressyr</option>
+                <option value="Allround">Allround</option>
+                <option value="Markarbete">Markarbete</option>
+                <option value="Teori">Teori</option>
+                <option value="Uteritt">Uteritt</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Svårighetsgrad / Ridnivå</label>
+              <select name="level" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+                <option value="Nybörjare">Nybörjare</option>
+                <option value="Nivå 1">Nivå 1</option>
+                <option value="Nivå 2">Nivå 2</option>
+                <option value="Nivå 3 - Medel" selected>Nivå 3 - Medel</option>
+                <option value="Nivå 4 - Avancerad">Nivå 4 - Avancerad</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Målgrupp</label>
+              <input type="text" name="targetGroup" value="Ungdom & Junior (10-18 år)" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Tid, Arena & Resursplanering -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-black">2</span>
+              Tid, Arena & Resursplanering
+            </h3>
+            <span class="text-[10px] uppercase font-bold text-stone-400 tracking-wider">STEG 2 AV 3</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Datum *</label>
+              <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Starttid *</label>
+              <input type="time" name="startTime" value="17:30" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Sluttid *</label>
+              <input type="time" name="endTime" value="18:30" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Ridlärare / Instruktör</label>
+              <select name="instructorId" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+                <% instructors.forEach(inst => { %>
+                  <option value="<%= inst.id %>"><%= inst.fullName %> (<%= inst.staffProfile ? inst.staffProfile.title : 'Instruktör' %>)</option>
+                <% }); %>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Arena / Ridbana</label>
+              <select name="arenaId" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+                <% arenas.forEach(arena => { %>
+                  <option value="<%= arena.id %>"><%= arena.name %> (<%= arena.dimensions || '20×60m' %>, <%= arena.surfaceType || 'Fibersand' %>)</option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Stallpersonalens instruktioner</label>
+            <textarea name="staffInstructions" rows="2" placeholder="Bygg 4 enkelhinder och en kombination på medellinjen. Framskrittning påbörjas kl 17:20."
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]"></textarea>
+          </div>
+        </div>
+
+        <!-- Step 3: Kapacitet, Grupp & Utrustningskrav -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-black">3</span>
+              Kapacitet, Grupp & Utrustningskrav
+            </h3>
+            <span class="text-[10px] uppercase font-bold text-stone-400 tracking-wider">STEG 3 AV 3</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Max antal deltagare</label>
+              <input type="number" name="maxParticipants" value="8" min="1" max="16" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Min antal deltagare</label>
+              <input type="number" name="minParticipants" value="4" min="1" max="10" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Förhandsinboka elever</label>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-y-auto p-2 bg-stone-50 rounded-xl border border-stone-200">
+              <% students.forEach(s => { %>
+                <label class="flex items-center gap-2 text-xs text-stone-700 p-1.5 hover:bg-white rounded-lg cursor-pointer">
+                  <input type="checkbox" name="studentIds" value="<%= s.id %>" class="rounded text-[#4a2828] focus:ring-[#4a2828]">
+                  <span><%= s.fullName %></span>
+                </label>
+              <% }); %>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Krav på hästmaterial & bana</label>
+            <input type="text" name="equipmentRequirements" value="Kräver C- eller D-ponny, Hinderpark framplockad, Säkerhetsväst obligatorisk"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Live Preview Card (4 cols) (Matching PDF 3 page 10) -->
+      <div class="lg:col-span-4 space-y-4">
+        <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm space-y-4 sticky top-6">
+          <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Förhandsgranskning</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">LIVE</span>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-bold text-xs">Hoppning • Nivå 3</span>
+              <span class="text-xs text-stone-500"><i class="fa-solid fa-users mr-1"></i> Max 8 elever</span>
+            </div>
+
+            <h4 class="text-lg font-bold text-stone-900 leading-tight">Hoppning Medel & Avancerad</h4>
+            <p class="text-xs text-stone-500"><i class="fa-solid fa-location-dot mr-1"></i> Stora Ridhuset (20×60m)</p>
+
+            <div class="p-3 bg-stone-50 rounded-xl border border-stone-100 flex items-center justify-between text-xs">
+              <span class="text-stone-600 font-medium">Tid:</span>
+              <span class="font-bold text-stone-900">17:30 - 18:30 (60m)</span>
+            </div>
+
+            <div class="rounded-xl overflow-hidden h-28 relative shadow-inner">
+              <img src="/images/bella.jpg" alt="Preview" class="w-full h-full object-cover">
+              <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded text-white text-[10px]">
+                Underlag: Fibersand harvat
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>

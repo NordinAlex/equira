@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-equira-green-950: #0f241a;
+  --color-equira-green-900: #142e21;
+  --color-equira-green-800: #1B3B2B;
+  --color-equira-green-700: #25523d;
+  --color-equira-green-600: #326a4f;
+  --color-equira-green-100: #e3efe7;
+  --color-equira-green-50: #f0f7f3;
+
+  --color-equira-cognac-900: #2a160d;
+  --color-equira-cognac-800: #3d2314;
+  --color-equira-cognac-700: #4a2828;
+  --color-equira-cognac-600: #5c3528;
+
+  --color-equira-sand-50: #fdfbf7;
+  --color-equira-sand-100: #f7f4ed;
+  --color-equira-sand-200: #ede8dd;
+}

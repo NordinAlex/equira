@@ -1,0 +1,287 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/students" class="hover:text-stone-700">Elever</a>
+        <span>&bull;</span>
+        <span>Redigera <%= student.fullName %></span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight mt-1">Redigera Elev: <%= student.fullName %></h2>
+      <p class="text-xs text-stone-500 mt-0.5">Uppdatera elevens personuppgifter, ridnivå, nödkontakt och ryttarvikt (SvRF).</p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/students" class="px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <button type="submit" form="studentEditForm" class="px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5">
+        <i class="fa-solid fa-floppy-disk text-xs"></i>
+        <span>Spara ändringar</span>
+      </button>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <form id="studentEditForm" action="/admin/students/<%= student.id %>/edit" method="POST" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- 1. Person- och kontaktuppgifter -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-regular fa-user text-stone-400"></i> Person- och kontaktuppgifter
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Fullständigt namn *</label>
+              <input type="text" name="fullName" value="<%= student.fullName || '' %>" placeholder="t.ex. Elsa Lindqvist" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Användarnamn *</label>
+              <input type="text" name="username" value="<%= student.username || '' %>" placeholder="elsa.l" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">E-postadress *</label>
+              <input type="email" name="email" value="<%= student.email || '' %>" placeholder="elsa@example.se" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Personnummer</label>
+              <input type="text" name="personnummer" value="<%= profile.personnummer || '' %>" placeholder="ÅÅÅÅMMDD-XXXX"
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Telefonnummer</label>
+              <input type="tel" name="phone" value="<%= student.phone || '' %>" placeholder="070-123 45 67"
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+
+            <!-- Ändra lösenord för elev -->
+            <div class="md:col-span-2 bg-stone-50/70 border border-stone-200 rounded-xl p-3.5 space-y-2">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                <label for="studentEditPassword" class="block text-xs font-semibold text-stone-700 flex items-center gap-1.5">
+                  <i class="fa-solid fa-key text-stone-400"></i> Ändra lösenord
+                </label>
+                <span class="text-[11px] text-stone-500">Lämna tomt för att behålla nuvarande lösenord</span>
+              </div>
+              <div class="relative flex items-center">
+                <input type="password" id="studentEditPassword" name="password" placeholder="Nytt lösenord (minst 6 tecken)" minlength="6"
+                  class="w-full pl-3.5 pr-28 py-2 bg-white border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] transition">
+                <div class="absolute right-2 flex items-center gap-1.5">
+                  <button type="button" id="toggleEditPasswordBtn" title="Visa/dölj lösenord" class="p-1.5 text-stone-400 hover:text-stone-700 rounded-lg transition text-xs flex items-center justify-center">
+                    <i class="fa-regular fa-eye" id="editPasswordEyeIcon"></i>
+                  </button>
+                  <button type="button" id="generateEditPasswordBtn" title="Generera säkert lösenord" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                    <i class="fa-solid fa-wand-magic-sparkles text-[11px] text-amber-700"></i>
+                    <span>Slumpa</span>
+                  </button>
+                </div>
+              </div>
+              <p class="text-[11px] text-stone-500">
+                Fyll endast i detta fält om du vill tilldela eleven ett nytt inloggningslösenord.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Ridprofil & Fysiska data (SvRF) -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-stone-400"></i> Ridprofil & Fysiska data
+            </h3>
+            <span class="text-[11px] text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded">SvRF Bärighetsmatchning</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Ridnivå *</label>
+              <select name="ridingLevel" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium">
+                <option value="Nybörjare" <%= profile.ridingLevel === 'Nybörjare' ? 'selected' : '' %>>Nybörjare</option>
+                <option value="Nivå 1" <%= profile.ridingLevel === 'Nivå 1' ? 'selected' : '' %>>Nivå 1</option>
+                <option value="Nivå 2" <%= profile.ridingLevel === 'Nivå 2' ? 'selected' : '' %>>Nivå 2</option>
+                <option value="Nivå 3" <%= profile.ridingLevel === 'Nivå 3' ? 'selected' : '' %>>Nivå 3 - Medel</option>
+                <option value="Nivå 4" <%= profile.ridingLevel === 'Nivå 4' ? 'selected' : '' %>>Nivå 4 - Avancerad</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Erfarenhet (år)</label>
+              <input type="number" step="0.5" name="experienceYears" value="<%= profile.experienceYears !== undefined && profile.experienceYears !== null ? profile.experienceYears : '2' %>" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+
+          <!-- Längd och Vikt för SvRF Hästvälfärd -->
+          <div class="p-4 bg-emerald-50/50 border border-emerald-200 rounded-2xl space-y-3">
+            <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+              <i class="fa-solid fa-scale-balanced"></i>
+              <span>Vikt & Längd (Hästvälfärd & Bärighet)</span>
+            </div>
+            <p class="text-[11px] text-emerald-700">
+              Data används strikt internt för att matcha ryttarens mått med hästens maxbelastning enligt Svenska Ridsportförbundets rekommendationer.
+            </p>
+            <div class="grid grid-cols-2 gap-4 pt-1">
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 mb-1">Längd (cm)</label>
+                <input type="number" name="heightCm" value="<%= profile.heightCm || 165 %>" required
+                  class="w-full px-3 py-2 bg-white border border-stone-200 rounded-xl text-sm font-semibold">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 mb-1">Vikt (kg) *</label>
+                <input type="number" name="weightKg" value="<%= profile.weightKg || 60 %>" required
+                  class="w-full px-3 py-2 bg-white border border-emerald-400 text-emerald-900 rounded-xl text-sm font-bold">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Primärt inriktningsmål</label>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+              <label class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
+                <input type="radio" name="primaryDiscipline" value="Allround" <%= (!profile.primaryDiscipline || profile.primaryDiscipline === 'Allround') ? 'checked' : '' %> class="text-[#4a2828]">
+                <span>Allround</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
+                <input type="radio" name="primaryDiscipline" value="Dressyr" <%= profile.primaryDiscipline === 'Dressyr' ? 'checked' : '' %> class="text-[#4a2828]">
+                <span>Dressyr</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
+                <input type="radio" name="primaryDiscipline" value="Hoppning" <%= profile.primaryDiscipline === 'Hoppning' ? 'checked' : '' %> class="text-[#4a2828]">
+                <span>Hoppning</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
+                <input type="radio" name="primaryDiscipline" value="Hobby / Skog" <%= profile.primaryDiscipline === 'Hobby / Skog' ? 'checked' : '' %> class="text-[#4a2828]">
+                <span>Hobby / Skog</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Nödkontakt & Status (4 cols) -->
+      <div class="lg:col-span-4 space-y-6">
+
+        <!-- Nödkontakt / Målsman -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-solid fa-kit-medical text-rose-500"></i> Nödkontakt / Målsman
+          </h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Kontaktpersons namn *</label>
+            <input type="text" name="emergencyContactName" value="<%= profile.emergencyContactName || '' %>" placeholder="t.ex. Johan Lindqvist" required
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Telefonnummer (akut) *</label>
+            <input type="tel" name="emergencyContactPhone" value="<%= profile.emergencyContactPhone || '' %>" placeholder="073-987 65 43" required
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Relation till eleven</label>
+            <select name="emergencyContactRelation" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+              <option value="Målsman / Förälder" <%= (!profile.emergencyContactRelation || profile.emergencyContactRelation === 'Målsman / Förälder') ? 'selected' : '' %>>Målsman / Förälder</option>
+              <option value="Partner" <%= profile.emergencyContactRelation === 'Partner' ? 'selected' : '' %>>Partner</option>
+              <option value="Anhörig" <%= profile.emergencyContactRelation === 'Anhörig' ? 'selected' : '' %>>Anhörig</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Medlemskap & Status -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3">Medlemskap & Status</h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Medlemskapsstatus</label>
+            <select name="membershipStatus" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+              <option value="Aktiv" <%= (!profile.membershipStatus || profile.membershipStatus === 'Aktiv') ? 'selected' : '' %>>Aktiv</option>
+              <option value="Pröv" <%= profile.membershipStatus === 'Pröv' ? 'selected' : '' %>>Pröv</option>
+              <option value="Kö" <%= profile.membershipStatus === 'Kö' ? 'selected' : '' %>>Kö</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Särskilda behov / Allergier</label>
+            <textarea name="specialNeeds" rows="3" placeholder="T.ex. Lindrig pälsdjursallergi, tidigare knäskada..."
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm"><%= profile.specialNeeds || '' %></textarea>
+          </div>
+        </div>
+
+        <!-- Farlig zon / Ta bort elev -->
+        <div class="bg-white rounded-2xl border border-rose-200 p-6 shadow-sm space-y-3">
+          <h3 class="text-sm font-bold text-rose-800 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Farlig zon
+          </h3>
+          <p class="text-xs text-stone-500">
+            Om eleven tas bort raderas även profil, relaterade bokningar och provresultat permanent.
+          </p>
+          <button type="button" onclick="confirmDeleteStudent()" class="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2">
+            <i class="fa-regular fa-trash-can"></i>
+            <span>Ta bort denna elev</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </form>
+
+  <form id="deleteStudentForm" action="/admin/students/<%= student.id %>/delete" method="POST" class="hidden"></form>
+
+  <script>
+    function confirmDeleteStudent() {
+      if (confirm('Är du säker på att du vill ta bort eleven <%= student.fullName %>?\n\nAlla kopplade bokningar och provresultat raderas permanent.')) {
+        document.getElementById('deleteStudentForm').submit();
+      }
+    }
+
+    (function() {
+      const passwordInput = document.getElementById('studentEditPassword');
+      const toggleBtn = document.getElementById('toggleEditPasswordBtn');
+      const eyeIcon = document.getElementById('editPasswordEyeIcon');
+      const generateBtn = document.getElementById('generateEditPasswordBtn');
+
+      if (toggleBtn && passwordInput && eyeIcon) {
+        toggleBtn.addEventListener('click', function() {
+          const isPassword = passwordInput.type === 'password';
+          passwordInput.type = isPassword ? 'text' : 'password';
+          eyeIcon.classList.toggle('fa-eye', !isPassword);
+          eyeIcon.classList.toggle('fa-eye-slash', isPassword);
+        });
+      }
+
+      if (generateBtn && passwordInput) {
+        generateBtn.addEventListener('click', function() {
+          const adjectives = ['Snabb', 'Klok', 'Glad', 'Pigg', 'Stark', 'Tapper', 'Vaken', 'Lugn', 'Trygg', 'Modig'];
+          const nouns = ['Hoppare', 'Ponny', 'Ryttare', 'Galopp', 'Skimmel', 'Valack', 'Travare', 'Grimma', 'Dressyr', 'Sadling'];
+          const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+          const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+          const randomNum = Math.floor(100 + Math.random() * 900);
+          const generated = `${randomAdj}${randomNoun}${randomNum}!`;
+
+          passwordInput.value = generated;
+          passwordInput.type = 'text';
+          if (eyeIcon) {
+            eyeIcon.classList.remove('fa-eye');
+            eyeIcon.classList.add('fa-eye-slash');
+          }
+        });
+      }
+    })();
+  </script>
+</div>

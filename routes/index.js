@@ -1,9 +1,15 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', (req, res) => {
+  if (!req.session || !req.session.user) {
+    return res.redirect('/login');
+  }
+
+  const role = req.session.user.role;
+  if (role === 'ADMIN') return res.redirect('/admin/overview');
+  if (role === 'STAFF') return res.redirect('/staff/overview');
+  return res.redirect('/student/overview');
 });
 
 module.exports = router;

@@ -1,0 +1,374 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/quizzes" class="hover:text-stone-700">Quiz</a>
+        <span>&bull;</span>
+        <span>Redigera Quiz</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight mt-1">Redigera &quot;<%= quiz.title %>&quot;</h2>
+      <p class="text-xs text-stone-500 mt-0.5">Uppdatera provuppgifter, svarsalternativ eller lägg till nya frågor.</p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/quizzes" class="px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <button type="submit" form="quizEditForm" class="px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5">
+        <i class="fa-solid fa-floppy-disk text-xs"></i>
+        <span>Spara ändringar</span>
+      </button>
+    </div>
+  </div>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-800 text-xs flex items-center gap-2">
+      <i class="fa-solid fa-circle-exclamation text-rose-600"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <form id="quizEditForm" action="/admin/quizzes/<%= quiz.id %>/edit" method="POST" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Basic Info & Questions (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- Grunduppgifter -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center justify-between">
+            <span>Grunduppgifter</span>
+            <span class="text-xs text-stone-400 font-normal">Obligatoriska fält märkta med *</span>
+          </h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Quiztitel *</label>
+            <input type="text" name="title" value="<%= quiz.title %>" required
+              class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Kategori</label>
+              <select name="category" class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium">
+                <% const categories = ['Säkerhet', 'Hästens anatomi', 'Hästens beteende', 'Stallkunskap', 'Utrustning', 'Ridning', 'Foderlära', 'Hästvälfärd']; %>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat %>" <%= quiz.category === cat ? 'selected' : '' %>><%= cat %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Målgrupp / Elevnivå</label>
+              <select name="targetLevel" class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium">
+                <% const levels = ['Nybörjare', 'Grupp 1-2', 'Grupp 2-3', 'Grupp 4+', 'Alla nivåer']; %>
+                <% levels.forEach(lvl => { %>
+                  <option value="<%= lvl %>" <%= quiz.targetLevel === lvl ? 'selected' : '' %>><%= lvl %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Beskrivning för eleven</label>
+            <textarea name="description" rows="2"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]"><%= quiz.description || '' %></textarea>
+          </div>
+        </div>
+
+        <!-- Questions Section Header with "Add Question" button -->
+        <div class="flex items-center justify-between pt-2">
+          <div>
+            <h3 class="text-base font-extrabold text-stone-900 tracking-tight">Frågor i detta quiz (<span id="questionCountHeader"><%= (quiz.questions || []).length %></span> st)</h3>
+            <p class="text-xs text-stone-500">Hantera frågor och svarsalternativ. Klicka på radioknappen för att ändra rätt svar.</p>
+          </div>
+          <button type="button" id="btnAddQuestion" class="inline-flex items-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition hover-lift">
+            <i class="fa-solid fa-plus text-xs"></i>
+            <span>Lägg till fråga</span>
+          </button>
+        </div>
+
+        <!-- Dynamic Questions Container -->
+        <div id="questionsContainer" class="space-y-6">
+          <% const questions = (quiz.questions && quiz.questions.length > 0) ? quiz.questions : [{
+            topicTitle: 'Fråga 1',
+            questionText: '',
+            explanationText: '',
+            options: [
+              { optionText: '', isCorrect: true },
+              { optionText: '', isCorrect: false },
+              { optionText: '', isCorrect: false },
+              { optionText: '', isCorrect: false }
+            ]
+          }]; %>
+
+          <% questions.forEach((q, qIdx) => { %>
+            <div class="question-card bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4 transition" data-qindex="<%= qIdx %>">
+              <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-lg bg-stone-100 text-stone-700 font-bold text-xs flex items-center justify-center q-number"><%= qIdx + 1 %></span>
+                  <h4 class="text-sm font-bold text-stone-900 q-title">Fråga <%= qIdx + 1 %></h4>
+                </div>
+                <button type="button" onclick="removeQuestion(this)" class="btn-remove-q text-stone-400 hover:text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-lg text-xs font-medium transition" title="Ta bort denna fråga">
+                  <i class="fa-regular fa-trash-can mr-1"></i> Ta bort fråga
+                </button>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 mb-1">Ämne / Kort rubrik</label>
+                <input type="text" name="questions[<%= qIdx %>][topicTitle]" value="<%= q.topicTitle || '' %>" placeholder="t.ex. Säkerhetsrutin vid boxutgång" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm">
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 mb-1">Frågans formulering *</label>
+                <textarea name="questions[<%= qIdx %>][questionText]" rows="2" required placeholder="Formulera frågan tydligt för eleven..." class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm font-medium text-stone-900"><%= q.questionText || '' %></textarea>
+              </div>
+
+              <!-- Options with Radio for Correct Option -->
+              <div class="space-y-2 pt-2">
+                <label class="block text-xs font-semibold text-stone-700">Svarsalternativ (Markera rätt svar med radioknappen)</label>
+
+                <% const opts = (q.options && q.options.length > 0) ? q.options : [
+                  { optionText: '', isCorrect: true },
+                  { optionText: '', isCorrect: false },
+                  { optionText: '', isCorrect: false },
+                  { optionText: '', isCorrect: false }
+                ]; %>
+
+                <% opts.forEach((opt, oIdx) => { %>
+                  <% const isCorr = Boolean(opt.isCorrect); %>
+                  <div class="opt-row flex items-center gap-3 p-2 rounded-xl border transition <%= isCorr ? 'bg-emerald-50/70 border-emerald-300' : 'bg-stone-50 border-stone-200' %>">
+                    <input type="radio" name="questions[<%= qIdx %>][correctIndex]" value="<%= oIdx %>" <%= isCorr ? 'checked' : '' %> onchange="updateRadioStyles(this)" class="q-radio text-emerald-600 focus:ring-emerald-500 ml-1">
+                    <input type="text" name="questions[<%= qIdx %>][options][]" value="<%= opt.optionText || opt.text || '' %>" placeholder="Alternativ <%= oIdx + 1 %>..." required class="w-full px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs font-medium text-stone-900">
+                    <span class="correct-badge px-2 py-0.5 rounded bg-emerald-200 text-emerald-800 text-[10px] font-bold shrink-0 <%= isCorr ? '' : 'hidden' %>">Rätt svar</span>
+                  </div>
+                <% }); %>
+              </div>
+
+              <!-- Pedagogisk återkoppling -->
+              <div class="p-3.5 bg-amber-50/50 border border-amber-200 rounded-xl space-y-1 mt-3">
+                <label class="block text-xs font-bold text-amber-900">
+                  <i class="fa-regular fa-lightbulb mr-1"></i> Pedagogisk förklaring (visas för eleven i provresultatet)
+                </label>
+                <textarea name="questions[<%= qIdx %>][explanationText]" rows="2" placeholder="Förklara varför svaret är rätt..." class="w-full px-3 py-2 bg-white border border-amber-200 rounded-lg text-xs text-stone-800"><%= q.explanationText || '' %></textarea>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+
+        <!-- Add Question Footer Button -->
+        <div class="pt-2">
+          <button type="button" onclick="document.getElementById('btnAddQuestion').click()" class="w-full py-3.5 border-2 border-dashed border-stone-300 hover:border-emerald-700 hover:bg-emerald-50/30 text-stone-600 hover:text-emerald-800 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition">
+            <i class="fa-solid fa-plus"></i>
+            <span>Lägg till ytterligare en fråga</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Settings & Badges (4 cols) -->
+      <div class="lg:col-span-4 space-y-6">
+
+        <!-- Quiz-inställningar -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-1.5">
+            <i class="fa-solid fa-sliders text-stone-400 text-xs"></i>
+            <span>Quiz-inställningar</span>
+          </h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Svårighetsgrad</label>
+            <select name="difficulty" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+              <option value="Lätt" <%= quiz.difficulty === 'Lätt' ? 'selected' : '' %>>Lätt</option>
+              <option value="Medel" <%= quiz.difficulty === 'Medel' ? 'selected' : '' %>>Medel</option>
+              <option value="Svår" <%= quiz.difficulty === 'Svår' ? 'selected' : '' %>>Svår</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Tidsgräns (minuter)</label>
+            <input type="number" name="timeLimitMinutes" value="<%= quiz.timeLimitMinutes || 15 %>" min="1" max="120" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium">
+          </div>
+        </div>
+
+        <!-- Betygskrav & Diplom -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-1.5">
+            <i class="fa-solid fa-medal text-amber-500 text-xs"></i>
+            <span>Betygskrav & Ryttarmärke</span>
+          </h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Godkäntgräns (%)</label>
+            <input type="number" name="passPercentage" value="<%= quiz.passPercentage || 80 %>" min="10" max="100" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm font-bold text-emerald-800">
+            <span class="text-[10px] text-stone-400 mt-1 block">80% krävs vanligtvis för Svenska Ridsportförbundets ryttarmärken</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Koppla till Ryttarmärke</label>
+            <select name="equestrianBadge" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+              <option value="" <%= !quiz.equestrianBadge ? 'selected' : '' %>>Inget märke</option>
+              <option value="Ryttarmärke 1 (Vit)" <%= quiz.equestrianBadge === 'Ryttarmärke 1 (Vit)' ? 'selected' : '' %>>Ryttarmärke 1 (Vit)</option>
+              <option value="Ryttarmärke 2 (Brons)" <%= quiz.equestrianBadge === 'Ryttarmärke 2 (Brons)' ? 'selected' : '' %>>Ryttarmärke 2 (Brons)</option>
+              <option value="Ryttarmärke 3 (Silver)" <%= quiz.equestrianBadge === 'Ryttarmärke 3 (Silver)' ? 'selected' : '' %>>Ryttarmärke 3 (Silver)</option>
+              <option value="Ryttarmärke 4 (Guld)" <%= quiz.equestrianBadge === 'Ryttarmärke 4 (Guld)' ? 'selected' : '' %>>Ryttarmärke 4 (Guld)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Publishing Actions -->
+        <div class="bg-stone-50 rounded-2xl border border-stone-200 p-4 space-y-3 text-xs">
+          <button type="submit" form="quizEditForm" class="w-full py-2.5 bg-[#3d2314] hover:bg-[#2a170c] text-white font-semibold rounded-xl shadow-xs transition text-center flex items-center justify-center gap-2">
+            <i class="fa-solid fa-floppy-disk text-xs"></i>
+            <span>Spara ändringar</span>
+          </button>
+          <a href="/admin/quizzes" class="block w-full py-2 text-center text-stone-600 hover:text-stone-900 border border-stone-300 rounded-xl hover:bg-white transition">
+            Avbryt & gå tillbaka
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<!-- JavaScript to dynamically add and remove questions -->
+<script>
+  function updateRadioStyles(radio) {
+    const card = radio.closest('.question-card');
+    const rows = card.querySelectorAll('.opt-row');
+    rows.forEach(row => {
+      const r = row.querySelector('.q-radio');
+      const badge = row.querySelector('.correct-badge');
+      if (r && r.checked) {
+        row.classList.add('bg-emerald-50/70', 'border-emerald-300');
+        row.classList.remove('bg-stone-50', 'border-stone-200');
+        if (badge) badge.classList.remove('hidden');
+      } else {
+        row.classList.remove('bg-emerald-50/70', 'border-emerald-300');
+        row.classList.add('bg-stone-50', 'border-stone-200');
+        if (badge) badge.classList.add('hidden');
+      }
+    });
+  }
+
+  function renumberQuestions() {
+    const cards = document.querySelectorAll('.question-card');
+    const countHeader = document.getElementById('questionCountHeader');
+    if (countHeader) countHeader.textContent = cards.length;
+
+    cards.forEach((card, idx) => {
+      const qNum = idx + 1;
+      card.dataset.qindex = idx;
+      const numSpan = card.querySelector('.q-number');
+      const titleSpan = card.querySelector('.q-title');
+      if (numSpan) numSpan.textContent = qNum;
+      if (titleSpan) titleSpan.textContent = 'Fråga ' + qNum;
+
+      // Update input names
+      const topicInput = card.querySelector('input[name*="[topicTitle]"]');
+      if (topicInput) topicInput.name = `questions[${idx}][topicTitle]`;
+
+      const qTextInput = card.querySelector('textarea[name*="[questionText]"]');
+      if (qTextInput) qTextInput.name = `questions[${idx}][questionText]`;
+
+      const expInput = card.querySelector('textarea[name*="[explanationText]"]');
+      if (expInput) expInput.name = `questions[${idx}][explanationText]`;
+
+      const radios = card.querySelectorAll('.q-radio');
+      radios.forEach(r => {
+        r.name = `questions[${idx}][correctIndex]`;
+      });
+
+      const optInputs = card.querySelectorAll('input[name*="[options]"]');
+      optInputs.forEach(opt => {
+        opt.name = `questions[${idx}][options][]`;
+      });
+    });
+  }
+
+  function removeQuestion(btn) {
+    const cards = document.querySelectorAll('.question-card');
+    if (cards.length <= 1) {
+      alert('Ett quiz måste innehålla minst en fråga.');
+      return;
+    }
+    const card = btn.closest('.question-card');
+    if (confirm('Vill du ta bort denna fråga?')) {
+      card.remove();
+      renumberQuestions();
+    }
+  }
+
+  document.getElementById('btnAddQuestion').addEventListener('click', () => {
+    const container = document.getElementById('questionsContainer');
+    const newIdx = document.querySelectorAll('.question-card').length;
+    const qNum = newIdx + 1;
+
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'question-card bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4 transition';
+    cardDiv.dataset.qindex = newIdx;
+
+    cardDiv.innerHTML = `
+      <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-lg bg-stone-100 text-stone-700 font-bold text-xs flex items-center justify-center q-number">${qNum}</span>
+          <h4 class="text-sm font-bold text-stone-900 q-title">Fråga ${qNum}</h4>
+        </div>
+        <button type="button" onclick="removeQuestion(this)" class="btn-remove-q text-stone-400 hover:text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-lg text-xs font-medium transition" title="Ta bort denna fråga">
+          <i class="fa-regular fa-trash-can mr-1"></i> Ta bort fråga
+        </button>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-stone-700 mb-1">Ämne / Kort rubrik</label>
+        <input type="text" name="questions[${newIdx}][topicTitle]" value="" placeholder="t.ex. Utrustning & tränsning" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-stone-700 mb-1">Frågans formulering *</label>
+        <textarea name="questions[${newIdx}][questionText]" rows="2" required placeholder="Formulera frågan tydligt för eleven..." class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs sm:text-sm font-medium text-stone-900"></textarea>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <label class="block text-xs font-semibold text-stone-700">Svarsalternativ (Markera rätt svar med radioknappen)</label>
+
+        <div class="opt-row flex items-center gap-3 p-2 rounded-xl border transition bg-emerald-50/70 border-emerald-300">
+          <input type="radio" name="questions[${newIdx}][correctIndex]" value="0" checked onchange="updateRadioStyles(this)" class="q-radio text-emerald-600 focus:ring-emerald-500 ml-1">
+          <input type="text" name="questions[${newIdx}][options][]" value="" placeholder="Rätt svarsalternativ..." required class="w-full px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs font-medium text-stone-900">
+          <span class="correct-badge px-2 py-0.5 rounded bg-emerald-200 text-emerald-800 text-[10px] font-bold shrink-0">Rätt svar</span>
+        </div>
+
+        <div class="opt-row flex items-center gap-3 p-2 rounded-xl border transition bg-stone-50 border-stone-200">
+          <input type="radio" name="questions[${newIdx}][correctIndex]" value="1" onchange="updateRadioStyles(this)" class="q-radio text-emerald-600 focus:ring-emerald-500 ml-1">
+          <input type="text" name="questions[${newIdx}][options][]" value="" placeholder="Felaktigt alternativ..." required class="w-full px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs text-stone-800">
+          <span class="correct-badge px-2 py-0.5 rounded bg-emerald-200 text-emerald-800 text-[10px] font-bold shrink-0 hidden">Rätt svar</span>
+        </div>
+
+        <div class="opt-row flex items-center gap-3 p-2 rounded-xl border transition bg-stone-50 border-stone-200">
+          <input type="radio" name="questions[${newIdx}][correctIndex]" value="2" onchange="updateRadioStyles(this)" class="q-radio text-emerald-600 focus:ring-emerald-500 ml-1">
+          <input type="text" name="questions[${newIdx}][options][]" value="" placeholder="Felaktigt alternativ..." required class="w-full px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs text-stone-800">
+          <span class="correct-badge px-2 py-0.5 rounded bg-emerald-200 text-emerald-800 text-[10px] font-bold shrink-0 hidden">Rätt svar</span>
+        </div>
+
+        <div class="opt-row flex items-center gap-3 p-2 rounded-xl border transition bg-stone-50 border-stone-200">
+          <input type="radio" name="questions[${newIdx}][correctIndex]" value="3" onchange="updateRadioStyles(this)" class="q-radio text-emerald-600 focus:ring-emerald-500 ml-1">
+          <input type="text" name="questions[${newIdx}][options][]" value="" placeholder="Felaktigt alternativ..." required class="w-full px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs text-stone-800">
+          <span class="correct-badge px-2 py-0.5 rounded bg-emerald-200 text-emerald-800 text-[10px] font-bold shrink-0 hidden">Rätt svar</span>
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-amber-50/50 border border-amber-200 rounded-xl space-y-1 mt-3">
+        <label class="block text-xs font-bold text-amber-900">
+          <i class="fa-regular fa-lightbulb mr-1"></i> Pedagogisk förklaring (visas för eleven i provresultatet)
+        </label>
+        <textarea name="questions[${newIdx}][explanationText]" rows="2" placeholder="Förklara varför svaret är rätt..." class="w-full px-3 py-2 bg-white border border-amber-200 rounded-lg text-xs text-stone-800"></textarea>
+      </div>
+    `;
+
+    container.appendChild(cardDiv);
+    renumberQuestions();
+    cardDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+</script>

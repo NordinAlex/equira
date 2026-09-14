@@ -1,0 +1,150 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/tasks" class="hover:text-stone-700">Stalluppgifter</a>
+        <span>&bull;</span>
+        <span>Ny stalluppgift</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight mt-1">Ny stalluppgift</h2>
+      <p class="text-xs text-stone-500 mt-0.5">Skapa och tilldela en daglig skötsel- eller driftuppgift i stallet.</p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/tasks" class="px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <button type="submit" form="taskForm" class="px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition">
+        Spara uppgift
+      </button>
+    </div>
+  </div>
+
+  <form id="taskForm" action="/admin/tasks/create" method="POST" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Details (8 cols) -->
+      <div class="lg:col-span-8 space-y-6">
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-regular fa-clipboard text-stone-400"></i> Uppgiftsdetaljer
+          </h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Uppgiftens namn / Typ *</label>
+            <input type="text" id="taskTitleInput" name="title" value="Morgonfodring, grovfoder & tillsyn" required
+              class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+
+            <!-- Quick Selection Pills (Matching PDF 3 page 7) -->
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              <button type="button" onclick="document.getElementById('taskTitleInput').value = 'Morgonfodring'; document.getElementById('taskTypeSelect').value = 'Morgonfodring';" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs">Morgonfodring</button>
+              <button type="button" onclick="document.getElementById('taskTitleInput').value = 'Lunchgiva'; document.getElementById('taskTypeSelect').value = 'Lunchgiva';" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs">Lunchgiva</button>
+              <button type="button" onclick="document.getElementById('taskTitleInput').value = 'Kvällsfodring'; document.getElementById('taskTypeSelect').value = 'Kvällsfodring';" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs">Kvällsfodring</button>
+              <button type="button" onclick="document.getElementById('taskTitleInput').value = 'Mockning Boxar'; document.getElementById('taskTypeSelect').value = 'Mockning';" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs">Mockning</button>
+              <button type="button" onclick="document.getElementById('taskTitleInput').value = 'Utsläpp i hagar'; document.getElementById('taskTypeSelect').value = 'Utsläpp';" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs">Utsläpp/Intag</button>
+              <button type="button" onclick="document.getElementById('taskTitleInput').value = 'Medicinering & Sårvård'; document.getElementById('taskTypeSelect').value = 'Medicinering';" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs">Medicinering</button>
+              <button type="button" onclick="document.getElementById('taskTitleInput').value = 'Täckesbyte'; document.getElementById('taskTypeSelect').value = 'Täckesbyte';" class="px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs">Täckesbyte</button>
+            </div>
+            <input type="hidden" id="taskTypeSelect" name="taskType" value="Morgonfodring">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Plats / Stallavdelning *</label>
+              <input type="text" name="location" value="Stall 1 & Hagområde" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Kopplad häst (frivilligt)</label>
+              <select name="horseId" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+                <option value="">Ingen specifik häst (gäller stallet)</option>
+                <% horses.forEach(h => { %>
+                  <option value="<%= h.id %>"><%= h.name %> (<%= h.boxNumber || 'Box' %>)</option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Datum *</label>
+              <input type="date" name="dueDate" value="<%= new Date().toISOString().split('T')[0] %>" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-stone-700 mb-1">Tidpunkt *</label>
+              <input type="time" name="dueTime" value="07:00" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-1">Instruktioner & Arbetsbeskrivning</label>
+            <textarea name="instructions" rows="3"
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]"
+              placeholder="Kontrollera att alla hästar har tillgång till färskt tempererat vatten..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Priority & Staff Assignment (4 cols) -->
+      <div class="lg:col-span-4 space-y-6">
+
+        <!-- Prioritetsnivå (Matching PDF 3 page 7) -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-3">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3">! Prioritetsnivå</h3>
+
+          <div class="space-y-2">
+            <label class="flex items-center gap-3 p-3 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer transition">
+              <input type="radio" name="priority" value="Normal" checked class="text-[#4a2828] focus:ring-[#4a2828]">
+              <div>
+                <span class="block text-xs font-bold text-stone-900">Normal</span>
+                <span class="block text-[11px] text-stone-400">Rutinmässig skötsel</span>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-3 p-3 border border-amber-200 bg-amber-50/50 rounded-xl hover:bg-amber-50 cursor-pointer transition">
+              <input type="radio" name="priority" value="Viktig" class="text-amber-700 focus:ring-amber-700">
+              <div>
+                <span class="block text-xs font-bold text-amber-900">Viktig</span>
+                <span class="block text-[11px] text-amber-700">Hög tillsyn / passas noga</span>
+              </div>
+            </label>
+
+            <label class="flex items-center gap-3 p-3 border border-rose-200 bg-rose-50/50 rounded-xl hover:bg-rose-50 cursor-pointer transition">
+              <input type="radio" name="priority" value="Akut" class="text-rose-700 focus:ring-rose-700">
+              <div>
+                <span class="block text-xs font-bold text-rose-900">Akut</span>
+                <span class="block text-[11px] text-rose-700">Omedelbar åtgärd krävs</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Tilldela personal -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-3">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3">Tilldela personal</h3>
+
+          <div class="space-y-2">
+            <% staff.forEach((s, idx) => { %>
+              <label class="flex items-center justify-between p-2.5 rounded-xl border border-stone-200 hover:bg-stone-50 cursor-pointer text-xs">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-stone-200 text-stone-800 flex items-center justify-center font-bold text-[10px]">
+                    <%= s.fullName.charAt(0) %>
+                  </div>
+                  <div>
+                    <span class="font-bold text-stone-900 block leading-tight"><%= s.fullName %></span>
+                    <span class="text-[10px] text-stone-400"><%= s.staffProfile ? s.staffProfile.title : 'Stallpersonal' %></span>
+                  </div>
+                </div>
+                <input type="radio" name="assignedToUserId" value="<%= s.id %>" <%= idx === 0 ? 'checked' : '' %> class="text-[#4a2828]">
+              </label>
+            <% }); %>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </form>
+</div>
