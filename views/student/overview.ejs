@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equira | Översikt</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+</head>
+
+<body class="bg-[#F2EFEB]">
+  <header class="mb-16">
+    <%-include('../Partials/topbar-student.ejs')%>
+  </header>
+
+  <main>
+    <div class="flex flex-col gap-2 p-6">
+      <h2 class="font-semibold">Hej, <%= user.fullName.split(' ')[0] || user.username %>!</h2>
+
+      <!-- Today's date -->
+      <p class="flex gap-2 text-gray-700">
+        <span>
+          <%= new Date().toLocaleDateString('sv-SE', {
+            weekday: 'long'
+        }).replace(/^./, c => c.toUpperCase()) %>
+        </span>
+        <span>|</span>
+        <span>
+          <%= new Date().toLocaleDateString('sv-SE', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }) %>
+        </span>
+      </p>
+
+    </div>
+
+    <h1 class="px-6 mt-6 font-semibold text-lg">Nästa lektion</h1>
+
+    <%-include('../Partials/lesson-card.ejs')%>
+
+    <div class="flex justify-between p-6">
+    <h2 class="font-semibold text-lg">Kommande lektioner</h2>
+    <a href="/student/schedule" class="text-equira-cognac-700">Se alla</a>
+    </div>
+
+    <div>
+        <%-include('../Partials/upcoming-lessons.ejs')%>
+    </div>
+  </main>
+
+  <footer class="pt-25">
+    <%-include('../Partials/bottomnav-student.ejs')%>
+  </footer>
+</body>
+
+</html>

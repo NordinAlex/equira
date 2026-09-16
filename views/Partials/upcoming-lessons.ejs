@@ -1,0 +1,27 @@
+ <% if (upcomingLessons.length === 0) { %>
+ <p class="px-6">Du har inga kommande lektioner just nu.</p>
+ <% } %>
+
+ <!-- Kommande lektioner, kort -->
+ <div class="border border-[#B0A696] rounded-xl bg-white mx-6">
+   <% upcomingLessons.forEach(booking => { %>
+
+   <a href="/student/lessons/<%= booking.lesson.id %>" class="block first:border-b border-[#B0A696] p-6">
+     <div class="flex gap-6">
+        
+        <!-- Grön ruta -->
+       <div class="flex flex-col bg-equira-green-100 rounded-xl p-4 text-center text-lg text-equira-green-700 font-semibold">
+         <p class="uppercase"><%= booking.dayLabel %></p>
+         <p><%= new Date(`${booking.lesson.date}T00:00:00`).getDate().toString().padStart(2, "0") %></p>
+       </div>
+
+       <div class="flex flex-col justify-center">
+         <p class="text-lg"><%= booking.lesson.lessonType %> | <%= booking.lesson.startTime %></p>
+         <p>Häst: <%= booking.horse?.name %></p>
+       </div>
+
+       <i class="fa solid fa-arrow-right text-lg text-equira-cognac-600 ml-auto self-center"></i>
+     </div>
+   </a>
+   <% }) %>
+ </div>
