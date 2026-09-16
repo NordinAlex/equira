@@ -1,5 +1,7 @@
 const express = require('express');
-const { getDataSource } = require('../config/database');
+
+const {requireLogin } = require('../middleware/authMiddleware');
+const studentController = require('../controllers/studentController');
 
 const router = express.Router();
 
@@ -8,35 +10,10 @@ router.use((req, res, next) => {
     next();
 });
 
-router.get("/horses", async (req, res, next) => {
-    try {
-        const dataSource = await getDataSource();
-        const horseRepository = dataSource.getRepository("Horse");
-        const horses = await horseRepository.find();
+router.get("/overview", requireLogin, studentController.overview);
 
-        res.render("student/horses", { horses });
-    } catch (error) {
-        next(error);
-    }
-});
+router.get("/horses", requireLogin, studentController.horses);
 
-router.get("/horses/:id", async (req, res, next) => {
-    try {
-        const dataSource = await getDataSource();
-        const horseRepository = dataSource.getRepository("Horse");
-        const horse = await horseRepository.findOneBy({
-            id: Number(req.params.id)
-        });
-
-        if (!horse) {
-            return res.status(404).render("error");
-        }
-
-        res.render("student/horse-profile", { horse });
-
-    } catch (error) {
-        next(error);
-    }
-});
+router.get("/horses/:id", requireLogin, studentController.horseProfile);
 
 module.exports = router;
