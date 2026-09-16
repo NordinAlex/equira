@@ -1,0 +1,57 @@
+<% if (nextLesson) { %>
+
+<div class="bg-white border border-[#B0A696] rounded-xl p-6 m-6 text-lg">
+
+  <!-- Övre rad -->
+  <div class="flex gap-2">
+
+    <!-- Grön ruta -->
+    <div class="flex gap-2 text-equira-green-700 bg-equira-green-100 rounded-full p-2">
+      <p><%= nextLesson.startTime %></p>
+      <p><%= nextLesson.dayLabel %></p>
+    </div>
+
+    <!-- Fri text -->
+    <div class="flex ml-auto p-2 text-gray-700">
+      <p><%= nextLesson.lessonType %> | <%= nextLesson.arena.name %></p>
+    </div>
+
+  </div>
+
+  <!-- Nedre rad -->
+  <div class="flex justify-between">
+
+    <!-- Häst -->
+    <% if (nextBooking.horse) { %>
+    <div class="flex mt-4 items-center gap-3 w-70">
+      <i class="fa-solid fa-horse-head text-3xl text-equira-cognac-600"></i>
+      <div class="flex flex-col gap-1">
+        <p>Häst:</p>
+        <p class="font-semibold"><%= nextBooking.horse.name %></p>
+      </div>
+    </div>
+    <% } %>
+
+    <!-- Instruktör -->
+    <div class="flex mt-4 items-center gap-3 ml-auto">
+      <i class="fa-solid fa-circle-user text-3xl text-equira-cognac-600"></i>
+      <div class="flex flex-wrap gap-1">
+        <p>Instruktör:</p>
+        <p class="font-semibold"><%= nextLesson.instructor.fullName %></p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Knapp -->
+  <div class="p-2 mt-6 flex">
+    <a href="/student/lessons/<%= nextLesson.id %>" class="flex items-center gap-2 justify-center bg-equira-cognac-600 rounded-lg text-white p-4 w-full">
+      Visa lektion
+      <span>
+        <i class="fa solid fa-arrow-right text-lg text-white mt-2"></i>
+      </span>
+    </a>
+  </div>
+
+</div>
+<% } %>

@@ -20,6 +20,7 @@ const horsesRouter = require('./routes/Staff/horses');
 const searchRouter = require('./routes/search');
 const adminRouter = require('./routes/adminRoutes');
 const apiRouter = require('./routes/apiRoutes');
+const profileRouter = require('./routes/Staff/profile');
 
 const app = express();
 
@@ -36,7 +37,7 @@ getDataSource()
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
-app.set('layout', 'layouts/adminLayout'); // default layout
+app.set('layout', false);
 app.set('layout extractScripts', true);
 app.set('layout extractStyles', true);
 
@@ -67,8 +68,13 @@ app.use('/student', studentRouter);
 app.use('/overview', overviewStaffRouter);
 app.use('/horses', horsesRouter);
 app.use('/search', searchRouter);
-app.use('/admin', adminRouter);
 app.use('/api', apiRouter);
+app.use('/profile', profileRouter);
+
+app.use('/admin', (req, res, next) => {
+  res.locals.layout = 'layouts/adminLayout';
+  next();
+}, adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
