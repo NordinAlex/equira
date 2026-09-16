@@ -29,7 +29,7 @@ router.get('/staff', function(req, res, next) {
     }
   ];
 
-  res.render('staff/horses', { title: 'Hästar', currentPage: 'horses', horses });
+  res.render('staff/horses', { title: 'Hästar', currentPage: 'horses', horses, layout: false, horses });
 });
 
 module.exports = router;
