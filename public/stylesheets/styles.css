@@ -154,11 +154,15 @@
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
     --color-equira-green-700: #25523d;
+    --color-equira-green-600: #326a4f;
     --color-equira-green-100: #e3efe7;
-    --color-equira-cognac-900: #2a160d;
+    --color-equira-green-50: #f0f7f3;
     --color-equira-cognac-800: #3d2314;
     --color-equira-cognac-700: #4a2828;
     --color-equira-cognac-600: #5c3528;
+    --color-equira-sand-50: #fdfbf7;
+    --color-equira-sand-100: #f7f4ed;
+    --color-equira-sand-200: #ede8dd;
   }
 }
 @layer base {
@@ -435,6 +439,12 @@
       max-width: 96rem;
     }
   }
+  .m-3 {
+    margin: calc(var(--spacing) * 3);
+  }
+  .m-4 {
+    margin: calc(var(--spacing) * 4);
+  }
   .m-6 {
     margin: calc(var(--spacing) * 6);
   }
@@ -458,6 +468,12 @@
   }
   .my-10 {
     margin-block: calc(var(--spacing) * 10);
+  }
+  .my-15 {
+    margin-block: calc(var(--spacing) * 15);
+  }
+  .my-20 {
+    margin-block: calc(var(--spacing) * 20);
   }
   .-mt-8 {
     margin-top: calc(var(--spacing) * -8);
@@ -540,11 +556,20 @@
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
   }
+  .mb-10 {
+    margin-bottom: calc(var(--spacing) * 10);
+  }
   .mb-15 {
     margin-bottom: calc(var(--spacing) * 15);
   }
   .mb-16 {
     margin-bottom: calc(var(--spacing) * 16);
+  }
+  .mb-20 {
+    margin-bottom: calc(var(--spacing) * 20);
+  }
+  .mb-26 {
+    margin-bottom: calc(var(--spacing) * 26);
   }
   .-ml-1 {
     margin-left: calc(var(--spacing) * -1);
@@ -759,6 +784,9 @@
   .w-72 {
     width: calc(var(--spacing) * 72);
   }
+  .w-fit {
+    width: fit-content;
+  }
   .w-full {
     width: 100%;
   }
@@ -945,6 +973,9 @@
   }
   .gap-7 {
     gap: calc(var(--spacing) * 7);
+  }
+  .gap-8 {
+    gap: calc(var(--spacing) * 8);
   }
   :where(.space-y-1 > :not(:last-child)) {
     --tw-space-y-reverse: 0;
@@ -1174,6 +1205,12 @@
       border-color: color-mix(in oklab, var(--color-emerald-900) 50%, transparent);
     }
   }
+  .border-equira-sand-100 {
+    border-color: var(--color-equira-sand-100);
+  }
+  .border-equira-sand-200 {
+    border-color: var(--color-equira-sand-200);
+  }
   .border-gray-200 {
     border-color: var(--color-gray-200);
   }
@@ -1246,6 +1283,9 @@
   .border-yellow-300 {
     border-color: var(--color-yellow-300);
   }
+  .border-b-\[\#F2EFEB\] {
+    border-bottom-color: #F2EFEB;
+  }
   .border-b-amber-500 {
     border-bottom-color: var(--color-amber-500);
   }
@@ -1275,6 +1315,9 @@
   }
   .bg-\[\#FAF7F2\] {
     background-color: #FAF7F2;
+  }
+  .bg-\[\#\] {
+    background-color: #;
   }
   .bg-\[\#f4f2ee\] {
     background-color: #f4f2ee;
@@ -1434,6 +1477,12 @@
   }
   .bg-equira-green-100 {
     background-color: var(--color-equira-green-100);
+  }
+  .bg-equira-sand-100 {
+    background-color: var(--color-equira-sand-100);
+  }
+  .bg-equira-sand-200 {
+    background-color: var(--color-equira-sand-200);
   }
   .bg-gray-50 {
     background-color: var(--color-gray-50);
@@ -2059,9 +2108,6 @@
   .text-equira-cognac-800 {
     color: var(--color-equira-cognac-800);
   }
-  .text-equira-cognac-900 {
-    color: var(--color-equira-cognac-900);
-  }
   .text-equira-green-700 {
     color: var(--color-equira-green-700);
   }
@@ -2661,9 +2707,6 @@
     }
     .hover\:text-equira-cognac-800:hover {
       color: var(--color-equira-cognac-800);
-    }
-    .hover\:text-equira-cognac-900:hover {
-      color: var(--color-equira-cognac-900);
     }
     .hover\:text-gray-600:hover {
       color: var(--color-gray-600);
