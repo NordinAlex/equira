@@ -177,4 +177,40 @@ async function horseProfile(req, res, next) {
     }
 }
 
-module.exports = { overview, lessonDetails, horses, horseProfile };
+// SCHEDULE
+
+async function schedule(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const lessonBookingRepository = dataSource.getRepository("LessonBooking");
+        const bookings = await lessonBookingRepository.find({
+            where: {
+                studentId: req.session.user.id
+            },
+            relations: {
+                lesson: {
+                    arena: true,
+                    instructor: true,
+                    ridingGroup: true
+                },
+                horse: true
+            },
+
+            order: {
+                lesson: {
+                    date: "ASC",
+                    startTime: "ASC"
+                }
+            }
+        });
+
+        res.render("student/schedule", {
+            bookings,
+            showBackButton: true
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { overview, lessonDetails, horses, horseProfile, schedule };

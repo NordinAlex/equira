@@ -154,13 +154,10 @@
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
     --color-equira-green-700: #25523d;
-    --color-equira-green-600: #326a4f;
     --color-equira-green-100: #e3efe7;
-    --color-equira-green-50: #f0f7f3;
     --color-equira-cognac-800: #3d2314;
     --color-equira-cognac-700: #4a2828;
     --color-equira-cognac-600: #5c3528;
-    --color-equira-sand-50: #fdfbf7;
     --color-equira-sand-100: #f7f4ed;
     --color-equira-sand-200: #ede8dd;
   }
@@ -439,12 +436,6 @@
       max-width: 96rem;
     }
   }
-  .m-3 {
-    margin: calc(var(--spacing) * 3);
-  }
-  .m-4 {
-    margin: calc(var(--spacing) * 4);
-  }
   .m-6 {
     margin: calc(var(--spacing) * 6);
   }
@@ -471,9 +462,6 @@
   }
   .my-15 {
     margin-block: calc(var(--spacing) * 15);
-  }
-  .my-20 {
-    margin-block: calc(var(--spacing) * 20);
   }
   .-mt-8 {
     margin-top: calc(var(--spacing) * -8);
@@ -513,6 +501,9 @@
   }
   .mt-20 {
     margin-top: calc(var(--spacing) * 20);
+  }
+  .mt-25 {
+    margin-top: calc(var(--spacing) * 25);
   }
   .mt-auto {
     margin-top: auto;
@@ -556,17 +547,11 @@
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
   }
-  .mb-10 {
-    margin-bottom: calc(var(--spacing) * 10);
-  }
   .mb-15 {
     margin-bottom: calc(var(--spacing) * 15);
   }
   .mb-16 {
     margin-bottom: calc(var(--spacing) * 16);
-  }
-  .mb-20 {
-    margin-bottom: calc(var(--spacing) * 20);
   }
   .mb-26 {
     margin-bottom: calc(var(--spacing) * 26);
@@ -1205,12 +1190,6 @@
       border-color: color-mix(in oklab, var(--color-emerald-900) 50%, transparent);
     }
   }
-  .border-equira-sand-100 {
-    border-color: var(--color-equira-sand-100);
-  }
-  .border-equira-sand-200 {
-    border-color: var(--color-equira-sand-200);
-  }
   .border-gray-200 {
     border-color: var(--color-gray-200);
   }
@@ -1283,9 +1262,6 @@
   .border-yellow-300 {
     border-color: var(--color-yellow-300);
   }
-  .border-b-\[\#F2EFEB\] {
-    border-bottom-color: #F2EFEB;
-  }
   .border-b-amber-500 {
     border-bottom-color: var(--color-amber-500);
   }
@@ -1315,9 +1291,6 @@
   }
   .bg-\[\#FAF7F2\] {
     background-color: #FAF7F2;
-  }
-  .bg-\[\#\] {
-    background-color: #;
   }
   .bg-\[\#f4f2ee\] {
     background-color: #f4f2ee;
@@ -1477,9 +1450,6 @@
   }
   .bg-equira-green-100 {
     background-color: var(--color-equira-green-100);
-  }
-  .bg-equira-sand-100 {
-    background-color: var(--color-equira-sand-100);
   }
   .bg-equira-sand-200 {
     background-color: var(--color-equira-sand-200);
