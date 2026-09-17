@@ -153,15 +153,13 @@
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
+    --color-equira-green-900: #142e21;
+    --color-equira-green-800: #1B3B2B;
     --color-equira-green-700: #25523d;
-    --color-equira-green-600: #326a4f;
     --color-equira-green-100: #e3efe7;
-    --color-equira-green-50: #f0f7f3;
     --color-equira-cognac-800: #3d2314;
     --color-equira-cognac-700: #4a2828;
     --color-equira-cognac-600: #5c3528;
-    --color-equira-sand-50: #fdfbf7;
-    --color-equira-sand-100: #f7f4ed;
     --color-equira-sand-200: #ede8dd;
   }
 }
@@ -439,12 +437,6 @@
       max-width: 96rem;
     }
   }
-  .m-3 {
-    margin: calc(var(--spacing) * 3);
-  }
-  .m-4 {
-    margin: calc(var(--spacing) * 4);
-  }
   .m-6 {
     margin: calc(var(--spacing) * 6);
   }
@@ -471,9 +463,6 @@
   }
   .my-15 {
     margin-block: calc(var(--spacing) * 15);
-  }
-  .my-20 {
-    margin-block: calc(var(--spacing) * 20);
   }
   .-mt-8 {
     margin-top: calc(var(--spacing) * -8);
@@ -513,6 +502,9 @@
   }
   .mt-20 {
     margin-top: calc(var(--spacing) * 20);
+  }
+  .mt-25 {
+    margin-top: calc(var(--spacing) * 25);
   }
   .mt-auto {
     margin-top: auto;
@@ -556,17 +548,17 @@
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
   }
-  .mb-10 {
-    margin-bottom: calc(var(--spacing) * 10);
+  .mb-9 {
+    margin-bottom: calc(var(--spacing) * 9);
+  }
+  .mb-12 {
+    margin-bottom: calc(var(--spacing) * 12);
   }
   .mb-15 {
     margin-bottom: calc(var(--spacing) * 15);
   }
   .mb-16 {
     margin-bottom: calc(var(--spacing) * 16);
-  }
-  .mb-20 {
-    margin-bottom: calc(var(--spacing) * 20);
   }
   .mb-26 {
     margin-bottom: calc(var(--spacing) * 26);
@@ -1122,9 +1114,25 @@
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 2px;
   }
+  .border-l {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 1px;
+  }
   .border-l-4 {
     border-left-style: var(--tw-border-style);
     border-left-width: 4px;
+  }
+  .border-l-5 {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 5px;
+  }
+  .border-l-6 {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 6px;
+  }
+  .border-l-\[5px\] {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 5px;
   }
   .border-dashed {
     --tw-border-style: dashed;
@@ -1205,12 +1213,6 @@
       border-color: color-mix(in oklab, var(--color-emerald-900) 50%, transparent);
     }
   }
-  .border-equira-sand-100 {
-    border-color: var(--color-equira-sand-100);
-  }
-  .border-equira-sand-200 {
-    border-color: var(--color-equira-sand-200);
-  }
   .border-gray-200 {
     border-color: var(--color-gray-200);
   }
@@ -1283,11 +1285,11 @@
   .border-yellow-300 {
     border-color: var(--color-yellow-300);
   }
-  .border-b-\[\#F2EFEB\] {
-    border-bottom-color: #F2EFEB;
-  }
   .border-b-amber-500 {
     border-bottom-color: var(--color-amber-500);
+  }
+  .border-l-equira-cognac-600 {
+    border-left-color: var(--color-equira-cognac-600);
   }
   .bg-\[\#1B3B2B\] {
     background-color: #1B3B2B;
@@ -1315,9 +1317,6 @@
   }
   .bg-\[\#FAF7F2\] {
     background-color: #FAF7F2;
-  }
-  .bg-\[\#\] {
-    background-color: #;
   }
   .bg-\[\#f4f2ee\] {
     background-color: #f4f2ee;
@@ -1477,9 +1476,6 @@
   }
   .bg-equira-green-100 {
     background-color: var(--color-equira-green-100);
-  }
-  .bg-equira-sand-100 {
-    background-color: var(--color-equira-sand-100);
   }
   .bg-equira-sand-200 {
     background-color: var(--color-equira-sand-200);
@@ -1849,6 +1845,9 @@
   .pb-6 {
     padding-bottom: calc(var(--spacing) * 6);
   }
+  .pb-8 {
+    padding-bottom: calc(var(--spacing) * 8);
+  }
   .pb-20 {
     padding-bottom: calc(var(--spacing) * 20);
   }
@@ -2110,6 +2109,12 @@
   }
   .text-equira-green-700 {
     color: var(--color-equira-green-700);
+  }
+  .text-equira-green-800 {
+    color: var(--color-equira-green-800);
+  }
+  .text-equira-green-900 {
+    color: var(--color-equira-green-900);
   }
   .text-gray-400 {
     color: var(--color-gray-400);
