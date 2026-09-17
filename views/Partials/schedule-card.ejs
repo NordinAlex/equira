@@ -1,6 +1,6 @@
 <!-- Label -->
 <div>
-  <h2 class="font-semibold text-xl border-b border-[#B0A696] py-3"><%= new Date(`${booking.lesson.date}T00:00:00`).toLocaleDateString("sv-SE", {
+  <h2 class="font-semibold text-2xl border-b border-[#B0A696] py-3"><%= new Date(`${booking.lesson.date}T00:00:00`).toLocaleDateString("sv-SE", {
             weekday: "long",
             day: "numeric",
             month: "short"
@@ -8,31 +8,37 @@
   </h2>
 
   <!-- Card -->
-  <div class="mt-3 bg-white border border-[#B0A696] rounded-xl p-5">
+  <div class="mt-3 mb-9 bg-white border border-[#B0A696] border-l-6 border-l-equira-cognac-600 rounded-xl p-5">
 
     <!-- TIME -->
-    <div>
-      <h2><%= booking.lesson.startTime %></h2>
-      <p><%= booking.lesson.endTime %></p>
+    <div class="mb-6 mt-3">
+      <h2 class="text-3xl font-semibold"><%= booking.lesson.startTime %></h2>
+      <p class="font-semibold text-equira-cognac-700"><%= booking.lesson.endTime %></p>
     </div>
 
     <!-- DISCIPLINE -->
-    <div>
-      <h3><%= booking.lesson.lessonType %></h3>
-      <p><%= booking.lesson.level %></p>
+    <div class="mb-6">
+      <div class="flex gap-2">
+        <i class="fa-regular fa-flag self-center"></i>
+        <h3 class="font-semibold"><%= booking.lesson.lessonType %></h3>
+      </div>
+      <p class="bg-equira-green-100 rounded-md w-fit py-2 px-3 text-equira-green-900 font-semibold mt-2"><%= booking.lesson.level %></p>
     </div>
 
     <!-- HORSE -->
-    <div>
-      <h4>Häst</h4>
-      <p><%= booking.horse.name %></p>
+    <div class="mb-6">
+      <h4 class="font-semibold">Häst</h4>
+      <div class="flex gap-2 mt-2 text-equira-cognac-800">
+        <i class="fa-solid fa-horse-head self-center text-xl"></i>
+        <p class="text-xl font-semibold"><%= booking.horse.name %></p>
+      </div>
     </div>
 
     <!-- PLACE AND INSTRUCTOR -->
-    <div>
-      <h4>Plats och instruktör</h4>
-      <p><%= booking.lesson.arena.name %></p>
-      <p>Instruktör: <%= booking.lesson.instructor.fullName %></p>
+    <div class="mb-3">
+      <h4 class="font-semibold pb-2">Plats och instruktör</h4>
+      <p class="text-xl"><%= booking.lesson.arena.name %></p>
+      <p class="font-semibold text-equira-cognac-800">Instruktör: <%= booking.lesson.instructor.fullName %></p>
     </div>
   </div>
 </div>

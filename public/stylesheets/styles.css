@@ -153,6 +153,8 @@
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
+    --color-equira-green-900: #142e21;
+    --color-equira-green-800: #1B3B2B;
     --color-equira-green-700: #25523d;
     --color-equira-green-100: #e3efe7;
     --color-equira-cognac-800: #3d2314;
@@ -435,9 +437,6 @@
       max-width: 96rem;
     }
   }
-  .m-3 {
-    margin: calc(var(--spacing) * 3);
-  }
   .m-6 {
     margin: calc(var(--spacing) * 6);
   }
@@ -548,6 +547,12 @@
   }
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
+  }
+  .mb-9 {
+    margin-bottom: calc(var(--spacing) * 9);
+  }
+  .mb-12 {
+    margin-bottom: calc(var(--spacing) * 12);
   }
   .mb-15 {
     margin-bottom: calc(var(--spacing) * 15);
@@ -1109,9 +1114,25 @@
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 2px;
   }
+  .border-l {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 1px;
+  }
   .border-l-4 {
     border-left-style: var(--tw-border-style);
     border-left-width: 4px;
+  }
+  .border-l-5 {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 5px;
+  }
+  .border-l-6 {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 6px;
+  }
+  .border-l-\[5px\] {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 5px;
   }
   .border-dashed {
     --tw-border-style: dashed;
@@ -1125,9 +1146,6 @@
   }
   .border-\[\#F2EFEB\] {
     border-color: #F2EFEB;
-  }
-  .border-\[\#\] {
-    border-color: #;
   }
   .border-amber-100 {
     border-color: var(--color-amber-100);
@@ -1269,6 +1287,9 @@
   }
   .border-b-amber-500 {
     border-bottom-color: var(--color-amber-500);
+  }
+  .border-l-equira-cognac-600 {
+    border-left-color: var(--color-equira-cognac-600);
   }
   .bg-\[\#1B3B2B\] {
     background-color: #1B3B2B;
@@ -1824,6 +1845,9 @@
   .pb-6 {
     padding-bottom: calc(var(--spacing) * 6);
   }
+  .pb-8 {
+    padding-bottom: calc(var(--spacing) * 8);
+  }
   .pb-20 {
     padding-bottom: calc(var(--spacing) * 20);
   }
@@ -2085,6 +2109,12 @@
   }
   .text-equira-green-700 {
     color: var(--color-equira-green-700);
+  }
+  .text-equira-green-800 {
+    color: var(--color-equira-green-800);
+  }
+  .text-equira-green-900 {
+    color: var(--color-equira-green-900);
   }
   .text-gray-400 {
     color: var(--color-gray-400);
