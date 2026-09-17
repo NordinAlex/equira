@@ -16,4 +16,6 @@ router.get("/horses", requireLogin, studentController.horses);
 
 router.get("/horses/:id", requireLogin, studentController.horseProfile);
 
+router.get("/lessons/:id", requireLogin, studentController.lessonDetails);
+
 module.exports = router;

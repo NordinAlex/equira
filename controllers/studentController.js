@@ -95,6 +95,49 @@ async function overview(req, res, next) {
     }
 }
 
+// LESSON DETAILS
+async function lessonDetails(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const bookingRepository = dataSource.getRepository("LessonBooking");
+        const booking = await bookingRepository.findOne({
+            where: {
+                lesson: {
+                    id: Number(req.params.id)
+                },
+                studentId: req.session.user.id
+            },
+            relations: {
+                lesson: {
+                    arena: true,
+                    instructor: true,
+                    ridingGroup: true
+                },
+                horse: true
+            }
+        });
+
+        if (!booking || !booking.lesson) {
+            return res.status(404).render("error", {
+                error: {
+                    status: 404
+                },
+                message: "Lektionen kunde inte hittas."
+            });
+        }
+
+        res.render("student/lesson-details", {
+            lesson: booking.lesson,
+            booking,
+            horse: booking.horse,
+            showBackButton: true
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
 // HORSES LIST
 async function horses(req, res, next) {
     try {
@@ -134,4 +177,4 @@ async function horseProfile(req, res, next) {
     }
 }
 
-module.exports = { overview, horses, horseProfile };
+module.exports = { overview, lessonDetails, horses, horseProfile };

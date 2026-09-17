@@ -154,11 +154,14 @@
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
     --color-equira-green-700: #25523d;
+    --color-equira-green-600: #326a4f;
     --color-equira-green-100: #e3efe7;
+    --color-equira-green-50: #f0f7f3;
     --color-equira-cognac-900: #2a160d;
     --color-equira-cognac-800: #3d2314;
     --color-equira-cognac-700: #4a2828;
     --color-equira-cognac-600: #5c3528;
+    --color-equira-sand-50: #fdfbf7;
   }
 }
 @layer base {
@@ -546,6 +549,15 @@
   .mb-16 {
     margin-bottom: calc(var(--spacing) * 16);
   }
+  .mb-22 {
+    margin-bottom: calc(var(--spacing) * 22);
+  }
+  .mb-24 {
+    margin-bottom: calc(var(--spacing) * 24);
+  }
+  .mb-26 {
+    margin-bottom: calc(var(--spacing) * 26);
+  }
   .-ml-1 {
     margin-left: calc(var(--spacing) * -1);
   }
@@ -758,6 +770,12 @@
   }
   .w-72 {
     width: calc(var(--spacing) * 72);
+  }
+  .w-auto {
+    width: auto;
+  }
+  .w-fit {
+    width: fit-content;
   }
   .w-full {
     width: 100%;
@@ -1264,6 +1282,9 @@
   .bg-\[\#4a2828\] {
     background-color: #4a2828;
   }
+  .bg-\[\#B\] {
+    background-color: #B;
+  }
   .bg-\[\#E0DCD6\] {
     background-color: #E0DCD6;
   }
@@ -1275,6 +1296,9 @@
   }
   .bg-\[\#FAF7F2\] {
     background-color: #FAF7F2;
+  }
+  .bg-\[\#\] {
+    background-color: #;
   }
   .bg-\[\#f4f2ee\] {
     background-color: #f4f2ee;
@@ -1432,8 +1456,14 @@
   .bg-equira-cognac-600 {
     background-color: var(--color-equira-cognac-600);
   }
+  .bg-equira-green-50 {
+    background-color: var(--color-equira-green-50);
+  }
   .bg-equira-green-100 {
     background-color: var(--color-equira-green-100);
+  }
+  .bg-equira-sand-50 {
+    background-color: var(--color-equira-sand-50);
   }
   .bg-gray-50 {
     background-color: var(--color-gray-50);
@@ -2059,8 +2089,8 @@
   .text-equira-cognac-800 {
     color: var(--color-equira-cognac-800);
   }
-  .text-equira-cognac-900 {
-    color: var(--color-equira-cognac-900);
+  .text-equira-green-600 {
+    color: var(--color-equira-green-600);
   }
   .text-equira-green-700 {
     color: var(--color-equira-green-700);
@@ -2661,9 +2691,6 @@
     }
     .hover\:text-equira-cognac-800:hover {
       color: var(--color-equira-cognac-800);
-    }
-    .hover\:text-equira-cognac-900:hover {
-      color: var(--color-equira-cognac-900);
     }
     .hover\:text-gray-600:hover {
       color: var(--color-gray-600);
