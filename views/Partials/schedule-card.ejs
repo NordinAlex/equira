@@ -1,0 +1,38 @@
+<!-- Label -->
+<div>
+  <h2 class="font-semibold text-xl border-b border-[#B0A696] py-3"><%= new Date(`${booking.lesson.date}T00:00:00`).toLocaleDateString("sv-SE", {
+            weekday: "long",
+            day: "numeric",
+            month: "short"
+        }).replace(".", "").replace(/^./, char => char.toUpperCase()) %>
+  </h2>
+
+  <!-- Card -->
+  <div class="mt-3 bg-white border border-[#B0A696] rounded-xl p-5">
+
+    <!-- TIME -->
+    <div>
+      <h2><%= booking.lesson.startTime %></h2>
+      <p><%= booking.lesson.endTime %></p>
+    </div>
+
+    <!-- DISCIPLINE -->
+    <div>
+      <h3><%= booking.lesson.lessonType %></h3>
+      <p><%= booking.lesson.level %></p>
+    </div>
+
+    <!-- HORSE -->
+    <div>
+      <h4>Häst</h4>
+      <p><%= booking.horse.name %></p>
+    </div>
+
+    <!-- PLACE AND INSTRUCTOR -->
+    <div>
+      <h4>Plats och instruktör</h4>
+      <p><%= booking.lesson.arena.name %></p>
+      <p>Instruktör: <%= booking.lesson.instructor.fullName %></p>
+    </div>
+  </div>
+</div>

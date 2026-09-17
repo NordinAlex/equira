@@ -158,7 +158,6 @@
     --color-equira-cognac-800: #3d2314;
     --color-equira-cognac-700: #4a2828;
     --color-equira-cognac-600: #5c3528;
-    --color-equira-sand-100: #f7f4ed;
     --color-equira-sand-200: #ede8dd;
   }
 }
@@ -435,6 +434,9 @@
     @media (width >= 96rem) {
       max-width: 96rem;
     }
+  }
+  .m-3 {
+    margin: calc(var(--spacing) * 3);
   }
   .m-6 {
     margin: calc(var(--spacing) * 6);
@@ -1123,6 +1125,9 @@
   }
   .border-\[\#F2EFEB\] {
     border-color: #F2EFEB;
+  }
+  .border-\[\#\] {
+    border-color: #;
   }
   .border-amber-100 {
     border-color: var(--color-amber-100);
