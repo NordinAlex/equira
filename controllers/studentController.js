@@ -213,4 +213,28 @@ async function schedule(req, res, next) {
     }
 }
 
-module.exports = { overview, lessonDetails, horses, horseProfile, schedule };
+// QUIZ
+
+async function quiz(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const quizRepository = dataSource.getRepository("Quiz");
+        const quiz = await quizRepository.find({
+            where: {
+                isPublished: true
+            },
+            order: {
+                title: "ASC"
+            }
+        });
+
+        res.render("student/quiz", {
+            quiz,
+            showBackButton: true
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quiz };
