@@ -10,13 +10,26 @@
   <link rel="stylesheet" href="/stylesheets/styles.css" />
 </head>
 
-<body>
-    <header class="mb-16">
+<body class="bg-[#F2EFEB]">
+  <header class="mb-16">
     <%-include('../Partials/topbar-student.ejs')%>
   </header>
 
   <main>
-    Quizlista
+
+    <!-- Title -->
+    <h1 class="px-6 pt-6 pb-3 text-3xl font-semibold">Kunskapsquiz</h1>
+    <p class="px-6">Testa och förbättra din kunskap om
+      hästar, ridning och stallmiljö. Välj en
+      kategori nedan för att starta.</p>
+
+      <!-- Quiz cards-->
+      
+      <% quizzes
+      .filter(quiz => quiz.questions.length > 0)
+      .forEach(quiz => { %>
+    <%- include('../partials/quizcard-student', { quiz }) %>
+    <% }) %>
   </main>
 
   <footer class="mt-25">

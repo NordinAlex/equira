@@ -18,7 +18,7 @@ router.get("/schedule", requireLogin, studentController.schedule);
 router.get("/horses", requireLogin, studentController.horses);
 router.get("/horses/:id", requireLogin, studentController.horseProfile);
 
-router.get("/quiz", requireLogin, studentController.quiz);
+router.get("/quiz", requireLogin, studentController.quizzes);
 
 
 
