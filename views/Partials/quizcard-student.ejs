@@ -1,0 +1,42 @@
+<!-- CARD -->
+<a href="#">
+  <div class="m-6 mt-10 p-6 bg-white border border-[#B0A696] rounded-xl">
+    <!-- TOP ROW -->
+    <div class="flex justify-between items-center">
+      <i class="fa-regular fa-lightbulb self-center
+    text-3xl bg-equira-green-100 text-equira-green-700 p-4 rounded-full"></i>
+      <p class="bg-[#F2EFEB] rounded-md h-fit p-1 font-semibold"><%= quiz.difficulty %></p>
+    </div>
+
+    <!-- TITLE -->
+    <div>
+      <h1 class="text-2xl font-semibold py-3 mt-3"><%= quiz.title %> </h1>
+      <p><%= quiz.description %></p>
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div class="mt-6 flex justify-between border-t border-[#F2EFEB]">
+
+      <!-- QUESTIONS -->
+      <div class="flex gap-2 mt-3">
+        <i class="fa-solid fa-table-list self-center"></i>
+        <p><%= quiz.questions.length %> frågor</p>
+      </div>
+
+
+      <!-- HIGH SCORE -->
+      <div class="flex items-center">
+        <% if (quiz.highScore !== null) { %>
+
+        <i class="fa-solid fa-trophy self-center"></i>
+        <p class="font-semibold mt-3"><%= quiz.attempts.percentage %></p>
+
+        <% } else { %>
+
+        <p class="font-semibold mt-3">Inget resultat</p>
+
+        <% } %>
+      </div>
+    </div>
+  </div>
+</a>

@@ -213,4 +213,48 @@ async function schedule(req, res, next) {
     }
 }
 
-module.exports = { overview, lessonDetails, horses, horseProfile, schedule };
+// QUIZ
+
+async function quizzes(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const quizRepository = dataSource.getRepository("Quiz");
+        const quizzes = await quizRepository.find({
+            where: {
+                isPublished: true
+            },
+            relations: {
+                questions: true,
+                attempts: true
+                },
+            order: {
+                title: "ASC"
+            }
+        });
+
+        const studentId = req.session.user.id;
+        const quizzesWithHighScore = quizzes.map(quiz => {
+            const studentAttempts = quiz.attempts.filter(
+                attempt => attempt.studentId === studentId
+            );
+
+            const highScore = studentAttempts.lentgh > 0
+            ? Math.max(...studentAttempts.map(attempt => attempt.percentage))
+            : null;
+
+            return {
+                ...quiz,
+                highScore
+            };
+        });
+
+        res.render("student/quiz", {
+            quizzes: quizzesWithHighScore,
+            showBackButton: true
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes };

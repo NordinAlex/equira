@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equira | Quiz</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+</head>
+
+<body class="bg-[#F2EFEB]">
+  <header class="mb-16">
+    <%-include('../Partials/topbar-student.ejs')%>
+  </header>
+
+  <main>
+
+    <!-- Title -->
+    <h1 class="px-6 pt-6 pb-3 text-3xl font-semibold">Kunskapsquiz</h1>
+    <p class="px-6">Testa och förbättra din kunskap om
+      hästar, ridning och stallmiljö. Välj en
+      kategori nedan för att starta.</p>
+
+      <!-- Quiz cards-->
+      
+      <% quizzes
+      .filter(quiz => quiz.questions.length > 0)
+      .forEach(quiz => { %>
+    <%- include('../partials/quizcard-student', { quiz }) %>
+    <% }) %>
+  </main>
+
+  <footer class="mt-25">
+    <%-include('../Partials/bottomnav-student.ejs')%>
+  </footer>
+</body>
+
+</html>
