@@ -5,11 +5,17 @@ function getAllTasks() {
 }
 
 function markTaskComplete(id) {
+  const now = new Date();
+  const localTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .replace('T', ' ')
+    .substring(0, 19);
+    
   return db.prepare(`
     UPDATE stable_tasks 
-    SET status = 'Klar', completedAt = datetime('now') 
+    SET status = 'Klar', completedAt = ?
     WHERE id = ?
-  `).run(id);
+  `).run(localTime, id);
 }
 
 function unmarkTaskComplete(id) {
