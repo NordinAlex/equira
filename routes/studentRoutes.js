@@ -11,9 +11,13 @@ router.use((req, res, next) => {
 });
 
 router.get("/overview", requireLogin, studentController.overview);
+router.get("/lessons/:id", requireLogin, studentController.lessonDetails);
+
+router.get("/schedule", requireLogin, studentController.schedule);
 
 router.get("/horses", requireLogin, studentController.horses);
-
 router.get("/horses/:id", requireLogin, studentController.horseProfile);
+
+
 
 module.exports = router;

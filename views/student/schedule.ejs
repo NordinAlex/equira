@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equira | Schema</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+</head>
+
+<body class="bg-[#F2EFEB]">
+  <header class="mb-16">
+    <%-include('../Partials/topbar-student.ejs')%>
+  </header>
+
+  <main>
+    <h1 class="px-6 pt-6 pb-3 text-3xl font-semibold">Mitt schema</h1>
+    <h2 class="px-6 pb-8 text-lg text-equira-cognac-700">Kommande lektioner och aktiviteter</h2>
+
+    <div class="mx-6">
+      <% bookings.forEach(booking => { %>
+      <%-include('../Partials/schedule-card.ejs', { booking }) %>
+      <% }) %>
+    </div>
+
+  </main>
+
+  <footer class="mt-25">
+    <%-include('../Partials/bottomnav-student.ejs')%>
+  </footer>
+</body>
+
+</html>
