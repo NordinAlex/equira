@@ -12,14 +12,12 @@ const { getDataSource } = require('./config/database');
 const installMiddleware = require('./middleware/installMiddleware');
 
 // Import routers
-const tasksRouter = require('./routes/Staff/tasks');
 const authRouter = require('./routes/auth');
 const studentRouter = require('./routes/studentRoutes');
-const overviewStaffRouter = require('./routes/Staff/overview');
-const horsesRouter = require('./routes/Staff/horses');
 const searchRouter = require('./routes/search');
 const adminRouter = require('./routes/adminRoutes');
 const apiRouter = require('./routes/apiRoutes');
+const staffRoutes = require('./routes/staffRoutes');
 
 const app = express();
 
@@ -36,7 +34,7 @@ getDataSource()
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
-app.set('layout', 'layouts/adminLayout'); // default layout
+app.set('layout', false);
 app.set('layout extractScripts', true);
 app.set('layout extractStyles', true);
 
@@ -51,10 +49,11 @@ app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   next();
 });
+
 // Static files
 app.use(
   express.static(path.join(__dirname, 'public'), {
-    dotfiles: 'allow' /* Express 5: preserve v4 behavior */,
+    dotfiles: 'allow',
   }),
 );
 app.use(installMiddleware);
@@ -62,13 +61,14 @@ app.use(installMiddleware);
 // Route handlers
 app.use('/', authRouter);
 app.use('/', indexRouter);
-app.use('/tasks', tasksRouter);
+app.use('/staff', staffRoutes);
 app.use('/student', studentRouter);
-app.use('/overview', overviewStaffRouter);
-app.use('/horses', horsesRouter);
 app.use('/search', searchRouter);
-app.use('/admin', adminRouter);
 app.use('/api', apiRouter);
+app.use('/admin', (req, res, next) => {
+  res.locals.layout = 'layouts/adminLayout';
+  next();
+}, adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -77,11 +77,8 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error', { layout: false });
 });

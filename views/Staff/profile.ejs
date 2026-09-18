@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <title>Min Profil</title>
+</head>
+
+<body class="bg-[#f5f0eb]">
+  <div class="flex">
+    <div class="hidden md:block">
+      <%- include("../Partials/sidebar-staff.ejs") %>
+    </div>
+
+    <div class="flex flex-1 flex-col">
+      <%- include("../Partials/topbar-staff.ejs") %>
+
+      <main class="p-4 md:p-8 pb-20 md:pb-8">
+
+        <h1 class="text-2xl font-bold">Min Profil</h1>
+        <div class="mb-6">
+            <p class="text-gray-400">
+              <%= dateString %>
+            </p>
+          </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- Vänster kolumn -->
+          <div class="flex flex-col gap-6">
+
+            <!-- Profilkort -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+              <div class="flex items-center gap-4 mb-4">
+                <img src="/images/avatar.jpg" class="size-16 rounded-full object-cover" />
+                <div>
+                  <h2 class="text-xl font-bold">Johan Svensson</h2>
+                  <p class="text-gray-500 text-sm">Stallansvarig</p>
+                  <p class="text-gray-400 text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-location-dot"></i> Mälardalen Ridcenter
+                  </p>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <button class="bg-[#2c1a0e] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#3d2512]">
+                  Redigera Profil
+                </button>
+                <button class="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
+                  Visa Schema
+                </button>
+              </div>
+            </div>
+
+            <!-- Senaste aktivitet -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold">Senaste aktivitet</h3>
+                <a href="#" class="text-sm text-gray-400 hover:text-gray-600">Visa alla</a>
+              </div>
+              <div class="flex flex-col gap-4">
+                <div class="flex items-start gap-3">
+                  <div class="bg-green-100 rounded-full p-2 mt-1">
+                    <i class="fa-solid fa-check text-green-500 text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold">Morgonfodring slutförd i Stall A.</p>
+                    <p class="text-xs text-gray-400">07:30 Idag</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <div class="bg-yellow-100 rounded-full p-2 mt-1">
+                    <i class="fa-solid fa-pen text-yellow-500 text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold">Uppdaterade journal för Bella.</p>
+                    <p class="text-xs text-gray-400">Igår, 15:45</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <div class="bg-gray-100 rounded-full p-2 mt-1">
+                    <i class="fa-regular fa-calendar text-gray-500 text-xs"></i>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold">Skapade nytt pass: Hovslagarebesök.</p>
+                    <p class="text-xs text-gray-400">Igår, 11:20</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Höger kolumn -->
+          <div class="flex flex-col gap-6">
+
+            <!-- Dagens prestationer -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+              <h3 class="font-semibold mb-6">Dagens prestationer</h3>
+              <div class="flex flex-col items-center mb-4">
+                <!-- Cirkel -->
+                <div class="relative size-36">
+                  <svg class="size-full -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="10" />
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#2c1a0e" stroke-width="10"
+                      stroke-dasharray="251.2"
+                      stroke-dashoffset="62.8"
+                      stroke-linecap="round" />
+                  </svg>
+                  <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <p class="text-3xl font-bold">12</p>
+                    <p class="text-xs text-gray-400">AV 16 KLARA</p>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-4">Bra jobbat! Du ligger före schemat idag.</p>
+              </div>
+            </div>
+
+            <!-- Inställningar -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+              <h3 class="font-semibold mb-4">Inställningar</h3>
+              <div class="flex flex-col">
+                <a href="#" class="flex items-center justify-between py-3 border-b hover:bg-gray-50 px-2 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <i class="fa-regular fa-circle-user text-gray-400"></i>
+                    <span class="text-sm">Kontouppgifter</span>
+                  </div>
+                  <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                </a>
+                <a href="#" class="flex items-center justify-between py-3 border-b hover:bg-gray-50 px-2 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-shield text-gray-400"></i>
+                    <span class="text-sm">Säkerhet & Lösenord</span>
+                  </div>
+                  <i class="fa-solid fa-chevron-right text-gray-400 text-xs"></i>
+                </a>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <%- include("../Partials/bottomnav-staff.ejs") %>
+</body>
+</html>

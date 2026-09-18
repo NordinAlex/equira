@@ -1,16 +1,19 @@
 const express = require('express');
-const horses = require('../data/horses');
+
+const {requireLogin } = require('../middleware/authMiddleware');
+const studentController = require('../controllers/studentController');
 
 const router = express.Router();
 
-router.get("/horses", (req, res) => {
-    res.render("student/horses", { horses });
+router.use((req, res, next) => {
+    res.locals.currentPath = req.path;
+    next();
 });
 
-router.get("/horses/:id", (req, res) => {
-    const horse = horses.find(horse => horse.id == req.params.id);
+router.get("/overview", requireLogin, studentController.overview);
 
-    res.render("student/horse-profile", { horse });
-});
+router.get("/horses", requireLogin, studentController.horses);
+
+router.get("/horses/:id", requireLogin, studentController.horseProfile);
 
 module.exports = router;

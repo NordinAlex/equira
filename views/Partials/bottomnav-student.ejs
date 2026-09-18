@@ -1,0 +1,33 @@
+<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-[#F2EFEB] drop-shadow-sm flex justify-around py-3 md:hidden">
+    
+    <a href="/student/overview"
+       class="flex flex-col items-center text-xs <%= currentPath.startsWith('/overview') ? 'font-bold text-equira-cognac-800' : 'text-equira-cognac-600 hover:text-equira-cognac-800' %>">
+        <i class="fa-solid fa-house text-xl mb-1"></i>
+        Översikt
+    </a>
+
+    <a href="/student/schedule"
+       class="flex flex-col items-center text-xs <%= currentPath.startsWith('/schedule') ? 'font-bold text-equira-cognac-800' : 'text-equira-cognac-600 hover:text-equira-cognac-800' %>">
+        <i class="fa-solid fa-calendar-days text-xl mb-1"></i>
+        Schema
+    </a>
+
+    <a href="/student/horses"
+       class="flex flex-col items-center text-xs <%= currentPath.startsWith('/horses') ? 'font-bold text-equira-cognac-800' : 'text-equira-cognac-600 hover:text-equira-cognac-800' %>">
+        <i class="fa-solid fa-horse-head text-xl mb-1"></i>
+        Hästar
+    </a>
+
+    <a href="/student/quiz"
+       class="flex flex-col items-center text-xs <%= currentPath.startsWith('/quiz') ? 'font-bold text-equira-cognac-800' : 'text-equira-cognac-600 hover:text-equira-cognac-800' %>">
+        <i class="fa-solid fa-circle-question text-xl mb-1"></i>
+        Quiz
+    </a>
+
+    <a href="/student/profile"
+       class="flex flex-col items-center text-xs <%= currentPath.startsWith('/profile') ? 'font-bold text-equira-cognac-800' : 'text-equira-cognac-600 hover:text-equira-cognac-800' %>">
+        <i class="fa-solid fa-circle-user text-xl mb-1"></i>
+        Profil
+    </a>
+
+</nav>
