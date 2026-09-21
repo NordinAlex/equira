@@ -38,13 +38,26 @@
   </div>
 
   <div>
-    <a href="/student/horses/<%= horse.id %>" class="flex gap-5 justify-between mx-6 mb-6 bg-[#F2EFEB] border border-[#B0A696] rounded-md p-3">
-      <i class="fa-solid fa-horse-head p-3 text-3xl self-center text-equira-cognac-800"></i>
-      <div class="flex flex-col">
-        <h3 class="font-semibold text-equira-cognac-800">Tilldelad häst</h3>
-        <p class="text-lg font-semibold"><%= booking.horse.name %></p>
-      </div>
-      <i class="fa solid fa-arrow-right text-xl ml-auto self-center p-3 text-equira-cognac-800"></i>
-    </a>
+    <% if (booking.horse) { %>
+  <a href="/student/horses/<%= booking.horse.id %>" class="flex gap-5 justify-between mx-6 mb-6 bg-[#F2EFEB] border border-[#B0A696] rounded-md p-3">
+    <i class="fa-solid fa-horse-head p-3 text-3xl self-center text-equira-cognac-800"></i>
+
+    <div class="flex flex-col">
+      <h3 class="font-semibold text-equira-cognac-800">Tilldelad häst</h3>
+      <p class="text-lg font-semibold"><%= booking.horse.name %></p>
+    </div>
+
+    <i class="fa-solid fa-arrow-right text-xl ml-auto self-center p-3 text-equira-cognac-800"></i>
+  </a>
+<% } else { %>
+  <div class="flex gap-5 mx-6 mb-6 bg-[#F2EFEB] border border-[#B0A696] rounded-md p-3">
+    <i class="fa-solid fa-horse-head p-3 text-3xl self-center text-equira-cognac-800"></i>
+
+    <div class="flex flex-col">
+      <h3 class="font-semibold text-equira-cognac-800">Tilldelad häst</h3>
+      <p class="text-lg font-semibold">Ej tilldelad än</p>
+    </div>
+  </div>
+<% } %>
   </div>
 </div>
