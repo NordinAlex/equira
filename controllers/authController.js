@@ -19,7 +19,7 @@ class AuthController {
   }
 
   async postLogin(req, res) {
-    const { username, password, returnUrl } = req.body;
+    const { username, password, returnUrl, remember } = req.body;
 
     try {
       const userDTO = await authService.authenticate(username, password);
@@ -33,6 +33,7 @@ class AuthController {
       }
 
       req.session.user = userDTO;
+      req.session.cookie.maxAge = remember ? 1000 * 60 * 60 * 24 * 60 : null;
 
       if (returnUrl && returnUrl.startsWith('/')) {
         return res.redirect(returnUrl);
@@ -69,7 +70,7 @@ class AuthController {
   }
 
   logout(req, res) {
-    req.session.destroy(err => {
+    req.session.destroy((err) => {
       if (err) {
         console.error('Logout session destroy error:', err);
       }
@@ -81,7 +82,11 @@ class AuthController {
     try {
       const isInstalled = await authService.isInstalled();
       if (isInstalled) {
-        if (req.setFlash) req.setFlash('info', 'Systemet är redan installerat. Vänligen logga in.');
+        if (req.setFlash)
+          req.setFlash(
+            'info',
+            'Systemet är redan installerat. Vänligen logga in.',
+          );
         return res.redirect('/login');
       }
 
@@ -98,13 +103,32 @@ class AuthController {
   }
 
   async postInstall(req, res) {
-    const { fullName, username, email, phone, title, avatarUrl, specializations, password, confirmPassword } = req.body;
-    const formData = { fullName, username, email, phone, title, avatarUrl, specializations };
+    const {
+      fullName,
+      username,
+      email,
+      phone,
+      title,
+      avatarUrl,
+      specializations,
+      password,
+      confirmPassword,
+    } = req.body;
+    const formData = {
+      fullName,
+      username,
+      email,
+      phone,
+      title,
+      avatarUrl,
+      specializations,
+    };
 
     try {
       const isInstalled = await authService.isInstalled();
       if (isInstalled) {
-        if (req.setFlash) req.setFlash('error', 'Systemet är redan installerat.');
+        if (req.setFlash)
+          req.setFlash('error', 'Systemet är redan installerat.');
         return res.redirect('/login');
       }
 
@@ -150,7 +174,10 @@ class AuthController {
       // Automatically log the new master admin in
       req.session.user = userDTO;
       if (req.setFlash) {
-        req.setFlash('success', `Välkommen till Equira, ${userDTO.fullName}! Ditt administratörskonto har skapats.`);
+        req.setFlash(
+          'success',
+          `Välkommen till Equira, ${userDTO.fullName}! Ditt administratörskonto har skapats.`,
+        );
       }
 
       return res.redirect('/admin/overview');
