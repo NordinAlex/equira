@@ -257,4 +257,36 @@ async function quizzes(req, res, next) {
     }
 }
 
-module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes };
+// PROFILE
+async function profile(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const studentProfileRepository = dataSource.getRepository("StudentProfile");
+        const quizAttemptRepository = dataSource.getRepository("QuizAttempt");
+
+        const studentProfile = await studentProfileRepository.findOne({
+            where: {
+                userId: req.session.user.id
+            }
+        });
+
+
+        const approvedQuizzes = await quizAttemptRepository.count({
+            where: {
+                studentId: req.session.user.id,
+                passed: true
+            }
+        });
+
+        res.render("student/profile", {
+            user: req.session.user,
+            ridingLevel: studentProfile?.ridingLevel,
+            approvedQuizzes,
+            showBackButton: true
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes, profile };

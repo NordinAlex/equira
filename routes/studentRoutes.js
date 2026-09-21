@@ -20,4 +20,6 @@ router.get("/horses/:id", requireLogin, requireRole('STUDENT'), studentControlle
 
 router.get("/quiz", requireLogin, requireRole('STUDENT'), studentController.quizzes);
 
+router.get("/profile", requireLogin, requireRole('STUDENT'), studentController.profile);
+
 module.exports = router;
