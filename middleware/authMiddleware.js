@@ -1,30 +1,34 @@
 function requireLogin(req, res, next) {
-    if (!req.session || !req.session.user) {
-        return res.redirect("/login");
-    }
+  if (!req.session || !req.session.user) {
+    return res.redirect('/login');
+  }
 
-    next();
+  next();
 }
 
-function requireRole(...roles) {
+function requireRole(...allowedRoles) {
   return (req, res, next) => {
-    if (!req.session || !req.session.user) {
-      return res.redirect(`/login?returnUrl=${encodeURIComponent(req.originalUrl)}`);
+    const user = req.session?.user;
+
+    if (!user) {
+      return res.redirect(
+        `/login?returnUrl=${encodeURIComponent(req.originalUrl)}`,
+      );
     }
 
-    const userRole = req.session.user.role;
-    if (!roles.includes(userRole)) {
-      if (req.xhr || req.headers.accept?.indexOf('json') > -1) {
-        return res.status(403).json({ error: 'Behörighet saknas.' });
-      }
+    const userRole = String(user.role || '').toUpperCase();
 
-      // Redirect to user's home portal based on role
-      if (userRole === 'ADMIN') return res.redirect('/admin/overview');
-      if (userRole === 'STAFF') return res.redirect('/staff/overview');
-      return res.redirect('/student/overview');
-    }
+    if (allowedRoles.includes(userRole)) {
+      return next();
+    }    
 
-    next();
+    return res.status(403).render('forbidden', {
+      title: 'Ingen behörighet - Equira',
+      requestedUrl: req.originalUrl,
+      layout: false,
+    });
+
+    
   };
 }
 

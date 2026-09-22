@@ -8,7 +8,7 @@
     <!-- Grön ruta -->
     <div class="flex gap-2 text-equira-green-700 bg-equira-green-100 rounded-full p-2">
       <p><%= nextLesson.startTime %></p>
-      <p><%= nextLesson.dayLabel %></p>
+      <p><%= nextLesson.dayLabel.charAt(0).toUpperCase() + nextLesson.dayLabel.slice(1) %></p>
     </div>
 
     <!-- Fri text -->
@@ -22,19 +22,24 @@
   <div class="flex justify-between">
 
     <!-- Häst -->
-    <% if (nextBooking.horse) { %>
     <div class="flex mt-4 items-center gap-3 w-70">
       <i class="fa-solid fa-horse-head text-3xl text-equira-cognac-600"></i>
+
       <div class="flex flex-col gap-1">
         <p>Häst:</p>
+
+        <% if (nextBooking.horse) { %>
         <p class="font-semibold"><%= nextBooking.horse.name %></p>
+        <% } else { %>
+        <p class="font-semibold">Ej tilldelad än</p>
+        <% } %>
       </div>
     </div>
-    <% } %>
 
     <!-- Instruktör -->
     <div class="flex mt-4 items-center gap-3 ml-auto">
       <i class="fa-solid fa-circle-user text-3xl text-equira-cognac-600"></i>
+
       <div class="flex flex-wrap gap-1">
         <p>Instruktör:</p>
         <p class="font-semibold"><%= nextLesson.instructor.fullName %></p>

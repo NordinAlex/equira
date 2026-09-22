@@ -1,12 +1,12 @@
 const crypto = require('crypto');
 
 const sessionConfig = {
-  secret: process.env.SESSION_SECRET || 'equira-riding-school-secret-key-2024',
+  secret:'equira-riding-school-secret-key-2024',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: false, // set to true in HTTPS production
-    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    maxAge: null, // Session cookie unless the user chooses "Kom ihåg mig"
   },
 };
 
