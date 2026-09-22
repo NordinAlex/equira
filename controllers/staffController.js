@@ -1,4 +1,5 @@
 const stableTaskService = require('../services/stableTaskService');
+const db = require('better-sqlite3')('data/equira.sqlite');
 
 // Hjälpfunktion för datum
 function getDateString() {
@@ -68,11 +69,20 @@ const staffController = {
   },
 
   getHorses: (req, res) => {
+    const horses = db.prepare("SELECT * FROM horses WHERE status = 'Aktiv & Tjänstbar'").all();
+    const tasks = db.prepare("SELECT * FROM stable_tasks WHERE horseId IS NOT NULL").all();
+
+    const horsesWithTasks = horses.map(horse => ({
+      ...horse,
+      tasks: tasks.filter(t => t.horseId === horse.id)
+    }));
+
     res.render('staff/horses', {
       title: 'Hästar',
       currentPage: 'horses',
       layout: false,
-      dateString: getDateString()
+      dateString: getDateString(),
+      horses: horsesWithTasks
     });
   },
 

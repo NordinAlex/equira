@@ -33,52 +33,55 @@
         <!-- Hästkort grid - dold på mobil -->
         <div class="hidden md:grid grid-cols-3 gap-4 mb-8">
           <% horses.forEach(horse => { %>
+          <% if (horse.tasks.length > 0) { %>
           <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
             <div class="relative">
-              <img src="<%= horse.image %>" class="w-full h-48 object-cover" />
+              <img src="<%= horse.photoUrl || '/images/horse-placeholder.jpg' %>" class="w-full h-48 object-cover" />
               <span class="absolute top-3 left-3 text-xs px-3 py-1 rounded-full flex items-center gap-1
-                <%= horse.statusColor === 'red' ? 'bg-red-500 text-white' : '' %>
-                <%= horse.statusColor === 'yellow' ? 'bg-yellow-100 text-yellow-700' : '' %>
-                <%= horse.statusColor === 'green' ? 'bg-green-100 text-green-700' : '' %>">
-                <i class="fa-solid fa-circle-exclamation"></i> <%= horse.status %>
+                <%= horse.tasks.some(t => t.priority === 'Hög') ? 'bg-red-500 text-white' : 'bg-green-100 text-green-700' %>">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <%= horse.tasks.some(t => t.priority === 'Hög') ? 'Prioritet hög' : 'Kommande' %>
               </span>
             </div>
             <div class="p-4">
               <h3 class="font-bold text-lg"><%= horse.name %></h3>
-              <p class="text-gray-400 text-sm mb-3"><%= horse.location %></p>
+              <p class="text-gray-400 text-sm mb-3"><%= horse.boxNumber %> • <%= horse.paddockNumber %></p>
               <p class="text-xs font-bold uppercase text-gray-400 mb-2">Åtgärder</p>
               <div class="flex gap-2 flex-wrap">
                 <% horse.tasks.forEach((task, index) => { %>
                 <span class="<%= index === 0 ? 'bg-[#2c1a0e] text-white' : 'border' %> text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <%= task %>
+                  <i class="fa-solid fa-list-check"></i> <%= task.title %>
                 </span>
                 <% }) %>
               </div>
             </div>
           </div>
+          <% } %>
           <% }) %>
         </div>
 
         <!-- Mobil häst-lista -->
         <div class="flex flex-col gap-3 md:hidden">
           <% horses.forEach(horse => { %>
+          <% if (horse.tasks.length > 0) { %>
           <div class="bg-white rounded-xl p-4">
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-3">
-                <img src="<%= horse.image %>" class="size-10 rounded-full object-cover" />
+                <img src="<%= horse.photoUrl || '/images/horse-placeholder.jpg' %>" class="size-10 rounded-full object-cover" />
                 <div>
                   <p class="font-semibold"><%= horse.name %></p>
-                  <p class="text-xs text-gray-400"><%= horse.location %></p>
+                  <p class="text-xs text-gray-400"><%= horse.boxNumber %> • <%= horse.paddockNumber %></p>
                 </div>
               </div>
               <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
             </div>
             <div class="flex gap-2 flex-wrap">
               <% horse.tasks.forEach(task => { %>
-              <span class="border text-xs px-3 py-1 rounded-full"><%= task %></span>
+              <span class="border text-xs px-3 py-1 rounded-full"><%= task.title %></span>
               <% }) %>
             </div>
           </div>
+          <% } %>
           <% }) %>
         </div>
 
