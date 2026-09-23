@@ -19,6 +19,7 @@ router.get("/horses", requireLogin, requireRole('STUDENT'), studentController.ho
 router.get("/horses/:id", requireLogin, requireRole('STUDENT'), studentController.horseProfile);
 
 router.get("/quiz", requireLogin, requireRole('STUDENT'), studentController.quizzes);
+router.get("/quiz/:id", requireLogin, requireRole('STUDENT'), studentController.activeQuiz);
 
 router.get("/profile", requireLogin, requireRole('STUDENT'), studentController.profile);
 
