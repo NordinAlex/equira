@@ -43,14 +43,31 @@
     </div>
 
     <!-- Next question -->
-     <div class="flex flex-col">
-     <button type="button" class="next-question bg-equira-cognac-600 text-white text-lg font-semibold rounded-full px-6 py-3 m-6 self-end">
-        Nästa fråga
-      <span>
-        <i class="fa solid fa-arrow-right text-lg text-white ml-2"></i>
-      </span>
-     </button>
-     </div>
+    <div class="flex items-center justify-between">
+
+      <!-- If not answered -->
+      <p class="answer-warning relative w-fit bg-red-100 border border-red-200 text-red-700 text-lg rounded-lg px-4 py-2 m-6
+      opacity-0 scale-90 transition-all duration-200 pointer-events-none">
+        Välj ett alternativ.
+        <span class="absolute left-1/2 -top-2 -translate-x-1/2 w-0 h-0
+        border-l-8 border-l-transparent
+        border-r-8 border-r-transparent
+        border-b-8 border-b-red-200
+        after:content-[''] after:absolute after:left-1/2 after:top-[2px]
+        after:-translate-x-1/2 after:w-0 after:h-0
+        after:border-l-[7px] after:border-l-transparent
+        after:border-r-[7px] after:border-r-transparent
+        after:border-b-[7px] after:border-b-red-100">
+        </span>
+      </p>
+
+      <button type="button" class="next-question bg-equira-cognac-600 text-white text-lg font-semibold rounded-full px-6 py-3 m-6 self-end">
+        <%= index === quiz.questions.length -1 ? "Slutför" : "Nästa fråga" %>
+        <span>
+          <i class="fa solid fa-arrow-right text-lg text-white ml-2"></i>
+        </span>
+      </button>
+    </div>
 
   </div>
   <% }) %>
