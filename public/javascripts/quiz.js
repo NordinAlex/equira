@@ -35,6 +35,8 @@ nextButton.forEach((button, index) => {
 
             const progress = ((index + 2) / totalQuestions) * 100;
             progressBar[index + 1].style.width = `${progress}%`;
+        } else {
+            alert("Quiz avslutat!");
         }
     });
 });
