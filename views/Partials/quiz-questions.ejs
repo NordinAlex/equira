@@ -1,0 +1,57 @@
+<div id="quiz-questions" class="hidden">
+
+  <% quiz.questions.forEach((question, index) => { %>
+
+  <div class="quiz-question hidden" data-question="<%= index %>">
+
+    <!-- Track progress -->
+    <!-- Question counter -->
+    <div class="flex justify-between px-6 mb-6">
+      <p class="font-semibold text-equira-cognac-700">
+        Fråga <%= index + 1 %> av <%= quiz.questions.length %>
+      </p>
+
+      <p class="font-semibold text-equira-cognac-700">
+        <%= Math.round(((index + 1) / quiz.questions.length) * 100) %>%
+      </p>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="w-[calc(100%-3rem)] h-3 bg-white mx-6 rounded-full drop-shadow">
+      <div class="quiz-progress h-full bg-equira-cognac-600 rounded-full"></div>
+    </div>
+
+    <!-- Questions -->
+    <h2 class="p-6 my-6 text-3xl font-semibold">
+      <%= question.questionText %>
+    </h2>
+
+    <!-- Answers -->
+    <div>
+      <% question.options.forEach(option => { %>
+      <label type="button" class="w-[calc(100%-3rem)] bg-white rounded-xl p-4 text-left text-xl mx-6 my-3 border border-[#B0A696] flex items-center gap-4 cursor-pointer has-checked:drop-shadow-xl has-checked:bg-equira-green-50">
+        <input type="radio" name="answer-<%= question.id %>" class="appearance-none shrink-0 w-5 h-5 rounded-full border border-equira-cognac-600
+        checked:bg-equira-cognac-600 relative
+    checked:after:content-[''] checked:after:absolute
+    checked:after:w-2 checked:after:h-2
+    checked:after:bg-white checked:after:rounded-full
+    checked:after:top-1/2 checked:after:left-1/2
+    checked:after:-translate-x-1/2 checked:after:-translate-y-1/2">
+        <%= option.optionText %>
+      </label>
+      <% }) %>
+    </div>
+
+    <!-- Next question -->
+     <div class="flex flex-col">
+     <button type="button" class="next-question bg-equira-cognac-600 text-white text-lg font-semibold rounded-full px-6 py-3 m-6 self-end">
+        Nästa fråga
+      <span>
+        <i class="fa solid fa-arrow-right text-lg text-white ml-2"></i>
+      </span>
+     </button>
+     </div>
+
+  </div>
+  <% }) %>
+</div>

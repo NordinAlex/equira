@@ -10,8 +10,19 @@
   <link rel="stylesheet" href="/stylesheets/styles.css" />
 </head>
 
-<body>
-  Här visas quiz: <%= quiz.title %>
+<body class="bg-[#F2EFEB]">
+  <header class="mb-26">
+    <%-include('../Partials/topbar-student.ejs')%>
+  </header>
+
+  <main>
+    <!-- Quiz Start -->
+    <%-include('../Partials/quiz-start.ejs', { quiz }) %>
+
+    <%-include('../Partials/quiz-questions.ejs', { quiz }) %>
+  </main>
+
+  <script src="/javascripts/quiz.js"></script>
 </body>
 
 </html>
