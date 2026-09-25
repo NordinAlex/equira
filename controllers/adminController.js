@@ -90,6 +90,71 @@ class AdminController {
     }
   }
 
+    async getHorseProfile(req, res) {
+    try {
+      const horse = await horsesService.getHorseById(req.params.id);
+
+      if (!horse) {
+        return res.redirect(
+          '/admin/horses?error=' +
+            encodeURIComponent('Hästen kunde inte hittas.')
+        );
+      }
+
+      const tasks = await tasksService.getStableTasks();
+
+      const horseTasks = tasks.filter(
+        task => Number(task.horseId) === Number(horse.id)
+      );
+
+      res.render('admin/horseProfile', {
+        title: `Equira - ${horse.name}`,
+        horse,
+        tasks: horseTasks,
+        error: req.query.error || null,
+        success: req.query.success || null,
+        layout: 'layouts/adminLayout',
+      });
+    } catch (err) {
+      console.error('Error loading horse profile:', err);
+
+      res.status(500).render('error', {
+        message: 'Kunde inte läsa in hästens profil',
+        error: err,
+      });
+    }
+  }
+
+  async postHorseTask(req, res) {
+    try {
+      const horse = await horsesService.getHorseById(req.params.id);
+
+      if (!horse) {
+        return res.redirect(
+          '/admin/horses?error=' +
+            encodeURIComponent('Hästen kunde inte hittas.')
+        );
+      }
+
+      await tasksService.createStableTask({
+        ...req.body,
+        horseId: horse.id,
+      });
+
+      res.redirect(
+        `/admin/horses/${horse.id}?success=` +
+          encodeURIComponent('Åtgärden har lagts till.')
+      );
+    } catch (err) {
+      console.error('Error creating horse task:', err);
+
+      res.redirect(
+        `/admin/horses/${req.params.id}?error=` +
+          encodeURIComponent('Kunde inte skapa åtgärden: ' + err.message)
+      );
+    }
+  }
+
   async getHorseEdit(req, res) {
     try {
       const horse = await horsesService.getHorseById(req.params.id);

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+
+  <title><%= horse.name %></title>
+</head>
+
+<body class="bg-[#f5f0eb]">
+
+  <div class="flex">
+
+    <!-- SIDEBAR -->
+    <div class="hidden md:block">
+      <%- include("../Partials/sidebar-staff.ejs") %>
+    </div>
+
+    <div class="flex flex-1 flex-col">
+
+      <!-- TOPBAR -->
+      <%- include("../Partials/topbar-staff.ejs") %>
+
+      <main class="p-4 md:p-8 pb-20 md:pb-8 max-w-6xl w-full mx-auto">
+
+        <!-- Tillbaka -->
+        <a
+          href="/staff/horses"
+          class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 mb-5"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+          Tillbaka till hästar
+        </a>
+
+
+        <!-- HERO -->
+        <section class="bg-white rounded-2xl overflow-hidden shadow-sm mb-6">
+
+          <div class="relative">
+
+            <img
+              src="<%= horse.photoUrl || '/images/horse-placeholder.jpg' %>"
+              alt="<%= horse.name %>"
+              class="w-full h-64 md:h-80 object-cover"
+            />
+
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+            <div class="absolute bottom-5 left-5 text-white">
+
+              <p class="text-sm opacity-90 mb-1">
+                <%= horse.breed || 'Häst' %>
+              </p>
+
+              <h1 class="text-3xl md:text-4xl font-bold">
+                <%= horse.name %>
+              </h1>
+
+              <% if (horse.officialName) { %>
+                <p class="text-sm opacity-90 mt-1">
+                  <%= horse.officialName %>
+                </p>
+              <% } %>
+
+            </div>
+
+          </div>
+
+
+          <!-- Grundinformation -->
+          <div class="p-5 md:p-6">
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+              <div>
+                <p class="text-xs uppercase text-gray-400 font-bold mb-1">
+                  Ras
+                </p>
+                <p class="font-semibold">
+                  <%= horse.breed || '–' %>
+                </p>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase text-gray-400 font-bold mb-1">
+                  Kön
+                </p>
+                <p class="font-semibold">
+                  <%= horse.gender || '–' %>
+                </p>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase text-gray-400 font-bold mb-1">
+                  Född
+                </p>
+                <p class="font-semibold">
+                  <%= horse.birthYear || '–' %>
+                </p>
+              </div>
+
+              <div>
+                <p class="text-xs uppercase text-gray-400 font-bold mb-1">
+                  Höjd
+                </p>
+                <p class="font-semibold">
+                  <%= horse.heightCm ? horse.heightCm + ' cm' : '–' %>
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- TVÅ KOLUMNER -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+
+          <!-- VÄNSTER / HUVUDINFO -->
+          <div class="lg:col-span-2 space-y-6">
+
+
+            <!-- BESKRIVNING -->
+            <% if (horse.description) { %>
+
+              <section class="bg-white rounded-2xl p-5 md:p-6 shadow-sm">
+
+                <h2 class="text-lg font-bold mb-3 flex items-center gap-2">
+                  <i class="fa-solid fa-horse text-gray-500"></i>
+                  Om <%= horse.name %>
+                </h2>
+
+                <p class="text-gray-600 leading-relaxed whitespace-pre-line">
+                  <%= horse.description %>
+                </p>
+
+              </section>
+
+            <% } %>
+
+
+            <!-- TEMPERAMENT -->
+            <% if (horse.temperamentDescription || horse.temperamentTraits) { %>
+
+              <section class="bg-white rounded-2xl p-5 md:p-6 shadow-sm">
+
+                <h2 class="text-lg font-bold mb-4">
+                  Temperament
+                </h2>
+
+                <% if (horse.temperamentDescription) { %>
+                  <p class="text-gray-600 leading-relaxed mb-4">
+                    <%= horse.temperamentDescription %>
+                  </p>
+                <% } %>
+
+
+                <% if (horse.temperamentTraits) { %>
+
+                  <div class="flex flex-wrap gap-2">
+
+                    <%
+                      let temperamentTraits = [];
+
+                      try {
+                        temperamentTraits =
+                          typeof horse.temperamentTraits === 'string'
+                            ? JSON.parse(horse.temperamentTraits)
+                            : horse.temperamentTraits;
+                      } catch (e) {
+                        temperamentTraits = [];
+                      }
+                    %>
+
+                    <% temperamentTraits.forEach(trait => { %>
+
+                      <span class="bg-[#f5f0eb] text-gray-700 text-sm px-3 py-1.5 rounded-full">
+                        <%= trait %>
+                      </span>
+
+                    <% }) %>
+
+                  </div>
+
+                <% } %>
+
+              </section>
+
+            <% } %>
+
+
+            <!-- RIDNING -->
+            <% if (horse.ridingDescription) { %>
+
+              <section class="bg-white rounded-2xl p-5 md:p-6 shadow-sm">
+
+                <h2 class="text-lg font-bold mb-3">
+                  Ridning
+                </h2>
+
+                <p class="text-gray-600 leading-relaxed whitespace-pre-line">
+                  <%= horse.ridingDescription %>
+                </p>
+
+              </section>
+
+            <% } %>
+
+
+            <!-- VIKTIG INFORMATION -->
+            <% if (horse.importantInfo || horse.warningsInstructions) { %>
+
+              <section class="bg-white rounded-2xl p-5 md:p-6 shadow-sm">
+
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                  <i class="fa-solid fa-circle-exclamation text-amber-500"></i>
+                  Viktig information
+                </h2>
+
+                <% if (horse.importantInfo) { %>
+
+                  <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-3">
+
+                    <p class="text-sm text-gray-700 whitespace-pre-line">
+                      <%= horse.importantInfo %>
+                    </p>
+
+                  </div>
+
+                <% } %>
+
+
+                <% if (horse.warningsInstructions) { %>
+
+                  <div class="bg-red-50 border border-red-100 rounded-xl p-4">
+
+                    <p class="text-sm text-gray-700 whitespace-pre-line">
+                      <%= horse.warningsInstructions %>
+                    </p>
+
+                  </div>
+
+                <% } %>
+
+              </section>
+
+            <% } %>
+
+
+            <!-- HÄSTENS ÅTGÄRDER -->
+            <section class="bg-white rounded-2xl p-5 md:p-6 shadow-sm">
+
+              <div class="flex items-center justify-between mb-5">
+
+                <div>
+                  <h2 class="text-lg font-bold">
+                    Åtgärder
+                  </h2>
+
+                  <p class="text-sm text-gray-400">
+                    Uppgifter som är kopplade till <%= horse.name %>
+                  </p>
+                </div>
+
+                <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-3 py-1.5 rounded-full">
+                  <%= tasks.length %> st
+                </span>
+
+              </div>
+
+
+              <% if (tasks.length === 0) { %>
+
+                <div class="text-center py-8 text-gray-400">
+
+                  <i class="fa-solid fa-check-circle text-3xl mb-3"></i>
+
+                  <p class="font-medium">
+                    Inga åtgärder just nu
+                  </p>
+
+                  <p class="text-sm mt-1">
+                    Det finns inga uppgifter kopplade till hästen.
+                  </p>
+
+                </div>
+
+              <% } else { %>
+
+                <div class="space-y-3">
+
+                  <% tasks.forEach(task => { %>
+
+                    <div class="border rounded-xl p-4">
+
+                      <div class="flex items-start justify-between gap-4">
+
+                        <div class="flex items-start gap-3">
+
+                          <div class="mt-1 w-9 h-9 rounded-lg bg-[#f5f0eb] flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-list-check text-gray-600"></i>
+                          </div>
+
+                          <div>
+
+                            <h3 class="font-semibold">
+                              <%= task.title %>
+                            </h3>
+
+                            <% if (task.taskType) { %>
+                              <p class="text-xs text-gray-400 mt-1">
+                                <%= task.taskType %>
+                              </p>
+                            <% } %>
+
+                          </div>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+                        <% if (task.status === 'Klar') { %>
+
+                          <span class="text-xs font-semibold bg-green-100 text-green-700 px-3 py-1 rounded-full">
+                            Klar
+                          </span>
+
+                        <% } else if (task.priority === 'Hög' || task.priority === 'Akut') { %>
+
+                          <span class="text-xs font-semibold bg-red-100 text-red-700 px-3 py-1 rounded-full">
+                            Prioriterad
+                          </span>
+
+                        <% } else { %>
+
+                          <span class="text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                            Kommande
+                          </span>
+
+                        <% } %>
+
+                      </div>
+
+
+                      <!-- INSTRUKTION -->
+                      <% if (task.instructions || task.description) { %>
+
+                        <div class="mt-4 bg-gray-50 rounded-lg p-3">
+
+                          <p class="text-xs uppercase font-bold text-gray-400 mb-1">
+                            Instruktion
+                          </p>
+
+                          <p class="text-sm text-gray-600 whitespace-pre-line">
+                            <%= task.instructions || task.description %>
+                          </p>
+
+                        </div>
+
+                      <% } %>
+
+
+                      <!-- TID -->
+                      <div class="flex flex-wrap gap-4 mt-4 text-xs text-gray-500">
+
+                        <% if (task.dueTime) { %>
+                          <span class="flex items-center gap-1.5">
+                            <i class="fa-regular fa-clock"></i>
+                            <%= task.dueTime %>
+                          </span>
+                        <% } %>
+
+                        <% if (task.dueDate) { %>
+                          <span class="flex items-center gap-1.5">
+                            <i class="fa-regular fa-calendar"></i>
+                            <%= task.dueDate %>
+                          </span>
+                        <% } %>
+
+                        <% if (task.location) { %>
+                          <span class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <%= task.location %>
+                          </span>
+                        <% } %>
+
+                      </div>
+
+
+                      <!-- KLAR-KNAPP -->
+                      <% if (task.status !== 'Klar') { %>
+
+                        <form
+                          action="/staff/tasks/<%= task.id %>/complete"
+                          method="POST"
+                          class="mt-4"
+                        >
+
+                          <button
+                            type="submit"
+                            class="w-full md:w-auto bg-[#2c1a0e] text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90"
+                          >
+                            <i class="fa-solid fa-check mr-2"></i>
+                            Markera som klar
+                          </button>
+
+                        </form>
+
+                      <% } %>
+
+                    </div>
+
+                  <% }) %>
+
+                </div>
+
+              <% } %>
+
+            </section>
+
+          </div>
+
+
+          <!-- HÖGERKOLUMN -->
+          <div class="space-y-6">
+
+
+            <!-- STALLINFO -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm">
+
+              <h2 class="font-bold mb-4">
+                Stallinformation
+              </h2>
+
+              <div class="space-y-4">
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-400">
+                    Box
+                  </span>
+
+                  <span class="font-semibold">
+                    <%= horse.boxNumber || '–' %>
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-400">
+                    Hage
+                  </span>
+
+                  <span class="font-semibold">
+                    <%= horse.paddockNumber || '–' %>
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-400">
+                    Status
+                  </span>
+
+                  <span class="font-semibold">
+                    <%= horse.status || '–' %>
+                  </span>
+                </div>
+
+              </div>
+
+            </section>
+
+
+            <!-- RYTTARINFO -->
+            <section class="bg-white rounded-2xl p-5 shadow-sm">
+
+              <h2 class="font-bold mb-4">
+                Ryttarinformation
+              </h2>
+
+              <div class="space-y-4">
+
+                <div>
+
+                  <p class="text-xs uppercase text-gray-400 font-bold mb-1">
+                    Max ryttarvikt
+                  </p>
+
+                  <p class="font-semibold">
+                    <%= horse.maxRiderWeightKg
+                      ? horse.maxRiderWeightKg + ' kg'
+                      : '–' %>
+                  </p>
+
+                </div>
+
+
+                <% if (horse.suitableLevels) { %>
+
+                  <div>
+
+                    <p class="text-xs uppercase text-gray-400 font-bold mb-2">
+                      Passar för
+                    </p>
+
+                    <%
+                      let suitableLevels = [];
+
+                      try {
+                        suitableLevels =
+                          typeof horse.suitableLevels === 'string'
+                            ? JSON.parse(horse.suitableLevels)
+                            : horse.suitableLevels;
+                      } catch (e) {
+                        suitableLevels = [];
+                      }
+                    %>
+
+                    <div class="flex flex-wrap gap-2">
+
+                      <% suitableLevels.forEach(level => { %>
+
+                        <span class="bg-[#f5f0eb] text-gray-700 text-xs px-3 py-1.5 rounded-full">
+                          <%= level %>
+                        </span>
+
+                      <% }) %>
+
+                    </div>
+
+                  </div>
+
+                <% } %>
+
+              </div>
+
+            </section>
+
+
+            <!-- UTRUSTNING -->
+            <% if (horse.equipmentNotes) { %>
+
+              <section class="bg-white rounded-2xl p-5 shadow-sm">
+
+                <h2 class="font-bold mb-3">
+                  Utrustning
+                </h2>
+
+                <p class="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
+                  <%= horse.equipmentNotes %>
+                </p>
+
+              </section>
+
+            <% } %>
+
+
+            <!-- HÄLSA -->
+            <% if (horse.healthNotes || horse.lastVaccination || horse.lastShoeing) { %>
+
+              <section class="bg-white rounded-2xl p-5 shadow-sm">
+
+                <h2 class="font-bold mb-4">
+                  Hälsa & skötsel
+                </h2>
+
+                <% if (horse.healthNotes) { %>
+
+                  <div class="mb-4">
+
+                    <p class="text-xs uppercase text-gray-400 font-bold mb-1">
+                      Hälsouppgifter
+                    </p>
+
+                    <p class="text-sm text-gray-600 whitespace-pre-line">
+                      <%= horse.healthNotes %>
+                    </p>
+
+                  </div>
+
+                <% } %>
+
+
+                <% if (horse.lastVaccination) { %>
+
+                  <div class="flex justify-between text-sm mb-2">
+
+                    <span class="text-gray-400">
+                      Senaste vaccination
+                    </span>
+
+                    <span class="font-medium">
+                      <%= horse.lastVaccination %>
+                    </span>
+
+                  </div>
+
+                <% } %>
+
+
+                <% if (horse.lastShoeing) { %>
+
+                  <div class="flex justify-between text-sm">
+
+                    <span class="text-gray-400">
+                      Senaste skoning
+                    </span>
+
+                    <span class="font-medium">
+                      <%= horse.lastShoeing %>
+                    </span>
+
+                  </div>
+
+                <% } %>
+
+              </section>
+
+            <% } %>
+
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+
+  <!-- MOBIL BOTTOM NAV -->
+  <%- include("../Partials/bottomnav-staff.ejs") %>
+
+</body>
+</html>

@@ -10,85 +10,211 @@
 
 <body class="bg-[#f5f0eb]">
   <div class="flex">
+
     <div class="hidden md:block">
       <%- include("../Partials/sidebar-staff.ejs") %>
     </div>
 
     <div class="flex flex-1 flex-col">
+
       <%- include("../Partials/topbar-staff.ejs") %>
 
       <main class="p-4 md:p-8 pb-20 md:pb-8">
 
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
+
           <div>
-            <h1 class="text-2xl font-bold">Hästar som kräver åtgärd</h1>
-            <p class="text-gray-400 text-sm">Översikt över dagens prioriterade insatser.</p>
+            <h1 class="text-2xl font-bold">
+              Hästar som kräver åtgärd
+            </h1>
+
+            <p class="text-gray-400 text-sm">
+              Översikt över dagens prioriterade insatser.
+            </p>
           </div>
-          <button class="border bg-white rounded-lg px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-100">
-            <i class="fa-solid fa-sliders"></i> Filtrera
+
+          <button
+            class="border bg-white rounded-lg px-4 py-2 text-sm flex items-center gap-2 hover:bg-gray-100"
+          >
+            <i class="fa-solid fa-sliders"></i>
+            Filtrera
           </button>
+
         </div>
 
-        <!-- Hästkort grid - dold på mobil -->
+
+        <!-- ========================================= -->
+        <!-- DESKTOP HÄSTKORT -->
+        <!-- ========================================= -->
+
         <div class="hidden md:grid grid-cols-3 gap-4 mb-8">
+
           <% horses.forEach(horse => { %>
-          <% if (horse.tasks.length > 0) { %>
-          <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
-            <div class="relative">
-              <img src="<%= horse.photoUrl || '/images/horse-placeholder.jpg' %>" class="w-full h-48 object-cover" />
-              <span class="absolute top-3 left-3 text-xs px-3 py-1 rounded-full flex items-center gap-1
-                <%= horse.tasks.some(t => t.priority === 'Hög') ? 'bg-red-500 text-white' : 'bg-green-100 text-green-700' %>">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <%= horse.tasks.some(t => t.priority === 'Hög') ? 'Prioritet hög' : 'Kommande' %>
-              </span>
-            </div>
-            <div class="p-4">
-              <h3 class="font-bold text-lg"><%= horse.name %></h3>
-              <p class="text-gray-400 text-sm mb-3"><%= horse.boxNumber %> • <%= horse.paddockNumber %></p>
-              <p class="text-xs font-bold uppercase text-gray-400 mb-2">Åtgärder</p>
-              <div class="flex gap-2 flex-wrap">
-                <% horse.tasks.forEach((task, index) => { %>
-                <span class="<%= index === 0 ? 'bg-[#2c1a0e] text-white' : 'border' %> text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                  <i class="fa-solid fa-list-check"></i> <%= task.title %>
-                </span>
-                <% }) %>
-              </div>
-            </div>
-          </div>
-          <% } %>
+
+            <% if (horse.tasks.length > 0) { %>
+
+              <a
+                href="/staff/horses/<%= horse.id %>"
+                class="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition hover:-translate-y-0.5"
+              >
+
+                <div class="relative">
+
+                  <img
+                    src="<%= horse.photoUrl || '/images/horse-placeholder.jpg' %>"
+                    alt="<%= horse.name %>"
+                    class="w-full h-48 object-cover"
+                  />
+
+                  <span
+                    class="absolute top-3 left-3 text-xs px-3 py-1 rounded-full flex items-center gap-1
+                    <%= horse.tasks.some(t => t.priority === 'Hög' || t.priority === 'Akut')
+                      ? 'bg-red-500 text-white'
+                      : 'bg-green-100 text-green-700' %>"
+                  >
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    <%= horse.tasks.some(t => t.priority === 'Hög' || t.priority === 'Akut')
+                      ? 'Prioritet hög'
+                      : 'Kommande' %>
+
+                  </span>
+
+                </div>
+
+
+                <div class="p-4">
+
+                  <div class="flex items-start justify-between gap-3">
+
+                    <div>
+
+                      <h3 class="font-bold text-lg">
+                        <%= horse.name %>
+                      </h3>
+
+                      <p class="text-gray-400 text-sm mb-3">
+                        <%= horse.boxNumber %> • <%= horse.paddockNumber %>
+                      </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right text-gray-300 mt-1"></i>
+
+                  </div>
+
+
+                  <p class="text-xs font-bold uppercase text-gray-400 mb-2">
+                    Åtgärder
+                  </p>
+
+
+                  <div class="flex gap-2 flex-wrap">
+
+                    <% horse.tasks.forEach((task, index) => { %>
+
+                      <span
+                        class="<%= index === 0
+                          ? 'bg-[#2c1a0e] text-white'
+                          : 'border text-gray-700' %>
+                          text-xs px-3 py-1 rounded-full flex items-center gap-1"
+                      >
+
+                        <i class="fa-solid fa-list-check"></i>
+
+                        <%= task.title %>
+
+                      </span>
+
+                    <% }) %>
+
+                  </div>
+
+                </div>
+
+              </a>
+
+            <% } %>
+
           <% }) %>
+
         </div>
 
-        <!-- Mobil häst-lista -->
+
+        <!-- ========================================= -->
+        <!-- MOBIL HÄSTLISTA -->
+        <!-- ========================================= -->
+
         <div class="flex flex-col gap-3 md:hidden">
+
           <% horses.forEach(horse => { %>
-          <% if (horse.tasks.length > 0) { %>
-          <div class="bg-white rounded-xl p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <img src="<%= horse.photoUrl || '/images/horse-placeholder.jpg' %>" class="size-10 rounded-full object-cover" />
-                <div>
-                  <p class="font-semibold"><%= horse.name %></p>
-                  <p class="text-xs text-gray-400"><%= horse.boxNumber %> • <%= horse.paddockNumber %></p>
+
+            <% if (horse.tasks.length > 0) { %>
+
+              <a
+                href="/staff/horses/<%= horse.id %>"
+                class="block bg-white rounded-xl p-4 hover:bg-gray-50 transition"
+              >
+
+                <div class="flex items-center justify-between mb-3">
+
+                  <div class="flex items-center gap-3">
+
+                    <img
+                      src="<%= horse.photoUrl || '/images/horse-placeholder.jpg' %>"
+                      alt="<%= horse.name %>"
+                      class="size-10 rounded-full object-cover"
+                    />
+
+                    <div>
+
+                      <p class="font-semibold">
+                        <%= horse.name %>
+                      </p>
+
+                      <p class="text-xs text-gray-400">
+                        <%= horse.boxNumber %> • <%= horse.paddockNumber %>
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                  <i class="fa-solid fa-chevron-right text-gray-300"></i>
+
                 </div>
-              </div>
-              <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
-            </div>
-            <div class="flex gap-2 flex-wrap">
-              <% horse.tasks.forEach(task => { %>
-              <span class="border text-xs px-3 py-1 rounded-full"><%= task.title %></span>
-              <% }) %>
-            </div>
-          </div>
-          <% } %>
+
+
+                <div class="flex gap-2 flex-wrap">
+
+                  <% horse.tasks.forEach(task => { %>
+
+                    <span class="border text-xs px-3 py-1 rounded-full">
+                      <%= task.title %>
+                    </span>
+
+                  <% }) %>
+
+                </div>
+
+              </a>
+
+            <% } %>
+
           <% }) %>
+
         </div>
 
       </main>
+
     </div>
+
   </div>
 
+
   <%- include("../Partials/bottomnav-staff.ejs") %>
+
 </body>
 </html>

@@ -28,10 +28,21 @@ function unmarkTaskComplete(id) {
 
 function addTask(task) {
   const today = new Date().toISOString().split('T')[0];
+
   return db.prepare(`
-    INSERT INTO stable_tasks (title, taskType, location, dueDate, dueTime, priority, status, instructions)
-    VALUES (?, ?, ?, ?, ?, ?, 'Kommande', ?)
-  `).run(task.title, task.taskType, task.location, today, task.dueTime, task.priority, task.instructions);
+    INSERT INTO stable_tasks
+    (title, taskType, location, horseId, dueDate, dueTime, priority, status, instructions)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'Kommande', ?)
+  `).run(
+    task.title,
+    task.taskType,
+    task.location,
+    task.horseId,
+    today,
+    task.dueTime,
+    task.priority,
+    task.instructions
+  );
 }
 
 function deleteTask(id) {
@@ -45,5 +56,10 @@ function resetCompletedTasks() {
     WHERE status = 'Klar' AND date(completedAt) < date('now')
   `).run();
 }
+
+console.log(
+  db.prepare("PRAGMA table_info(stable_tasks)").all()
+);
+
 
 module.exports = { getAllTasks, markTaskComplete, unmarkTaskComplete, addTask, deleteTask, resetCompletedTasks };
