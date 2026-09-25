@@ -10,13 +10,52 @@
   <link rel="stylesheet" href="/stylesheets/styles.css" />
 </head>
 
-<body>
+<body class="bg-[#F2EFEB]">
   <header class="mb-16">
     <%-include('../Partials/topbar-student.ejs')%>
   </header>
 
   <main>
-    <p> Resultat </p>
+
+    <!-- Result summary -->
+    <div class="flex flex-col items-center text-center p-12">
+
+      <!-- Icon -->
+      <% if (attempt.passed) { %>
+      <div class="flex items-center justify-center bg-green-100 w-24 h-24 rounded-full drop-shadow">
+        <i class="fa-regular fa-circle-check text-7xl text-equira-green-600"></i>
+      </div>
+      <% } else { %>
+      <div class="flex items-center justify-center bg-red-100 w-24 h-24 rounded-full drop-shadow">
+        <i class="fa-regular fa-circle-xmark text-7xl text-red-800"></i>
+      </div>
+      <% } %>
+
+      <!-- Message -->
+      <h1 class="text-3xl font-semibold pt-6 py-3">
+        <%= attempt.passed ? "Bra jobbat!" : "Försök igen!" %>
+      </h1>
+      <h3 class="text-equira-cognac-700 text-xl"><%= attempt.quiz.title %></h3>
+
+      <!-- Score -->
+      <div class="w-full flex justify-evenly mt-6">
+        <div>
+          <h2 class="text-3xl font-semibold 
+          <%= attempt.passed ? 'text-equira-green-600' : 'text-red-800'%>"><%= attempt.percentage %>%</h2>
+          <p class="font-semibold text-equira-cognac-600 pt-1">Resultat</p>
+        </div>
+
+        <div class="border-l border-[#B0A696]"></div>
+
+        <div>
+          <h2 class="text-3xl text-equira-cognac-800 font-semibold"><%= attempt.score %> av <%= attempt.totalQuestions %></h2>
+          <p class="font-semibold text-equira-cognac-600 pt-1">Rätt svar</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions and answers -->
+
   </main>
 
   <footer class="mt-25">

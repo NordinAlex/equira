@@ -404,6 +404,9 @@ async function quizResult(req, res, next) {
                 quizId: Number(req.params.id),
                 studentId: req.session.user.id
             },
+            relations: {
+                quiz: true
+            },
             order: {
                 completedAt: "DESC"
             }
