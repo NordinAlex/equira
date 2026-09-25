@@ -226,7 +226,7 @@ async function quizzes(req, res, next) {
             relations: {
                 questions: true,
                 attempts: true
-                },
+            },
             order: {
                 title: "ASC"
             }
@@ -239,8 +239,8 @@ async function quizzes(req, res, next) {
             );
 
             const highScore = studentAttempts.length > 0
-            ? Math.max(...studentAttempts.map(attempt => attempt.percentage))
-            : null;
+                ? Math.max(...studentAttempts.map(attempt => attempt.percentage))
+                : null;
 
             return {
                 ...quiz,
@@ -405,7 +405,11 @@ async function quizResult(req, res, next) {
                 studentId: req.session.user.id
             },
             relations: {
-                quiz: true
+                quiz: {
+                    questions: {
+                        options: true
+                    }
+                }
             },
             order: {
                 completedAt: "DESC"
@@ -421,12 +425,20 @@ async function quizResult(req, res, next) {
             });
         }
 
+        const answers = JSON.parse(attempt.answersJson || "{}");
+        attempt.quiz.questions.forEach(question => {
+            const selectedOptionId = Number(answers[`answer-${question.id}`]);
+            const correctOption = question.options.find(option => option.isCorrect);
+            question.isCorrect = selectedOptionId === correctOption.id;
+        });
+
         res.render("student/quiz-result", {
             attempt,
             showBackButton: false
         });
 
     } catch (error) {
+        console.error(error)
         next(error);
     }
 }

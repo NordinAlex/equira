@@ -35,7 +35,7 @@
       <h1 class="text-3xl font-semibold pt-6 py-3">
         <%= attempt.passed ? "Bra jobbat!" : "Försök igen!" %>
       </h1>
-      <h3 class="text-equira-cognac-700 text-xl"><%= attempt.quiz.title %></h3>
+      <h3 class="text-equira-cognac-700 text-xl pb-3"><%= attempt.quiz.title %></h3>
 
       <!-- Score -->
       <div class="w-full flex justify-evenly mt-6">
@@ -55,6 +55,32 @@
     </div>
 
     <!-- Questions and answers -->
+
+    <div class="mx-6">
+      <% attempt.quiz.questions.forEach(question => { %>
+
+      <!-- Card -->
+      <div class="bg-white rounded-xl border border-[#B0A696] flex gap-4 p-4 mb-3 drop-shadow">
+
+        <!-- Icon -->
+        <div class="text-2xl py-2 pl-1">
+          <% if (question.isCorrect) { %>
+          <i class="fa-regular fa-circle-check text-equira-green-600"></i>
+          <% } else { %>
+          <i class="fa-regular fa-circle-xmark text-red-800"></i>
+          <% } %>
+        </div>
+
+        <div>
+          <!-- Explanation -->
+          <h2 class="text-xl font-semibold pt-2"><%= question.topicTitle %></h2>
+          <p class="text-lg py-2"><%= question.explanationText %></p>
+        </div>
+
+      </div>
+
+      <% }) %>
+    </div>
 
   </main>
 
