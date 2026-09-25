@@ -1,4 +1,4 @@
-<div id="quiz-questions" class="hidden">
+<div id="quiz-questions" data-quiz-id="<%= quiz.id %>" class="hidden">
 
   <% quiz.questions.forEach((question, index) => { %>
 
@@ -30,7 +30,7 @@
     <div>
       <% question.options.forEach(option => { %>
       <label type="button" class="w-[calc(100%-3rem)] bg-white rounded-xl p-4 text-left text-xl mx-6 my-3 border border-[#B0A696] flex items-center gap-4 cursor-pointer has-checked:drop-shadow-xl has-checked:bg-equira-green-50">
-        <input type="radio" name="answer-<%= question.id %>" class="appearance-none shrink-0 w-5 h-5 rounded-full border border-equira-cognac-600
+        <input type="radio" name="answer-<%= question.id %>" value="<%= option.id %>" class="appearance-none shrink-0 w-5 h-5 rounded-full border border-equira-cognac-600
         checked:bg-equira-cognac-600 relative
     checked:after:content-[''] checked:after:absolute
     checked:after:w-2 checked:after:h-2
@@ -61,7 +61,7 @@
         </span>
       </p>
 
-      <button type="button" class="next-question bg-equira-cognac-600 text-white text-lg font-semibold rounded-full px-6 py-3 m-6 self-end">
+      <button type="button" class="next-question bg-equira-cognac-600 text-white text-lg font-semibold rounded-full px-6 py-3 m-6 self-end cursor-pointer">
         <%= index === quiz.questions.length -1 ? "Slutför" : "Nästa fråga" %>
         <span>
           <i class="fa solid fa-arrow-right text-lg text-white ml-2"></i>

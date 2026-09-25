@@ -213,7 +213,7 @@ async function schedule(req, res, next) {
     }
 }
 
-// QUIZ
+// QUIZ LIST
 
 async function quizzes(req, res, next) {
     try {
@@ -226,7 +226,7 @@ async function quizzes(req, res, next) {
             relations: {
                 questions: true,
                 attempts: true
-                },
+            },
             order: {
                 title: "ASC"
             }
@@ -239,8 +239,8 @@ async function quizzes(req, res, next) {
             );
 
             const highScore = studentAttempts.length > 0
-            ? Math.max(...studentAttempts.map(attempt => attempt.percentage))
-            : null;
+                ? Math.max(...studentAttempts.map(attempt => attempt.percentage))
+                : null;
 
             return {
                 ...quiz,
@@ -326,4 +326,121 @@ async function activeQuiz(req, res, next) {
     }
 }
 
-module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes, activeQuiz, profile };
+// SAVE SCORE
+
+async function quizResults(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const quizRepository = dataSource.getRepository("Quiz");
+        const quiz = await quizRepository.findOne({
+            where: {
+                id: Number(req.params.id),
+                isPublished: true
+            },
+            relations: {
+                questions: {
+                    options: true
+                }
+            }
+        });
+
+        if (!quiz) {
+            return res.status(404).render("error", {
+                error: {
+                    status: 404
+                },
+                message: "Vi hittade inte det quiz du letar efter."
+            });
+        }
+
+        const answers = req.body.answers || {};
+        let score = 0;
+
+        quiz.questions.forEach(question => {
+            const selectedOptionId = Number(answers[`answer-${question.id}`]);
+            const correctOption = question.options.find(
+                option => option.isCorrect
+            );
+
+            if (correctOption && selectedOptionId === correctOption.id) {
+                score++;
+            }
+        });
+
+        console.log("ANSWERS:", answers);
+        console.log("SCORE:", score);
+
+        const totalQuestions = quiz.questions.length;
+        const percentage = Math.round((score / totalQuestions) * 100);
+        const passed = percentage >= 80;
+
+        const quizAttemptRepository = dataSource.getRepository("QuizAttempt");
+        const attempt = quizAttemptRepository.create({
+            quizId: quiz.id,
+            studentId: req.session.user.id,
+            score,
+            totalQuestions,
+            percentage,
+            passed,
+            answersJson: JSON.stringify(answers)
+        });
+
+        await quizAttemptRepository.save(attempt);
+
+        res.json({ success: true });
+
+    } catch (error) {
+        console.error("QUIZ RESULTS ERROR:", error);
+        next(error)
+    }
+}
+
+async function quizResult(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const quizAttemptRepository = dataSource.getRepository("QuizAttempt");
+        const attempt = await quizAttemptRepository.findOne({
+            where: {
+                quizId: Number(req.params.id),
+                studentId: req.session.user.id
+            },
+            relations: {
+                quiz: {
+                    questions: {
+                        options: true
+                    }
+                }
+            },
+            order: {
+                completedAt: "DESC"
+            }
+        });
+
+        if (!attempt) {
+            return res.status(404).render("error", {
+                error: {
+                    status: 404
+                },
+                message: "Vi hittade inget quizresultat."
+            });
+        }
+
+        const answers = JSON.parse(attempt.answersJson || "{}");
+        attempt.quiz.questions.forEach(question => {
+            const selectedOptionId = Number(answers[`answer-${question.id}`]);
+            const correctOption = question.options.find(option => option.isCorrect);
+            question.isCorrect = selectedOptionId === correctOption.id;
+        });
+
+        res.render("student/quiz-result", {
+            attempt,
+            showBackButton: false
+        });
+
+    } catch (error) {
+        console.error(error)
+        next(error);
+    }
+}
+
+module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes, activeQuiz, quizResults, quizResult, profile };

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equira | Quizresultat</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+</head>
+
+<body class="bg-[#F2EFEB]">
+  <header class="mb-16">
+    <%-include('../Partials/topbar-student.ejs')%>
+  </header>
+
+  <main>
+
+    <!-- Result summary -->
+    <div class="flex flex-col items-center text-center p-12">
+
+      <!-- Icon -->
+      <% if (attempt.passed) { %>
+      <div class="flex items-center justify-center bg-green-100 w-24 h-24 rounded-full drop-shadow">
+        <i class="fa-regular fa-circle-check text-7xl text-equira-green-600"></i>
+      </div>
+      <% } else { %>
+      <div class="flex items-center justify-center bg-red-100 w-24 h-24 rounded-full drop-shadow">
+        <i class="fa-regular fa-circle-xmark text-7xl text-red-800"></i>
+      </div>
+      <% } %>
+
+      <!-- Message -->
+      <h1 class="text-3xl font-semibold pt-6 py-3">
+        <%= attempt.passed ? "Bra jobbat!" : "Försök igen!" %>
+      </h1>
+      <h3 class="text-equira-cognac-700 text-xl pb-3"><%= attempt.quiz.title %></h3>
+
+      <!-- Score -->
+      <div class="w-full flex justify-evenly mt-6">
+        <div>
+          <h2 class="text-3xl font-semibold 
+          <%= attempt.passed ? 'text-equira-green-600' : 'text-red-800'%>"><%= attempt.percentage %>%</h2>
+          <p class="font-semibold text-equira-cognac-600 pt-1">Resultat</p>
+        </div>
+
+        <div class="border-l border-[#B0A696]"></div>
+
+        <div>
+          <h2 class="text-3xl text-equira-cognac-800 font-semibold"><%= attempt.score %> av <%= attempt.totalQuestions %></h2>
+          <p class="font-semibold text-equira-cognac-600 pt-1">Rätt svar</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions and answers -->
+
+    <div class="mx-6">
+      <% attempt.quiz.questions.forEach(question => { %>
+
+      <!-- Card -->
+      <div class="bg-white rounded-xl border border-[#B0A696] flex gap-4 p-4 mb-3 drop-shadow">
+
+        <!-- Icon -->
+        <div class="text-2xl py-2 pl-1">
+          <% if (question.isCorrect) { %>
+          <i class="fa-regular fa-circle-check text-equira-green-600"></i>
+          <% } else { %>
+          <i class="fa-regular fa-circle-xmark text-red-800"></i>
+          <% } %>
+        </div>
+
+        <div>
+          <!-- Explanation -->
+          <h2 class="text-xl font-semibold pt-2"><%= question.topicTitle %></h2>
+          <p class="text-lg py-2"><%= question.explanationText %></p>
+        </div>
+
+      </div>
+
+      <% }) %>
+    </div>
+
+  </main>
+
+  <footer class="mt-6 pb-12 py-3">
+    <div class="flex flex-col items-center gap-6">
+    <!-- Try again -->
+     <a href="/student/quiz/<%= attempt.quiz.id %>"
+        class="w-full max-w-xs bg-white border border-[#B0A696] rounded-full py-3 text-lg text-center text-equira-cognac-700 font-semibold">
+        Försök igen
+     </a>
+
+     <!-- Return -->
+      <a href="/student/quiz"
+      class="w-full max-w-xs bg-equira-cognac-700 border border-[#B0A696] rounded-full py-3 text-lg text-center text-white font-semibold">
+        Tillbaka till quiz
+      </a>
+      </div>
+  </footer>
+
+</body>
+
+</html>
