@@ -41,7 +41,7 @@ nextButton.forEach((button, index) => {
             const answers = {};
 
             quizQuestions.forEach((question) => {
-                const selectedAnswer = currentQuestion.querySelector('input[type="radio"]:checked');
+                const selectedAnswer = question.querySelector('input[type="radio"]:checked');
 
                 if (selectedAnswer) {
                     answers[selectedAnswer.name] = selectedAnswer.value;

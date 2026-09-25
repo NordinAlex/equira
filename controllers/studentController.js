@@ -367,6 +367,9 @@ async function quizResults(req, res, next) {
             }
         });
 
+        console.log("ANSWERS:", answers);
+        console.log("SCORE:", score);
+
         const totalQuestions = quiz.questions.length;
         const percentage = Math.round((score / totalQuestions) * 100);
         const passed = percentage >= 80;
@@ -384,12 +387,7 @@ async function quizResults(req, res, next) {
 
         await quizAttemptRepository.save(attempt);
 
-        res.render("student/quiz-result", {
-            score,
-            totalQuestions,
-            percentage,
-            passed
-        });
+        res.json({ success: true });
 
     } catch (error) {
         console.error("QUIZ RESULTS ERROR:", error);
