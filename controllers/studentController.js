@@ -213,7 +213,7 @@ async function schedule(req, res, next) {
     }
 }
 
-// QUIZ
+// QUIZ LIST
 
 async function quizzes(req, res, next) {
     try {
@@ -326,4 +326,108 @@ async function activeQuiz(req, res, next) {
     }
 }
 
-module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes, activeQuiz, profile };
+// SAVE SCORE
+
+async function quizResults(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const quizRepository = dataSource.getRepository("Quiz");
+        const quiz = await quizRepository.findOne({
+            where: {
+                id: Number(req.params.id),
+                isPublished: true
+            },
+            relations: {
+                questions: {
+                    options: true
+                }
+            }
+        });
+
+        if (!quiz) {
+            return res.status(404).render("error", {
+                error: {
+                    status: 404
+                },
+                message: "Vi hittade inte det quiz du letar efter."
+            });
+        }
+
+        const answers = req.body.answers || {};
+        let score = 0;
+
+        quiz.questions.forEach(question => {
+            const selectedOptionId = Number(answers[`answer-${question.id}`]);
+            const correctOption = question.options.find(
+                option => option.isCorrect
+            );
+
+            if (correctOption && selectedOptionId === correctOption.id) {
+                score++;
+            }
+        });
+
+        const totalQuestions = quiz.questions.length;
+        const percentage = Math.round((score / totalQuestions) * 100);
+        const passed = percentage >= 80;
+
+        const quizAttemptRepository = dataSource.getRepository("QuizAttempt");
+        const attempt = quizAttemptRepository.create({
+            quizId: quiz.id,
+            studentId: req.session.user.id,
+            score,
+            totalQuestions,
+            percentage,
+            passed,
+            answersJson: JSON.stringify(answers)
+        });
+
+        await quizAttemptRepository.save(attempt);
+
+        res.render("student/quiz-result", {
+            score,
+            totalQuestions,
+            percentage,
+            passed
+        });
+
+    } catch (error) {
+        console.error("QUIZ RESULTS ERROR:", error);
+        next(error)
+    }
+}
+
+async function quizResult(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const quizAttemptRepository = dataSource.getRepository("QuizAttempt");
+        const attempt = await quizAttemptRepository.findOne({
+            where: {
+                quizId: Number(req.params.id),
+                studentId: req.session.user.id
+            },
+            order: {
+                completedAt: "DESC"
+            }
+        });
+
+        if (!attempt) {
+            return res.status(404).render("error", {
+                error: {
+                    status: 404
+                },
+                message: "Vi hittade inget quizresultat."
+            });
+        }
+
+        res.render("student/quiz-result", {
+            attempt,
+            showBackButton: false
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes, activeQuiz, quizResults, quizResult, profile };

@@ -4,6 +4,8 @@ const questions = document.getElementById("quiz-questions");
 const quizQuestions = document.querySelectorAll(".quiz-question");
 const totalQuestions = quizQuestions.length;
 const progressBar = document.querySelectorAll(".quiz-progress");
+const quizQuestionsContainer = document.getElementById("quiz-questions");
+const quizId = quizQuestionsContainer.dataset.quizId;
 
 startButton.addEventListener("click", () => {
     startScreen.classList.add("hidden");
@@ -36,7 +38,26 @@ nextButton.forEach((button, index) => {
             const progress = ((index + 2) / totalQuestions) * 100;
             progressBar[index + 1].style.width = `${progress}%`;
         } else {
-            alert("Quiz avslutat!");
+            const answers = {};
+
+            quizQuestions.forEach((question) => {
+                const selectedAnswer = currentQuestion.querySelector('input[type="radio"]:checked');
+
+                if (selectedAnswer) {
+                    answers[selectedAnswer.name] = selectedAnswer.value;
+                }
+            });
+            fetch(`/student/quiz/${quizId}/results`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ answers })
+            })
+
+            .then(() => {
+                window.location.href = `/student/quiz/${quizId}/result`;
+            });
         }
     });
 });

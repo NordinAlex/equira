@@ -28,8 +28,10 @@
       <div class="flex items-center">
         <% if (quiz.highScore !== null) { %>
 
-        <i class="fa-solid fa-trophy self-center"></i>
-        <p class="font-semibold mt-3"><%= quiz.attempts.percentage %></p>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-trophy mt-3"></i>
+          <p class="font-semibold mt-3"><%= quiz.highScore %>%</p>
+        </div>
 
         <% } else { %>
 
@@ -37,6 +39,7 @@
 
         <% } %>
       </div>
+
     </div>
   </div>
 </a>
