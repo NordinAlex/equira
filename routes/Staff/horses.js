@@ -21,7 +21,7 @@ router.get('/staff', function(req, res, next) {
     },
     {
       name: 'Max',
-      location: 'Hage 4 • Skning 14:00',
+      location: 'Hage 4 • Skoning 14:00',
       status: 'Kommande',
       statusColor: 'green',
       image: '/images/max.jpg',

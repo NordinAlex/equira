@@ -28,7 +28,7 @@
           <div class="bg-green-100 rounded-2xl p-5 flex justify-between items-center">
             <div>
               <p class="text-xs font-bold uppercase text-gray-500 mb-2">Att göra idag</p>
-              <p class="text-4xl font-bold">2</p>
+              <p class="text-4xl font-bold"><%= todoCount %></p>
             </div>
             <div class="bg-green-200 rounded-full p-3">
               <i class="fa-solid fa-list-check text-green-600 text-xl"></i>
@@ -37,7 +37,7 @@
           <div class="bg-white rounded-2xl p-5 flex justify-between items-center">
             <div>
               <p class="text-xs font-bold uppercase text-gray-500 mb-2">Avklarade</p>
-              <p class="text-4xl font-bold">0</p>
+              <p class="text-4xl font-bold"><%= doneCount %></p>
             </div>
             <div class="bg-green-500 rounded-full p-3">
               <i class="fa-solid fa-check text-white text-xl"></i>
@@ -48,100 +48,42 @@
         <!-- Dagens uppgifter -->
         <h2 class="text-xl font-bold mb-4">Dagens uppgifter</h2>
 
-        <!-- 07:00 Morgonfodring -->
+        <% Object.entries(grouped).forEach(([type, tasks]) => { %>
         <div class="mb-6">
           <p class="flex items-center gap-2 text-sm font-semibold mb-3">
             <span class="size-3 rounded-full bg-gray-800 inline-block"></span>
-            07:00 Morgonfodring
+            <%= type %>
           </p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div class="bg-white rounded-xl p-4 flex items-center justify-between">
+            <% tasks.forEach(task => { %>
+            <div class="bg-white rounded-xl p-4 flex items-center justify-between <%= task.status === 'Klar' ? 'opacity-60' : '' %>">
               <div class="flex items-center gap-3">
+                <% if (task.photoUrl) { %>
+                <img src="<%= task.photoUrl %>" class="size-10 rounded-full object-cover" />
+                <% } else { %>
                 <div class="bg-gray-100 rounded-lg p-2">
-                  <i class="fa-solid fa-utensils text-gray-500"></i>
+                  <i class="fa-solid fa-list-check text-gray-500"></i>
                 </div>
+                <% } %>
                 <div>
-                  <p class="font-semibold">Fodra stall 1</p>
-                  <p class="text-xs text-gray-400">Hästar: 12</p>
+                  <p class="font-semibold"><%= task.horseName || task.title %></p>
+                  <p class="text-xs text-gray-400"><%= task.location %></p>
+                  <% if (task.instructions) { %>
+                  <p class="text-xs text-gray-400 mt-1"><%= task.instructions %></p>
+                  <% } %>
                 </div>
               </div>
-              <input type="checkbox" checked class="size-5 accent-blue-500" />
+              <form action="/staff/overview/tasks/<%= task.id %>/<%= task.status === 'Klar' ? 'uncomplete' : 'complete' %>" method="POST">
+                <input type="checkbox" 
+                  class="size-5 accent-blue-500 cursor-pointer"
+                  <%= task.status === 'Klar' ? 'checked' : '' %>
+                  onchange="this.form.submit()" />
+              </form>
             </div>
-            <div class="bg-white rounded-xl p-4 flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div class="bg-gray-100 rounded-lg p-2">
-                  <i class="fa-solid fa-utensils text-gray-500"></i>
-                </div>
-                <div>
-                  <p class="font-semibold">Fodra stall 2</p>
-                  <p class="text-xs text-gray-400">Hästar: 8</p>
-                </div>
-              </div>
-              <input type="checkbox" checked class="size-5 accent-blue-500" />
-            </div>
-            <div class="bg-white rounded-xl p-4 flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div class="bg-blue-100 rounded-lg p-2">
-                  <i class="fa-solid fa-droplet text-blue-500"></i>
-                </div>
-                <div>
-                  <p class="font-semibold">Kontrollera vatten</p>
-                  <p class="text-xs text-gray-400">Båda stallen</p>
-                </div>
-              </div>
-              <input type="checkbox" class="size-5" />
-            </div>
+            <% }) %>
           </div>
         </div>
-
-        <!-- 09:00 Utsläpp -->
-        <div class="mb-6">
-          <p class="flex items-center gap-2 text-sm font-semibold mb-3">
-            <span class="size-3 rounded-full bg-orange-400 inline-block"></span>
-            09:00 Utsläpp
-          </p>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div class="bg-white rounded-xl p-4">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <img src="/images/bella.jpg" class="size-10 rounded-full object-cover" />
-                  <div>
-                    <p class="font-semibold">Bella</p>
-                    <p class="text-xs text-gray-400">Hage 3</p>
-                  </div>
-                </div>
-                <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
-              </div>
-              <p class="text-sm text-gray-500"><i class="fa-solid fa-shirt mr-2 text-gray-400"></i>Ta på täcke (Regn)</p>
-            </div>
-            <div class="bg-white rounded-xl p-4">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <img src="/images/luna.jpg" class="size-10 rounded-full object-cover" />
-                  <div>
-                    <p class="font-semibold">Luna</p>
-                    <p class="text-xs text-gray-400">Hage 4</p>
-                  </div>
-                </div>
-                <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
-              </div>
-              <p class="text-sm text-gray-500"><i class="fa-solid fa-shield mr-2 text-gray-400"></i>Borsta hovar</p>
-            </div>
-            <div class="bg-white rounded-xl p-4">
-              <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center gap-3">
-                  <img src="/images/max.jpg" class="size-10 rounded-full object-cover" />
-                  <div>
-                    <p class="font-semibold">Max</p>
-                    <p class="text-xs text-gray-400">Hage 1</p>
-                  </div>
-                </div>
-                <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
-              </div>
-              <p class="text-sm text-gray-500"><i class="fa-regular fa-circle mr-2 text-gray-400"></i>Inga extra uppgifter</p>
-            </div>
-          </div>
-        </div>
+        <% }) %>
 
       </main>
     </div>
