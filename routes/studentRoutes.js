@@ -1,6 +1,6 @@
 const express = require('express');
 
-const {requireLogin } = require('../middleware/authMiddleware');
+const {requireLogin, requireRole } = require('../middleware/authMiddleware');
 const studentController = require('../controllers/studentController');
 
 const router = express.Router();
@@ -10,16 +10,17 @@ router.use((req, res, next) => {
     next();
 });
 
-router.get("/overview", requireLogin, studentController.overview);
-router.get("/lessons/:id", requireLogin, studentController.lessonDetails);
+router.get("/overview", requireLogin, requireRole('STUDENT'), studentController.overview);
+router.get("/lessons/:id", requireLogin, requireRole('STUDENT'), studentController.lessonDetails);
 
-router.get("/schedule", requireLogin, studentController.schedule);
+router.get("/schedule", requireLogin, requireRole('STUDENT'), studentController.schedule);
 
-router.get("/horses", requireLogin, studentController.horses);
-router.get("/horses/:id", requireLogin, studentController.horseProfile);
+router.get("/horses", requireLogin, requireRole('STUDENT'), studentController.horses);
+router.get("/horses/:id", requireLogin, requireRole('STUDENT'), studentController.horseProfile);
 
-router.get("/quiz", requireLogin, studentController.quizzes);
+router.get("/quiz", requireLogin, requireRole('STUDENT'), studentController.quizzes);
+router.get("/quiz/:id", requireLogin, requireRole('STUDENT'), studentController.activeQuiz);
 
-
+router.get("/profile", requireLogin, requireRole('STUDENT'), studentController.profile);
 
 module.exports = router;

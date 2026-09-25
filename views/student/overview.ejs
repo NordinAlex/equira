@@ -38,17 +38,19 @@
 
     </div>
 
+    <% if (nextLesson) { %>
     <h1 class="px-6 mt-6 font-semibold text-lg">Nästa lektion</h1>
+    <% } %>
 
     <%-include('../Partials/lesson-card.ejs')%>
 
     <div class="flex justify-between p-6">
-    <h2 class="font-semibold text-lg">Kommande lektioner</h2>
-    <a href="/student/schedule" class="text-equira-cognac-700">Se alla</a>
+      <h2 class="font-semibold text-lg">Kommande lektioner</h2>
+      <a href="/student/schedule" class="text-equira-cognac-700">Se alla</a>
     </div>
 
     <div>
-        <%-include('../Partials/upcoming-lessons.ejs')%>
+      <%-include('../Partials/upcoming-lessons.ejs')%>
     </div>
   </main>
 

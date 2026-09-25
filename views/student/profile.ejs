@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equira | Profil</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+</head>
+
+<body class="bg-[#F2EFEB]">
+  <header class="mb-16">
+    <%-include('../Partials/topbar-student.ejs')%>
+  </header>
+
+  <main>
+    <!-- User information -->
+    <div>
+      <div class="flex justify-center p-10">
+        <img src="/images/avatar.jpg" alt="Profilbild" class="w-40 h-40 rounded-full object-cover drop-shadow-lg">
+      </div>
+
+      <h1 class="text-2xl font-semibold text-center"><%= user.fullName %></h1>
+      <p class="text-lg font-semibold bg-equira-green-100 text-equira-green-800 w-fit rounded-full p-3 mx-auto my-3">Ridnivå: <%= ridingLevel %></p>
+    </div>
+
+    <!-- Quiz results -->
+    <div class="mx-6 mt-12 mb-15 bg-white border border-[#B0A696] rounded-xl drop-shadow text-equira-green-700 flex flex-col items-center gap-3 p-6">
+      <i class="fa-solid fa-award text-4xl"></i>
+      <h2 class="font-semibold text-4xl"><%= approvedQuizzes %></h2>
+      <p class="font-semibold text-lg">Quiz godkända</p>
+    </div>
+
+    <!-- Log out -->
+    <a href="/logout"
+    class="flex gap-3 w-fit border-[2px] rounded-xl py-3 px-12 mx-auto justify-center text-lg text-[grey]">
+      <i class="fa-solid fa-arrow-right-from-bracket self-center mt-1"></i>
+      Logga ut
+    </a>
+
+  </main>
+
+  <footer class="pt-25">
+    <%-include('../Partials/bottomnav-student.ejs')%>
+  </footer>
+</body>
+
+</html>

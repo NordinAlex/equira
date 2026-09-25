@@ -238,7 +238,7 @@ async function quizzes(req, res, next) {
                 attempt => attempt.studentId === studentId
             );
 
-            const highScore = studentAttempts.lentgh > 0
+            const highScore = studentAttempts.length > 0
             ? Math.max(...studentAttempts.map(attempt => attempt.percentage))
             : null;
 
@@ -257,4 +257,73 @@ async function quizzes(req, res, next) {
     }
 }
 
-module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes };
+// PROFILE
+async function profile(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const studentProfileRepository = dataSource.getRepository("StudentProfile");
+        const quizAttemptRepository = dataSource.getRepository("QuizAttempt");
+
+        const studentProfile = await studentProfileRepository.findOne({
+            where: {
+                userId: req.session.user.id
+            }
+        });
+
+
+        const approvedQuizzes = await quizAttemptRepository.count({
+            where: {
+                studentId: req.session.user.id,
+                passed: true
+            }
+        });
+
+        res.render("student/profile", {
+            user: req.session.user,
+            ridingLevel: studentProfile?.ridingLevel,
+            approvedQuizzes,
+            showBackButton: true
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// ACTIVE QUIZ
+
+async function activeQuiz(req, res, next) {
+    try {
+        const dataSource = await getDataSource();
+        const quizRepository = dataSource.getRepository("Quiz");
+        const quiz = await quizRepository.findOne({
+            where: {
+                id: Number(req.params.id),
+                isPublished: true
+            },
+            relations: {
+                questions: {
+                    options: true
+                }
+            }
+        });
+
+        if (!quiz) {
+            return res.status(404).render("error", {
+                error: {
+                    status: 404
+                },
+                message: "Vi hittade inte det quiz du letar efter."
+            });
+        }
+
+        res.render("student/active-quiz", {
+            quiz,
+            showBackButton: true
+        });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { overview, lessonDetails, horses, horseProfile, schedule, quizzes, activeQuiz, profile };
