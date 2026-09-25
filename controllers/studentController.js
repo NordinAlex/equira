@@ -204,8 +204,13 @@ async function schedule(req, res, next) {
             }
         });
 
+        const upcomingBookings = bookings.filter(booking => {
+            const dateTime = new Date(`${booking.lesson.date}T${booking.lesson.startTime}`);
+            return dateTime >= new Date();
+        })
+
         res.render("student/schedule", {
-            bookings,
+            bookings: upcomingBookings,
             showBackButton: true
         });
     } catch (error) {
@@ -394,6 +399,8 @@ async function quizResults(req, res, next) {
         next(error)
     }
 }
+
+// RESULT PAGE
 
 async function quizResult(req, res, next) {
     try {

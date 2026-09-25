@@ -20,9 +20,18 @@
     <h2 class="px-6 pb-8 text-lg text-equira-cognac-700">Kommande lektioner och aktiviteter</h2>
 
     <div class="mx-6">
+
+      <% if (bookings.length === 0) { %>
+
+      <p class="text-lg">Du har inga bokade lektioner just nu.</p>
+
+      <% } else { %>
+
       <% bookings.forEach(booking => { %>
       <%-include('../Partials/schedule-card.ejs', { booking }) %>
       <% }) %>
+
+      <% } %>
     </div>
 
   </main>
