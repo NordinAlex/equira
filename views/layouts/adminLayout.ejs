@@ -90,20 +90,27 @@
           <span>Elever</span>
         </a>
 
-        <a href="/admin/staff" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/staff') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+        <a href="/admin/staff" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath === '/admin/staff' ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
           <i class="fa-solid fa-id-badge w-5 text-center text-base"></i>
           <span>Personal</span>
         </a>
+
+      <a href="/admin/staff-schedule" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/staff-schedule') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+        <i class="fa-solid fa-calendar-week w-5 text-center text-base"></i>
+        <span>Personalschema</span>
+      </a>
+
+      <a href="/admin/stampling" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/stampling') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+        <i class="fa-solid fa-clock-rotate-left w-5 text-center text-base"></i>
+        <span>Stämpling & Tid</span>
+      </a>
+
 
         <a href="/admin/horses" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/horses') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
           <i class="fa-solid fa-horseshoe w-5 text-center text-base"></i>
           <span>Hästar</span>
         </a>
-
-        <a href="/admin/assign" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/assign') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
-          <i class="fa-solid fa-arrows-split-up-and-left w-5 text-center text-base"></i>
-          <span>Hästtilldelning</span>
-        </a>
+       
 
         <a href="/admin/tasks" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/tasks') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
           <i class="fa-solid fa-tractor w-5 text-center text-base"></i>
@@ -179,20 +186,26 @@
           <span>Elever</span>
         </a>
 
-        <a href="/admin/staff" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/staff') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+        <a href="/admin/staff" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath === '/admin/staff' ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
           <i class="fa-solid fa-id-badge w-5 text-center text-base"></i>
           <span>Personal</span>
         </a>
+
+ <a href="/admin/staff-schedule" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/staff-schedule') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+        <i class="fa-solid fa-calendar-week w-5 text-center text-base"></i>
+        <span>Personalschema</span>
+      </a>
+
+      <a href="/admin/stampling" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/stampling') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
+        <i class="fa-solid fa-clock-rotate-left w-5 text-center text-base"></i>
+        <span>Stämpling & Tid</span>
+      </a>
 
         <a href="/admin/horses" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/horses') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
           <i class="fa-solid fa-horseshoe w-5 text-center text-base"></i>
           <span>Hästar</span>
         </a>
-
-        <a href="/admin/assign" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/assign') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
-          <i class="fa-solid fa-arrows-split-up-and-left w-5 text-center text-base"></i>
-          <span>Hästtilldelning</span>
-        </a>
+        
 
         <a href="/admin/tasks" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/tasks') ? 'bg-white/15 text-white shadow-sm font-semibold' : 'text-emerald-100/70 hover:bg-white/10 hover:text-white' %>">
           <i class="fa-solid fa-tractor w-5 text-center text-base"></i>

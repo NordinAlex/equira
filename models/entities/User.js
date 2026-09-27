@@ -57,5 +57,10 @@ module.exports = new EntitySchema({
       inverseSide: 'user',
       cascade: true,
     },
+     timeEntries: {
+      type: 'one-to-many',
+      target: 'TimeEntry',
+      inverseSide: 'user',
+    },
   },
 });

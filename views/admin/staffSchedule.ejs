@@ -1,0 +1,732 @@
+<div class="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto space-y-6">
+
+  <!-- Top Breadcrumb & Page Header -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-500 font-medium uppercase tracking-wider mb-1">
+        <a href="/admin/overview" class="hover:text-emerald-800">Admin</a>
+        <span>/</span>
+        <a href="/admin/staff" class="hover:text-emerald-800">Personal</a>
+        <span>/</span>
+        <span class="text-stone-800 font-bold">Personalschema</span>
+      </div>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-stone-900 tracking-tight flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center text-lg shadow-sm">
+          <i class="fa-solid fa-calendar-week"></i>
+        </div>
+        <span>Personalschema & Schemaläggning</span>
+      </h1>
+      <p class="text-xs md:text-sm text-stone-500 mt-1">
+        Planera arbetspass, tilldela tider och hantera stallpersonalens månads- och veckoscheman.
+      </p>
+    </div>
+
+    <!-- Top Action Buttons -->
+    <div class="flex items-center gap-2.5 flex-wrap">
+      <button type="button" 
+              onclick="openQuickWeekModal()"
+              class="px-3.5 py-2 bg-white hover:bg-stone-50 text-stone-700 border border-stone-300 rounded-xl text-xs font-semibold shadow-xs flex items-center gap-2 transition hover-lift">
+        <i class="fa-solid fa-bolt text-amber-600"></i>
+        <span>Snabbplanera vecka</span>
+      </button>
+
+      <button type="button" 
+              onclick="openCreateShiftModal()"
+              class="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-2 transition hover-lift">
+        <i class="fa-solid fa-plus text-xs"></i>
+        <span>Nytt arbetspass</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI / Stats Overview Row -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <!-- Total Hours -->
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs flex items-center justify-between">
+      <div>
+        <span class="text-[10px] font-bold tracking-wider uppercase text-stone-400">PLANERAD TID DENNA MÅNAD</span>
+        <p class="text-2xl md:text-3xl font-black text-stone-900 mt-0.5"><%= data.totalPlannedHours || 144 %> tim</p>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center text-lg border border-emerald-100">
+        <i class="fa-regular fa-clock"></i>
+      </div>
+    </div>
+
+    <!-- Shifts Count -->
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs flex items-center justify-between">
+      <div>
+        <span class="text-[10px] font-bold tracking-wider uppercase text-stone-400">SCHEMALAGDA ARBETSPASS</span>
+        <p class="text-2xl md:text-3xl font-black text-stone-900 mt-0.5"><%= data.totalShiftsCount || 18 %> pass</p>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center text-lg border border-blue-100">
+        <i class="fa-solid fa-calendar-check"></i>
+      </div>
+    </div>
+
+    <!-- Active Staff Count -->
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs flex items-center justify-between">
+      <div>
+        <span class="text-[10px] font-bold tracking-wider uppercase text-stone-400">TILLGÄNGLIG PERSONAL</span>
+        <p class="text-2xl md:text-3xl font-black text-stone-900 mt-0.5"><%= data.staffUsers ? data.staffUsers.length : 3 %> anställda</p>
+      </div>
+      <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center text-lg border border-amber-100">
+        <i class="fa-solid fa-users"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter & Month Navigation Bar -->
+  <div class="bg-white rounded-2xl border border-stone-200/90 p-4 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <!-- Month Navigation -->
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-bold text-stone-500 uppercase tracking-wide">Månad:</span>
+      <div class="inline-flex items-center bg-stone-100 rounded-xl p-1 border border-stone-200">
+        <a href="/admin/staff-schedule?month=<%= data.prevMonthKey %><%= data.selectedUserId ? '&staffId=' + data.selectedUserId : '' %>" 
+           title="Föregående månad"
+           class="w-7 h-7 flex items-center justify-center text-stone-600 hover:text-stone-900 hover:bg-white rounded-lg transition">
+          <i class="fa-solid fa-chevron-left text-xs"></i>
+        </a>
+        <span class="px-4 text-xs font-bold text-stone-900">
+          <%= data.monthLabel %>
+        </span>
+        <a href="/admin/staff-schedule?month=<%= data.nextMonthKey %><%= data.selectedUserId ? '&staffId=' + data.selectedUserId : '' %>" 
+           title="Nästa månad"
+           class="w-7 h-7 flex items-center justify-center text-stone-600 hover:text-stone-900 hover:bg-white rounded-lg transition">
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Staff Filter Dropdown -->
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-bold text-stone-500 uppercase tracking-wide">Filtrera personal:</span>
+      <form action="/admin/staff-schedule" method="GET" class="flex items-center gap-2">
+        <input type="hidden" name="month" value="<%= data.monthKey %>">
+        <select name="staffId" onchange="this.form.submit()" class="bg-stone-50 border border-stone-200 text-stone-800 text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+          <option value="">Alla i personalen</option>
+          <% (data.staffUsers || []).forEach(staff => { %>
+            <option value="<%= staff.id %>" <%= (data.selectedUserId === staff.id) ? 'selected' : '' %>>
+              <%= staff.fullName %> (<%= staff.title %>)
+            </option>
+          <% }); %>
+        </select>
+        <% if (data.selectedUserId) { %>
+          <a href="/admin/staff-schedule?month=<%= data.monthKey %>" class="text-xs text-stone-400 hover:text-stone-700 underline">Återställ</a>
+        <% } %>
+      </form>
+    </div>
+  </div>
+
+  <!-- WEEKS SCHEDULE MATRIX -->
+  <div class="space-y-6">
+    <% (data.weeks || []).forEach(week => { %>
+      <div class="bg-white rounded-2xl md:rounded-3xl border border-stone-200/90 shadow-sm overflow-hidden">
+        
+        <!-- Week Header Bar -->
+        <div class="px-5 py-3.5 bg-stone-50/80 border-b border-stone-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded-lg <%= week.isCurrentWeek ? 'bg-emerald-800 text-white font-bold' : 'bg-stone-200 text-stone-800 font-semibold' %> text-xs">
+              Vecka <%= week.weekNumber %>
+            </span>
+            <span class="text-xs text-stone-500 font-medium">
+              <%= week.days[0].dateStr %> – <%= week.days[6].dateStr %>
+            </span>
+            <% if (week.isCurrentWeek) { %>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                Denna vecka
+              </span>
+            <% } %>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" 
+                    onclick="openQuickWeekModalWithDate('<%= week.mondayDateStr %>')"
+                    class="text-xs text-emerald-800 hover:text-emerald-950 font-semibold flex items-center gap-1 hover:underline">
+              <i class="fa-solid fa-bolt text-[11px] text-amber-600"></i>
+              <span>Planera V.<%= week.weekNumber %></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scrollable Table Wrapper -->
+        <div class="overflow-x-auto">
+          <div class="min-w-[800px]">
+            
+            <!-- Day Column Titles Row -->
+            <div class="grid grid-cols-12 gap-2 px-5 py-2.5 border-b border-stone-100 text-center text-xs font-semibold text-stone-600 bg-stone-50/30">
+              <div class="col-span-3 text-left">Personal & Roll</div>
+              <div class="col-span-9 grid grid-cols-7 gap-2">
+                <% week.days.forEach(day => { %>
+                  <div class="<%= day.isSunday ? 'text-[#e11d48]' : (day.isToday ? 'text-emerald-800 font-bold' : 'text-stone-700') %> leading-tight">
+                    <div><%= day.dayName %></div>
+                    <div class="text-[11px] font-normal"><%= day.dateStr %></div>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+
+            <!-- Staff Rows -->
+            <div class="divide-y divide-stone-100">
+              <% (week.staffRows || []).forEach(row => { %>
+                <div class="grid grid-cols-12 gap-2 px-5 py-3 items-center hover:bg-stone-50/40 transition">
+                  
+                  <!-- Left: Staff Profile & Weekly hours -->
+                  <div class="col-span-3 flex items-center justify-between pr-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <img src="<%= row.user.avatarUrl %>" alt="<%= row.user.fullName %>" class="w-8 h-8 rounded-full object-cover border border-stone-200 flex-shrink-0">
+                      <div class="min-w-0">
+                        <h4 class="text-xs font-bold text-stone-900 truncate leading-tight"><%= row.user.fullName %></h4>
+                        <p class="text-[10px] text-stone-400 truncate"><%= row.user.title %></p>
+                      </div>
+                    </div>
+                    <span class="px-2 py-0.5 rounded border border-stone-200 text-stone-600 text-[10px] font-medium bg-white flex-shrink-0">
+                      <%= row.weekHours %> tim
+                    </span>
+                  </div>
+
+                  <!-- Right: 7 Days Shift Slots -->
+                  <div class="col-span-9 grid grid-cols-7 gap-2">
+                    <% row.days.forEach(day => { %>
+                      <div class="min-h-[56px] rounded-xl border border-stone-100 p-1.5 flex flex-col justify-center items-center relative group transition <%= day.shifts.length > 0 ? (day.shifts.some(s => s.isClockedIn) ? 'bg-emerald-50/70 border-emerald-300' : (day.shifts.some(s => s.isAdjusted) ? 'bg-amber-50/60 border-amber-300' : 'bg-[#0088d1]/10 border-[#0088d1]/30')) : 'bg-stone-50/30 hover:border-stone-300' %>">
+                        
+                        <% if (day.shifts.length > 0) { %>
+                          <% day.shifts.forEach(shift => { %>
+                            <div class="w-full text-center space-y-0.5">
+                              
+                              <!-- Shift time display & struck-through original if adjusted -->
+                              <div class="flex items-center justify-center gap-1 flex-wrap">
+                                <span class="text-[11px] font-bold text-[#005a9c] leading-tight">
+                                  <%= shift.startTime %> – <%= shift.endTime %>
+                                </span>
+                                <% if (shift.isAdjusted && (shift.originalPlannedStartTime !== shift.startTime || shift.originalPlannedEndTime !== shift.endTime)) { %>
+                                  <span class="text-[8.5px] text-stone-400 font-medium" title="Ursprungligt planerat pass: <%= shift.originalPlannedStartTime %>–<%= shift.originalPlannedEndTime %>">
+                                    (orig: <span class="line-through"><%= shift.originalPlannedStartTime %>–<%= shift.originalPlannedEndTime %></span>)
+                                  </span>
+                                <% } %>
+                              </div>
+
+                              <!-- Stamping & Status Indicators -->
+                              <div class="flex items-center justify-center gap-1 flex-wrap pt-0.5">
+                                <% if (shift.isClockedIn) { %>
+                                  <span class="inline-flex items-center gap-1 text-[8.5px] font-bold text-emerald-800 bg-emerald-100/90 px-1.5 py-0.5 rounded-full border border-emerald-300 shadow-2xs" title="Personal är instämplad sedan <%= shift.checkInTimeStr %>">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> In <%= shift.checkInTimeStr %>
+                                  </span>
+                                <% } else if (shift.checkInTimeStr && shift.checkInTimeStr !== '–' && shift.checkOutTimeStr && shift.checkOutTimeStr !== '–') { %>
+                                  <span class="inline-flex items-center gap-1 text-[8.5px] font-semibold text-sky-800 bg-sky-100/80 px-1.5 py-0.5 rounded-md border border-sky-200" title="Personal stämplade: <%= shift.checkInTimeStr %>–<%= shift.checkOutTimeStr %> (Original: <%= shift.originalCheckInTimeStr %>–<%= shift.originalCheckOutTimeStr %>)">
+                                    <i class="fa-solid fa-fingerprint text-[7.5px] text-sky-600"></i> <%= shift.checkInTimeStr %>–<%= shift.checkOutTimeStr %>
+                                  </span>
+                                <% } else { %>
+                                  <span class="text-[9px] text-stone-500 font-medium truncate">
+                                    <%= shift.hours %>h &bull; <%= shift.location %>
+                                  </span>
+                                <% } %>
+
+                                <% if (shift.isAdjusted) { %>
+                                  <span class="inline-flex items-center gap-0.5 text-[8px] font-bold text-amber-800 bg-amber-100/90 px-1 py-0.5 rounded border border-amber-300" title="Justerad av <%= shift.adjustedBy || 'Admin' %><%= shift.adjustedAtStr ? ' kl ' + shift.adjustedAtStr : '' %>">
+                                    <i class="fa-solid fa-pen-nib text-[6.5px] text-amber-600"></i> Justerad
+                                  </span>
+                                <% } %>
+                              </div>
+
+                              <!-- Quick Edit / Delete Buttons on Hover -->
+                              <% if (!shift.isDemo) { %>
+                                <div class="absolute inset-0 bg-stone-900/80 rounded-xl flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition z-10">
+                                  <button type="button" 
+                                          data-shift='<%- JSON.stringify(shift) %>'
+                                          onclick="openEditShiftModal(JSON.parse(this.dataset.shift))"
+                                          title="Redigera pass och se stämplingar"
+                                          class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white text-white hover:text-stone-900 flex items-center justify-center text-xs transition">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                  </button>
+                                  <form action="/admin/staff-schedule/delete/<%= shift.id %>" method="POST" onsubmit="return confirm('Vill du ta bort detta arbetspass?');">
+                                    <button type="submit" 
+                                            title="Ta bort pass"
+                                            class="w-7 h-7 rounded-lg bg-rose-500/80 hover:bg-rose-600 text-white flex items-center justify-center text-xs transition">
+                                      <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                  </form>
+                                </div>
+                              <% } %>
+                            </div>
+                          <% }); %>
+                        <% } else { %>
+                          <!-- Empty day slot: Quick + button -->
+                          <button type="button" 
+                                  onclick="openCreateShiftModalWithParams('<%= row.user.id %>', '<%= day.fullDate %>')"
+                                  title="Schemalägg pass för <%= row.user.fullName %>"
+                                  class="w-full h-full flex items-center justify-center text-stone-300 hover:text-emerald-700 opacity-0 group-hover:opacity-100 transition">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                          </button>
+                        <% } %>
+
+                      </div>
+                    <% }); %>
+                  </div>
+
+                </div>
+              <% }); %>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    <% }); %>
+  </div>
+
+</div>
+
+<!-- MODAL 1: CREATE SINGLE SHIFT -->
+<div id="createShiftModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-200 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-emerald-800 text-white flex items-center justify-center text-sm shadow-xs">
+          <i class="fa-solid fa-plus"></i>
+        </div>
+        <h3 class="text-base font-bold text-stone-900">Schemalägg nytt arbetspass</h3>
+      </div>
+      <button type="button" onclick="closeCreateShiftModal()" class="w-8 h-8 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <form action="/admin/staff-schedule/create" method="POST" class="space-y-4 text-xs">
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">Personal *</label>
+        <select name="userId" id="createShiftUserId" required class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+          <% (data.staffUsers || []).forEach(staff => { %>
+            <option value="<%= staff.id %>"><%= staff.fullName %> (<%= staff.title %>)</option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Datum *</label>
+          <input type="date" name="date" id="createShiftDate" required value="2026-09-28" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Passnamn / Roll</label>
+          <input type="text" name="shiftName" value="Stallpersonal (6851)" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Starttid *</label>
+          <input type="time" name="startTime" id="createStartTime" value="12:00" required onchange="updateCreateShiftCalc()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Sluttid *</label>
+          <input type="time" name="endTime" id="createEndTime" value="21:00" required onchange="updateCreateShiftCalc()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Arbetstid (timmar)</label>
+          <input type="number" step="0.5" name="hours" id="createHours" value="8.0" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+      </div>
+
+      <div class="p-2.5 bg-emerald-50/70 border border-emerald-200/70 rounded-xl flex items-center justify-between text-[11px] text-emerald-900">
+        <span class="flex items-center gap-1.5 font-medium">
+          <i class="fa-solid fa-mug-hot text-emerald-700"></i>
+          <span id="createBreakHint">Beräknad rast från pass: <strong>1 rast (01:00)</strong></span>
+        </span>
+        <span class="text-stone-500" id="createElapsedHint">Passlängd: 9 tim</span>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">Placering / Anläggning</label>
+        <input type="text" name="location" value="Huvudstallet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">Notering / Instruktion</label>
+        <textarea name="note" rows="2" placeholder="T.ex. Helgfodring eller hästskötsel..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700"></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+        <button type="button" onclick="closeCreateShiftModal()" class="px-4 py-2 border border-stone-300 hover:bg-stone-50 text-stone-700 rounded-xl font-semibold transition">Avbryt</button>
+        <button type="submit" class="px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl font-semibold shadow-xs transition">Spara arbetspass</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 2: QUICK PLAN STANDARD WEEK (Mån–Fre) -->
+<div id="quickWeekModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-200 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center text-sm shadow-xs">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-stone-900">Snabbplanera hel vecka</h3>
+          <p class="text-[11px] text-stone-500">Skapar 5 pass automatiskt (Mån–Fre 40 tim)</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeQuickWeekModal()" class="w-8 h-8 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <form action="/admin/staff-schedule/quick-week" method="POST" class="space-y-4 text-xs">
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">Välj personal *</label>
+        <select name="userId" required class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+          <% (data.staffUsers || []).forEach(staff => { %>
+            <option value="<%= staff.id %>"><%= staff.fullName %> (<%= staff.title %>)</option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">Veckans startdatum (Måndag) *</label>
+        <input type="date" name="mondayDate" id="quickWeekMondayDate" required value="2026-09-28" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Starttid</label>
+          <input type="time" name="startTime" value="12:00" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Sluttid</label>
+          <input type="time" name="endTime" value="21:00" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">Passnamn</label>
+        <input type="text" name="shiftName" value="Stallpersonal (6851)" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+      </div>
+
+      <div class="p-3 bg-amber-50 rounded-xl text-[11px] text-amber-900 border border-amber-200/80">
+        <i class="fa-solid fa-circle-info mr-1 text-amber-700"></i>
+        Detta skapar automatiskt 5 arbetspass för måndag t.o.m. fredag (totalt 40 timmar) och uppdaterar personalens schema i mobilen.
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+        <button type="button" onclick="closeQuickWeekModal()" class="px-4 py-2 border border-stone-300 hover:bg-stone-50 text-stone-700 rounded-xl font-semibold transition">Avbryt</button>
+        <button type="submit" class="px-5 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-xl font-semibold shadow-xs transition">Skapa standardvecka</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 3: EDIT SHIFT -->
+<div id="editShiftModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden transition-opacity">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-200 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm shadow-xs">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </div>
+        <h3 class="text-base font-bold text-stone-900">Redigera arbetspass</h3>
+      </div>
+      <button type="button" onclick="closeEditShiftModal()" class="w-8 h-8 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <form id="editShiftForm" method="POST" class="space-y-4 text-xs">
+      <!-- Personalens Stämpling & Orörd Historik -->
+      <div class="p-3.5 bg-stone-50 border border-stone-200 rounded-2xl space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-stone-800 text-[11px] flex items-center gap-1.5">
+            <i class="fa-solid fa-fingerprint text-blue-600"></i> Personalens stämpling & historik
+          </span>
+          <span id="editShiftAuditBadge" class="text-[10px] px-2 py-0.5 rounded-full font-semibold border">
+            <!-- Populated via JS -->
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-[11px]">
+          <div class="p-2 bg-white rounded-xl border border-stone-200/80">
+            <span class="text-stone-400 block text-[9.5px]">Stämplat In (Personal)</span>
+            <span class="font-bold text-stone-800" id="editModalCheckInTime">--:--</span>
+          </div>
+          <div class="p-2 bg-white rounded-xl border border-stone-200/80">
+            <span class="text-stone-400 block text-[9.5px]">Stämplat Ut (Personal)</span>
+            <span class="font-bold text-stone-800" id="editModalCheckOutTime">--:--</span>
+          </div>
+        </div>
+
+        <div class="p-2 bg-white rounded-xl border border-stone-200/80 flex items-center justify-between text-[11px] gap-2 flex-wrap">
+          <div>
+            <span class="text-stone-400 block text-[9.5px]">Ursprungligt planerat pass</span>
+            <span class="font-semibold text-stone-700" id="editModalOrigPlanned">--:-- – --:--</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button type="button" onclick="applyStaffPunchTimes()" id="btnApplyStaffPunch" class="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg text-[10px] font-semibold border border-blue-200 transition">
+              <i class="fa-solid fa-clock-rotate-left mr-0.5"></i> Sätt efter stämpling
+            </button>
+            <button type="button" onclick="resetToOriginalPlannedTimes()" id="btnResetOrigPlanned" class="px-2 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-[10px] font-semibold border border-stone-300 transition">
+              <i class="fa-solid fa-rotate-left mr-0.5"></i> Återställ original
+            </button>
+          </div>
+        </div>
+
+        <!-- Audit info note if previously adjusted -->
+        <div id="editModalAdjustedInfo" class="hidden p-2 bg-amber-50 rounded-xl border border-amber-200 text-[10.5px] text-amber-900">
+          <i class="fa-solid fa-circle-info mr-1 text-amber-600"></i>
+          <span id="editModalAdjustedText"></span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Starttid *</label>
+          <input type="time" name="startTime" id="editStartTime" required onchange="updateEditShiftCalc()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Sluttid *</label>
+          <input type="time" name="endTime" id="editEndTime" required onchange="updateEditShiftCalc()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Arbetstid (timmar)</label>
+          <input type="number" step="0.5" name="hours" id="editHours" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+      </div>
+
+      <div class="p-2.5 bg-blue-50/70 border border-blue-200/70 rounded-xl flex items-center justify-between text-[11px] text-blue-900">
+        <span class="flex items-center gap-1.5 font-medium">
+          <i class="fa-solid fa-mug-hot text-blue-700"></i>
+          <span id="editBreakHint">Beräknad rast från pass: <strong>1 rast (01:00)</strong></span>
+        </span>
+        <span class="text-stone-500" id="editElapsedHint">Passlängd: 9 tim</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Passnamn</label>
+          <input type="text" name="shiftName" id="editShiftName" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        </div>
+        <div>
+          <label class="block font-semibold text-stone-700 mb-1">Status</label>
+          <select name="status" id="editStatus" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+            <option value="BOKAD">Bokad</option>
+            <option value="EJ_INSTAMPLAD">Ej instämplad</option>
+            <option value="INSTAMPLAD">Instämplad</option>
+            <option value="AVSLUTAD">Avslutad</option>
+            <option value="JUSTERAD">Justerad</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">Placering</label>
+        <input type="text" name="location" id="editLocation" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">Notering</label>
+        <input type="text" name="note" id="editNote" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+      </div>
+
+      <div>
+        <label class="block font-semibold text-stone-700 mb-1">
+          Administratörens justeringsorsak <span class="text-stone-400 font-normal">(loggas i historik)</span>
+        </label>
+        <input type="text" name="adminNote" id="editAdminNote" placeholder="T.ex. Godkänt övertid 30 min eller korrigerad stämpling efter avstämning" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-stone-800 focus:outline-none focus:ring-2 focus:ring-emerald-700">
+        <p class="text-[10px] text-stone-400 mt-1 flex items-center gap-1">
+          <i class="fa-solid fa-lock text-stone-400"></i> Personalens originalstämpling bevaras alltid permanent i systemet.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+        <button type="button" onclick="closeEditShiftModal()" class="px-4 py-2 border border-stone-300 hover:bg-stone-50 text-stone-700 rounded-xl font-semibold transition">Avbryt</button>
+        <button type="submit" class="px-5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl font-semibold shadow-xs transition">Spara ändringar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function calcBreakMetrics(startTime, endTime) {
+    if (!startTime || !endTime) return { elapsedHours: 9, breakMinutes: 60, breakStr: '01:00', breakLabel: '1 rast', workHours: 8.0 };
+    const [sh, sm] = startTime.split(':').map(Number);
+    let [eh, em] = endTime.split(':').map(Number);
+    let startMin = (sh || 0) * 60 + (sm || 0);
+    let endMin = (eh || 0) * 60 + (em || 0);
+    if (endMin < startMin) endMin += 24 * 60;
+    const elapsedMinutes = endMin - startMin;
+    const elapsedHours = Math.round((elapsedMinutes / 60) * 10) / 10;
+
+    let breakMinutes = 60;
+    let breakStr = '01:00';
+    let breakLabel = '1 rast';
+
+    if (elapsedMinutes < 300) {
+      breakMinutes = 0;
+      breakStr = '00:00';
+      breakLabel = 'Ingen rast';
+    } else if (elapsedMinutes < 450) {
+      breakMinutes = 30;
+      breakStr = '00:30';
+      breakLabel = '1 rast';
+    } else if (elapsedMinutes < 630) {
+      breakMinutes = 60;
+      breakStr = '01:00';
+      breakLabel = '1 rast';
+    } else {
+      breakMinutes = 90;
+      breakStr = '01:30';
+      breakLabel = '2 raster';
+    }
+
+    const workHours = Math.round(((elapsedMinutes - breakMinutes) / 60) * 10) / 10;
+    return { elapsedMinutes, elapsedHours, breakMinutes, breakStr, breakLabel, workHours };
+  }
+
+  function updateCreateShiftCalc() {
+    const s = document.getElementById('createStartTime').value;
+    const e = document.getElementById('createEndTime').value;
+    const res = calcBreakMetrics(s, e);
+    document.getElementById('createHours').value = res.workHours;
+    document.getElementById('createBreakHint').innerHTML = `Beräknad rast från pass: <strong>${res.breakLabel} (${res.breakStr})</strong>`;
+    document.getElementById('createElapsedHint').textContent = `Passlängd: ${res.elapsedHours} tim`;
+  }
+
+  function updateEditShiftCalc() {
+    const s = document.getElementById('editStartTime').value;
+    const e = document.getElementById('editEndTime').value;
+    const res = calcBreakMetrics(s, e);
+    document.getElementById('editHours').value = res.workHours;
+    document.getElementById('editBreakHint').innerHTML = `Beräknad rast från pass: <strong>${res.breakLabel} (${res.breakStr})</strong>`;
+    document.getElementById('editElapsedHint').textContent = `Passlängd: ${res.elapsedHours} tim`;
+  }
+
+  function openCreateShiftModal() {
+    document.getElementById('createShiftModal').classList.remove('hidden');
+    updateCreateShiftCalc();
+  }
+
+  function openCreateShiftModalWithParams(userId, dateStr) {
+    if (userId) document.getElementById('createShiftUserId').value = userId;
+    if (dateStr) document.getElementById('createShiftDate').value = dateStr;
+    document.getElementById('createShiftModal').classList.remove('hidden');
+    updateCreateShiftCalc();
+  }
+
+  function closeCreateShiftModal() {
+    document.getElementById('createShiftModal').classList.add('hidden');
+  }
+
+  function openQuickWeekModal() {
+    document.getElementById('quickWeekModal').classList.remove('hidden');
+  }
+
+  function openQuickWeekModalWithDate(dateStr) {
+    if (dateStr) document.getElementById('quickWeekMondayDate').value = dateStr;
+    document.getElementById('quickWeekModal').classList.remove('hidden');
+  }
+
+  function closeQuickWeekModal() {
+    document.getElementById('quickWeekModal').classList.add('hidden');
+  }
+
+  let currentEditingShift = null;
+
+  function openEditShiftModal(shiftOrId, startTime, endTime, hours, shiftName, location, note, status) {
+    let data = {};
+    if (typeof shiftOrId === 'object' && shiftOrId !== null) {
+      data = shiftOrId;
+    } else {
+      data = {
+        id: shiftOrId,
+        startTime,
+        endTime,
+        hours,
+        shiftName,
+        location,
+        note,
+        adminNote: '',
+        status,
+        originalPlannedStartTime: startTime,
+        originalPlannedEndTime: endTime,
+        checkInTimeStr: '–',
+        checkOutTimeStr: '–',
+        isAdjusted: false
+      };
+    }
+    currentEditingShift = data;
+
+    document.getElementById('editShiftForm').action = `/admin/staff-schedule/edit/${data.id}`;
+    document.getElementById('editStartTime').value = data.startTime || '12:00';
+    document.getElementById('editEndTime').value = data.endTime || '21:00';
+    document.getElementById('editHours').value = data.hours || 8.0;
+    document.getElementById('editShiftName').value = data.shiftName || 'Stallpersonal (6851)';
+    document.getElementById('editLocation').value = data.location || 'Huvudstallet';
+    document.getElementById('editNote').value = data.note || '';
+    document.getElementById('editAdminNote').value = data.adminNote || '';
+    document.getElementById('editStatus').value = data.status || 'BOKAD';
+
+    // Stamping & audit display
+    const checkIn = data.checkInTimeStr && data.checkInTimeStr !== '–' ? data.checkInTimeStr : 'Ej stämplat';
+    const checkOut = data.checkOutTimeStr && data.checkOutTimeStr !== '–' ? data.checkOutTimeStr : (data.isClockedIn ? 'Instämplad (pågår)' : 'Ej stämplat');
+    document.getElementById('editModalCheckInTime').textContent = checkIn;
+    document.getElementById('editModalCheckOutTime').textContent = checkOut;
+
+    const origStart = data.originalPlannedStartTime || data.startTime || '12:00';
+    const origEnd = data.originalPlannedEndTime || data.endTime || '21:00';
+    document.getElementById('editModalOrigPlanned').textContent = `${origStart} – ${origEnd}`;
+
+    // Enable/disable quick punch button
+    const hasPunchTimes = (data.checkInTimeStr && data.checkInTimeStr !== '–') || (data.checkOutTimeStr && data.checkOutTimeStr !== '–');
+    const btnPunch = document.getElementById('btnApplyStaffPunch');
+    if (btnPunch) btnPunch.style.display = hasPunchTimes ? 'inline-flex' : 'none';
+
+    // Status badge & audit note
+    const badge = document.getElementById('editShiftAuditBadge');
+    const adjInfo = document.getElementById('editModalAdjustedInfo');
+    const adjText = document.getElementById('editModalAdjustedText');
+
+    if (data.isAdjusted) {
+      badge.className = 'text-[10px] px-2 py-0.5 rounded-full font-semibold border bg-amber-100 text-amber-900 border-amber-300';
+      badge.innerHTML = '<i class="fa-solid fa-pen-nib mr-1"></i>Justerad';
+      adjInfo.classList.remove('hidden');
+      adjText.innerHTML = `Detta pass justerades av <strong>${data.adjustedBy || 'Administratör'}</strong>${data.adjustedAtStr ? ' kl ' + data.adjustedAtStr : ''}. Personalens originaltider bevaras orörda som underlag.`;
+    } else if (data.isClockedIn) {
+      badge.className = 'text-[10px] px-2 py-0.5 rounded-full font-semibold border bg-emerald-100 text-emerald-800 border-emerald-300';
+      badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block mr-1"></span>Instämplad nu';
+      adjInfo.classList.add('hidden');
+    } else if (data.checkInTimeStr && data.checkInTimeStr !== '–') {
+      badge.className = 'text-[10px] px-2 py-0.5 rounded-full font-semibold border bg-sky-100 text-sky-800 border-sky-300';
+      badge.innerHTML = '<i class="fa-solid fa-fingerprint mr-1"></i>Stämplat pass';
+      adjInfo.classList.add('hidden');
+    } else {
+      badge.className = 'text-[10px] px-2 py-0.5 rounded-full font-semibold border bg-stone-100 text-stone-700 border-stone-200';
+      badge.innerHTML = 'Planerat pass';
+      adjInfo.classList.add('hidden');
+    }
+
+    updateEditShiftCalc();
+    document.getElementById('editShiftModal').classList.remove('hidden');
+  }
+
+  function applyStaffPunchTimes() {
+    if (!currentEditingShift) return;
+    if (currentEditingShift.checkInTimeStr && currentEditingShift.checkInTimeStr !== '–') {
+      document.getElementById('editStartTime').value = currentEditingShift.checkInTimeStr;
+    }
+    if (currentEditingShift.checkOutTimeStr && currentEditingShift.checkOutTimeStr !== '–') {
+      document.getElementById('editEndTime').value = currentEditingShift.checkOutTimeStr;
+    }
+    updateEditShiftCalc();
+  }
+
+  function resetToOriginalPlannedTimes() {
+    if (!currentEditingShift) return;
+    const origStart = currentEditingShift.originalPlannedStartTime || currentEditingShift.startTime || '12:00';
+    const origEnd = currentEditingShift.originalPlannedEndTime || currentEditingShift.endTime || '21:00';
+    document.getElementById('editStartTime').value = origStart;
+    document.getElementById('editEndTime').value = origEnd;
+    updateEditShiftCalc();
+  }
+
+  function closeEditShiftModal() {
+    document.getElementById('editShiftModal').classList.add('hidden');
+  }
+</script>

@@ -7,7 +7,10 @@ const tasksService = require('../services/admin/tasksService');
 const quizzesService = require('../services/admin/quizzesService');
 const staffService = require('../services/admin/staffService');
 const profileService = require('../services/admin/profileService');
+const timeTrackingService = require('../services/admin/timeTrackingService');
+const staffScheduleService = require('../services/admin/staffScheduleService');
 const AdminViewModel = require('../models/viewModels/admin/AdminViewModel');
+
 
 class AdminController {
   async getOverview(req, res) {
@@ -1058,6 +1061,241 @@ class AdminController {
         req.setFlash('error', err.message || 'Kunde inte ändra lösenordet.');
       }
       res.redirect('/admin/profile');
+    }
+  }
+
+   /**
+   * GET /admin/stampling
+   * Overview of active staff on site, time punches, filterable logs, and manual punch controls.
+   */
+  async getStampling(req, res) {
+    try {
+      const stats = await timeTrackingService.getOverviewStats();
+      const activeStaff = await timeTrackingService.getActiveStaff();
+      const entries = await timeTrackingService.getAllTimeEntries(req.query);
+      const staffMembers = await timeTrackingService.getAllStaffUsers();
+
+      res.render('admin/stampling', {
+        title: 'Equira Admin - Stämpling & Tidsredovisning',
+        layout: 'layouts/adminLayout',
+        currentPath: '/admin/stampling',
+        stats,
+        activeStaff,
+        entries,
+        staffMembers,
+        query: req.query,
+      });
+    } catch (err) {
+      console.error('Error loading admin stampling:', err);
+      res.status(500).render('error', {
+        message: 'Kunde inte ladda stämplingsöversikten',
+        error: err,
+      });
+    }
+  }
+
+  /**
+   * POST /admin/stampling/in
+   * Admin manually clocks in or creates a time entry for any staff member.
+   */
+  async postAdminCheckIn(req, res) {
+    try {
+      await timeTrackingService.manualClockIn(req.body);
+      if (req.setFlash) {
+        req.setFlash('success', 'Personal har stämplats in / ny tidsregistrering skapad!');
+      }
+      res.redirect('/admin/stampling');
+    } catch (err) {
+      console.error('Error admin clocking in:', err);
+      if (req.setFlash) {
+        req.setFlash('error', err.message || 'Kunde inte stämpla in personalen.');
+      }
+      res.redirect('/admin/stampling');
+    }
+  }
+
+  /**
+   * POST /admin/stampling/out/:id
+   * Admin manually clocks out an active staff member.
+   */
+  async postAdminCheckOut(req, res) {
+    try {
+      const { id } = req.params;
+      const { checkOutTime, adminNote } = req.body;
+      await timeTrackingService.manualClockOut(id, checkOutTime, adminNote);
+
+      if (req.setFlash) {
+        req.setFlash('success', 'Personal har stämplats ut!');
+      }
+      res.redirect('/admin/stampling');
+    } catch (err) {
+      console.error('Error admin clocking out:', err);
+      if (req.setFlash) {
+        req.setFlash('error', err.message || 'Kunde inte stämpla ut personalen.');
+      }
+      res.redirect('/admin/stampling');
+    }
+  }
+
+  /**
+   * POST /admin/stampling/edit/:id
+   * Admin adjusts or corrects an existing time entry.
+   */
+  async postAdminEditTimeEntry(req, res) {
+    try {
+      const { id } = req.params;
+      const adminName = req.session.user?.fullName || req.session.user?.username || 'Administratör';
+      await timeTrackingService.updateTimeEntry(id, {
+        ...req.body,
+        adjustedBy: adminName,
+      });
+
+      if (req.setFlash) {
+        req.setFlash('success', 'Tidsstämpeln har uppdaterats (personalens originalstämpling har bevarats)!');
+      }
+      res.redirect('/admin/stampling');
+    } catch (err) {
+      console.error('Error editing time entry:', err);
+      if (req.setFlash) {
+        req.setFlash('error', err.message || 'Kunde inte uppdatera tidsstämpeln.');
+      }
+      res.redirect('/admin/stampling');
+    }
+  }
+
+  /**
+   * POST /admin/stampling/delete/:id
+   * Admin deletes a time entry.
+   */
+  async postAdminDeleteTimeEntry(req, res) {
+    try {
+      const { id } = req.params;
+      await timeTrackingService.deleteTimeEntry(id);
+
+      if (req.setFlash) {
+        req.setFlash('success', 'Tidsstämpeln har raderats.');
+      }
+      res.redirect('/admin/stampling');
+    } catch (err) {
+      console.error('Error deleting time entry:', err);
+      if (req.setFlash) {
+        req.setFlash('error', err.message || 'Kunde inte ta bort tidsstämpeln.');
+      }
+      res.redirect('/admin/stampling');
+    }
+  }
+
+  /**
+   * GET /admin/staff-schedule
+   * Displays the staff workforce scheduling management dashboard.
+   */
+  async getStaffSchedule(req, res) {
+    try {
+      const month = req.query.month || '2026-09';
+      const staffId = req.query.staffId || null;
+
+      const scheduleData = await staffScheduleService.getMonthlyScheduleOverview(month, staffId);
+
+      res.render('admin/staffSchedule', {
+        title: 'Equira - Personalschema & Schemaläggning',
+        data: scheduleData,
+        currentPath: '/admin/staff-schedule',
+        layout: 'layouts/adminLayout',
+      });
+    } catch (err) {
+      console.error('Error loading admin staff schedule:', err);
+      res.status(500).render('error', {
+        message: 'Kunde inte läsa in personalschemat',
+        error: err,
+      });
+    }
+  }
+
+  /**
+   * POST /admin/staff-schedule/create
+   * Admin schedules a new shift for a staff member.
+   */
+  async postCreateStaffShift(req, res) {
+    try {
+      await staffScheduleService.createShift(req.body);
+      if (req.setFlash) {
+        req.setFlash('success', 'Arbetspasset har schemalagts!');
+      }
+      const month = req.body.date ? req.body.date.substring(0, 7) : '2026-09';
+      res.redirect(`/admin/staff-schedule?month=${month}`);
+    } catch (err) {
+      console.error('Error creating staff shift:', err);
+      if (req.setFlash) {
+        req.setFlash('error', err.message || 'Kunde inte schemalägga passet.');
+      }
+      res.redirect('/admin/staff-schedule');
+    }
+  }
+
+  /**
+   * POST /admin/staff-schedule/quick-week
+   * Admin schedules a full standard week (Mon-Fri) for a staff member.
+   */
+  async postQuickWeekStaffShift(req, res) {
+    try {
+      await staffScheduleService.createStandardWeek(req.body);
+      if (req.setFlash) {
+        req.setFlash('success', 'Standardvecka (Mån–Fre) har schemalagts!');
+      }
+      const month = req.body.mondayDate ? req.body.mondayDate.substring(0, 7) : '2026-09';
+      res.redirect(`/admin/staff-schedule?month=${month}`);
+    } catch (err) {
+      console.error('Error quick scheduling week:', err);
+      if (req.setFlash) {
+        req.setFlash('error', err.message || 'Kunde inte schemalägga veckan.');
+      }
+      res.redirect('/admin/staff-schedule');
+    }
+  }
+
+  /**
+   * POST /admin/staff-schedule/edit/:id
+   * Admin modifies a scheduled shift.
+   */
+  async postEditStaffShift(req, res) {
+    try {
+      const { id } = req.params;
+      const adminName = req.session.user?.fullName || req.session.user?.username || 'Administratör';
+      await staffScheduleService.updateShift(id, {
+        ...req.body,
+        adjustedBy: adminName,
+      });
+      if (req.setFlash) {
+        req.setFlash('success', 'Arbetspasset har uppdaterats (original planerad tid bevarad)!');
+      }
+      res.redirect(req.headers.referer || '/admin/staff-schedule');
+    } catch (err) {
+      console.error('Error editing shift:', err);
+      if (req.setFlash) {
+        req.setFlash('error', err.message || 'Kunde inte uppdatera passet.');
+      }
+      res.redirect('/admin/staff-schedule');
+    }
+  }
+
+  /**
+   * POST /admin/staff-schedule/delete/:id
+   * Admin removes a scheduled shift.
+   */
+  async postDeleteStaffShift(req, res) {
+    try {
+      const { id } = req.params;
+      await staffScheduleService.deleteShift(id);
+      if (req.setFlash) {
+        req.setFlash('success', 'Arbetspasset har tagits bort från schemat.');
+      }
+      res.redirect(req.headers.referer || '/admin/staff-schedule');
+    } catch (err) {
+      console.error('Error deleting shift:', err);
+      if (req.setFlash) {
+        req.setFlash('error', err.message || 'Kunde inte ta bort passet.');
+      }
+      res.redirect('/admin/staff-schedule');
     }
   }
 }
