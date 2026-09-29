@@ -26,10 +26,6 @@ router.post('/tasks/:id/complete', (req, res) => {
   staffController.postCompleteTask(req, res);
 });
 
-router.post('/tasks/:id/delete', (req, res) => {
-  staffController.deleteTask(req, res);
-});
-
 router.post('/tasks/:id/uncomplete', (req, res) => {
   staffController.unmarkTask(req, res);
 });
