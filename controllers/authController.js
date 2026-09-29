@@ -51,23 +51,7 @@ class AuthController {
     }
   }
 
-  /**
-   * Fast 1-click test login for quick demonstration of all 3 portals
-   */
-  async fastLogin(req, res) {
-    try {
-      const userDTO = await authService.getQuickLoginUser(req.params.role);
-      if (!userDTO) {
-        return res.redirect('/login');
-      }
-
-      req.session.user = userDTO;
-      return this._redirectByRole(userDTO.role, res);
-    } catch (err) {
-      console.error('Fast login error:', err);
-      return res.redirect('/login');
-    }
-  }
+  
 
   logout(req, res) {
     req.session.destroy((err) => {

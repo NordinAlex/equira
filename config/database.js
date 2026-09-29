@@ -24,6 +24,7 @@ const entities = [
   require('../models/entities/QuizQuestion'),
   require('../models/entities/QuizOption'),
   require('../models/entities/QuizAttempt'),
+  require('../models/entities/TimeEntry'),
 ];
 
 const AppDataSource = new DataSource({

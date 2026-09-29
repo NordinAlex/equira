@@ -1,0 +1,1016 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
+
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center shadow-xs">
+          <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">Stämpling & Tidsredovisning</h1>
+          <p class="text-sm text-stone-500 mt-0.5">Hantera personalens instämplingar, arbetade timmar och tidsjusteringar</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-2.5">     
+      <button type="button" 
+              onclick="openManualPunchModal()"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition shadow-xs cursor-pointer">
+        <i class="fa-solid fa-plus"></i>
+        <span>Manuell Stämpling</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Overview Stat Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Active on site -->
+    <div class="bg-white rounded-2xl p-5 border border-stone-200/80 shadow-2xs flex items-center justify-between">
+      <div>
+        <p class="text-[11px] font-bold tracking-wider uppercase text-stone-400">PÅ PLATS JUST NU</p>
+        <p class="text-3xl font-black text-stone-900 mt-1 flex items-center gap-2">
+          <%= stats.activeCount %>
+          <% if (stats.activeCount > 0) { %>
+            <span class="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <% } %>
+        </p>
+        <p class="text-xs text-stone-500 mt-1 font-medium">Instämplad personal</p>
+      </div>
+      <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl">
+        <i class="fa-solid fa-user-check"></i>
+      </div>
+    </div>
+
+    <!-- Total hours today -->
+    <div class="bg-white rounded-2xl p-5 border border-stone-200/80 shadow-2xs flex items-center justify-between">
+      <div>
+        <p class="text-[11px] font-bold tracking-wider uppercase text-stone-400">ARBETAD TID IDAG</p>
+        <p class="text-3xl font-black text-stone-900 mt-1"><%= stats.totalHoursTodayStr %></p>
+        <p class="text-xs text-stone-500 mt-1 font-medium">Totalt loggade timmar</p>
+      </div>
+      <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center text-xl">
+        <i class="fa-solid fa-hourglass-half"></i>
+      </div>
+    </div>
+
+    <!-- Planned shifts -->
+    <div class="bg-white rounded-2xl p-5 border border-stone-200/80 shadow-2xs flex items-center justify-between">
+      <div>
+        <p class="text-[11px] font-bold tracking-wider uppercase text-stone-400">PLANERADE PASS IDAG</p>
+        <p class="text-3xl font-black text-stone-900 mt-1"><%= stats.plannedShiftsCount %></p>
+        <p class="text-xs text-stone-500 mt-1 font-medium"><%= stats.completedShiftsCount %> pass avslutade</p>
+      </div>
+      <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center text-xl">
+        <i class="fa-regular fa-calendar-days"></i>
+      </div>
+    </div>
+
+    <!-- Overtime / Variance -->
+    <div class="bg-white rounded-2xl p-5 border border-stone-200/80 shadow-2xs flex items-center justify-between">
+      <div>
+        <p class="text-[11px] font-bold tracking-wider uppercase text-stone-400">AVVIKELSER / ÖVERTID</p>
+        <p class="text-3xl font-black text-stone-900 mt-1"><%= stats.overtimeCount %></p>
+        <p class="text-xs text-purple-700 font-bold mt-1 flex items-center gap-1">
+          <i class="fa-solid fa-clock"></i> <%= stats.totalOvertimeStr || '0h 00m' %> övertid loggad
+        </p>
+      </div>
+      <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center text-xl">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Active Staff on Site -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-emerald-500 <%= activeStaff.length > 0 ? 'animate-pulse' : '' %>"></span>
+        <h2 class="text-lg font-bold text-stone-900">Just nu i tjänst på anläggningen (<%= activeStaff.length %>)</h2>
+      </div>
+      <span class="text-xs text-stone-500">Uppdateras i realtid</span>
+    </div>
+
+    <% if (activeStaff && activeStaff.length > 0) { %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% activeStaff.forEach(staff => { %>
+          <div class="bg-white rounded-2xl p-5 border border-emerald-200/80 shadow-2xs relative flex flex-col justify-between hover:shadow-xs transition">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <img src="<%= staff.avatarUrl %>" alt="<%= staff.fullName %>" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-100">
+                  <div>
+                    <h3 class="font-bold text-stone-900 text-sm"><%= staff.fullName %></h3>
+                    <p class="text-xs text-stone-400"><%= staff.title %></p>
+                  </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                  Aktiv
+                </span>
+              </div>
+
+              <div class="bg-stone-50 rounded-xl p-3 space-y-1.5 text-xs">
+                <div class="flex justify-between">
+                  <span class="text-stone-500">Instämplad:</span>
+                  <span class="font-bold text-stone-800">Kl <%= staff.checkInTimeStr %></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-stone-500">Planerat pass:</span>
+                  <span class="font-semibold text-stone-700"><%= staff.plannedPassStr %></span>
+                </div>
+                <div class="flex justify-between pt-1 border-t border-stone-200/60">
+                  <span class="text-stone-500">Pågående arbetstid:</span>
+                  <span class="font-black text-emerald-800"><%= staff.elapsedStr %></span>
+                </div>
+              </div>
+
+              <% if (staff.subtextNote) { %>
+                <p class="text-[11px] text-stone-500 italic"><i class="fa-regular fa-comment-dots mr-1"></i><%= staff.subtextNote %></p>
+              <% } %>
+            </div>
+
+            <!-- Direct Clock Out Action Button -->
+            <div class="pt-4 mt-3 border-t border-stone-100 flex items-center justify-between">
+              <span class="text-[11px] text-stone-400">ID #<%= staff.id %></span>
+              <button type="button" 
+                      onclick="openQuickClockOutModal('<%= staff.id %>', '<%= staff.fullName %>')"
+                      class="px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-right-from-bracket text-[11px]"></i>
+                <span>Stämpla ut personal</span>
+              </button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="bg-white rounded-2xl p-8 border border-stone-200 text-center space-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center mx-auto text-xl">
+          <i class="fa-solid fa-mug-hot"></i>
+        </div>
+        <p class="font-bold text-stone-800 text-sm">Ingen personal är instämplad just nu</p>
+        <p class="text-xs text-stone-400 max-w-sm mx-auto">Personal stämplar in från sin mobila sida, eller så kan administratör stämpla in personal manuellt med knappen ovan.</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Filter & History Table -->
+  <div class="bg-white rounded-2xl border border-stone-200/80 shadow-2xs overflow-hidden">
+    
+    <!-- Filter Bar Header -->
+    <div class="p-5 border-b border-stone-100 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 class="text-lg font-bold text-stone-900">Tidshistorik & Stämpelloggar</h2>
+        <span class="text-xs text-stone-400 font-medium">Visar <%= entries.length %> stämplingar</span>
+      </div>
+
+      <!-- Filters Form -->
+      <form method="GET" action="/admin/stampling" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Date filter -->
+        <div>
+          <label class="block text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-1">Datum</label>
+          <select name="date" class="w-full text-xs bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-700">
+            <option value="all" <%= (query.date === 'all' || !query.date) ? 'selected' : '' %>>Alla datum</option>
+            <option value="today" <%= query.date === 'today' ? 'selected' : '' %>>Idag</option>
+            <option value="yesterday" <%= query.date === 'yesterday' ? 'selected' : '' %>>Igår</option>
+          </select>
+        </div>
+
+        <!-- Staff member filter -->
+        <div>
+          <label class="block text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-1">Personal</label>
+          <select name="userId" class="w-full text-xs bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-700">
+            <option value="all" <%= (!query.userId || query.userId === 'all') ? 'selected' : '' %>>Alla personal</option>
+            <% staffMembers.forEach(user => { %>
+              <option value="<%= user.id %>" <%= query.userId == user.id ? 'selected' : '' %>><%= user.fullName %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <!-- Status filter -->
+        <div>
+          <label class="block text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-1">Status</label>
+          <select name="status" class="w-full text-xs bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-700">
+            <option value="all" <%= (!query.status || query.status === 'all') ? 'selected' : '' %>>Alla statusar</option>
+            <option value="INSTAMPLAD" <%= query.status === 'INSTAMPLAD' ? 'selected' : '' %>>Instämplad (Pågående)</option>
+            <option value="AVSLUTAD" <%= query.status === 'AVSLUTAD' ? 'selected' : '' %>>Avslutad</option>
+            <option value="JUSTERAD" <%= query.status === 'JUSTERAD' ? 'selected' : '' %>>Justerad</option>
+          </select>
+        </div>
+
+        <!-- Submit & Reset -->
+        <div class="flex items-end gap-2">
+          <button type="submit" class="flex-1 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold py-2 px-3 rounded-xl transition cursor-pointer">
+            <i class="fa-solid fa-filter mr-1"></i>Filtrera
+          </button>
+          <a href="/admin/stampling" class="bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-bold py-2 px-3 rounded-xl transition text-center">
+            Rensa
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Data Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="bg-stone-50/80 text-stone-500 font-bold border-b border-stone-200/80 uppercase tracking-wider text-[10px]">
+            <th class="py-3 px-4">Personal</th>
+            <th class="py-3 px-4">Datum</th>
+            <th class="py-3 px-4">Planerat pass</th>
+            <th class="py-3 px-4">Incheckad</th>
+            <th class="py-3 px-4">Utcheckad</th>
+            <th class="py-3 px-4">Arbetad tid</th>
+            <th class="py-3 px-4">Avvikelse</th>
+            <th class="py-3 px-4">Status</th>
+            <th class="py-3 px-4">Notering</th>
+            <th class="py-3 px-4 text-right">Åtgärder</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-stone-100">
+          <% if (entries && entries.length > 0) { %>
+            <% entries.forEach(entry => { %>
+              <tr class="hover:bg-stone-50/70 transition">
+                <!-- Personal -->
+                <td class="py-3 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <img src="<%= entry.avatarUrl %>" alt="<%= entry.fullName %>" class="w-8 h-8 rounded-full object-cover border border-stone-200">
+                    <div>
+                      <p class="font-bold text-stone-900 text-xs"><%= entry.fullName %></p>
+                      <p class="text-[10px] text-stone-400"><%= entry.title %></p>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Datum -->
+                <td class="py-3 px-4 font-medium text-stone-700 whitespace-nowrap">
+                  <%= entry.date %>
+                </td>
+
+                <!-- Planerat pass -->
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="font-medium text-stone-700 block"><%= entry.plannedPassStr %></span>
+                  <% if (entry.hasPlannedAdjusted) { %>
+                    <span class="text-[10px] text-stone-400 block line-through">Orig: <%= entry.originalPlannedPassStr %></span>
+                  <% } %>
+                </td>
+
+                <!-- Incheckad -->
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <% if (entry.hasInAdjusted) { %>
+                    <span class="text-[10px] text-stone-400 block line-through">Orig: <%= entry.originalCheckInTimeStr %></span>
+                    <span class="font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      <%= entry.checkInTimeStr %>
+                    </span>
+                  <% } else { %>
+                    <span class="font-bold text-stone-900 bg-stone-100 px-2 py-0.5 rounded-md">
+                      <%= entry.checkInTimeStr %>
+                    </span>
+                  <% } %>
+                </td>
+
+                <!-- Utcheckad -->
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <% if (entry.status === 'INSTAMPLAD') { %>
+                    <span class="text-emerald-700 font-bold flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                      Pågår...
+                    </span>
+                  <% } else if (entry.hasOutAdjusted) { %>
+                    <span class="text-[10px] text-stone-400 block line-through">Orig: <%= entry.originalCheckOutTimeStr %></span>
+                    <span class="font-bold text-amber-900 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      <%= entry.checkOutTimeStr %>
+                    </span>
+                  <% } else { %>
+                    <span class="font-medium text-stone-800">
+                      <%= entry.checkOutTimeStr %>
+                    </span>
+                  <% } %>
+                </td>
+
+                <!-- Arbetad tid -->
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="font-black text-stone-900 block text-xs"><%= entry.netWorkedStr || entry.durationStr %></span>
+                  <% if (entry.breakMinutes > 0) { %>
+                    <span class="text-[9.5px] text-stone-400 block font-medium" title="Bruttotid på plats: <%= entry.durationStr %>, Rastavdrag: <%= entry.breakStr %>">
+                      Rast: <%= entry.breakStr %>
+                    </span>
+                  <% } %>
+                </td>
+
+                <!-- Avvikelse / Övertid -->
+                <td class="py-3 px-4 whitespace-nowrap font-bold">
+                  <% if (entry.isOvertime || entry.diffType === 'positive') { %>
+                    <span class="inline-flex items-center gap-1 text-purple-900 bg-purple-100/90 px-2.5 py-1 rounded-lg text-xs font-black border border-purple-300 shadow-2xs" title="Automatisk övertid: <%= entry.overtimeStr || entry.diffFormatted %>">
+                      <i class="fa-solid fa-fire-flame-curved text-purple-600 text-[10px]"></i>
+                      +<%= entry.overtimeStr || entry.diffFormatted %>
+                    </span>
+                  <% } else if (entry.diffType === 'negative') { %>
+                    <span class="inline-flex items-center gap-1 text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md text-[11px] font-bold border border-rose-200" title="Underskriden tid: <%= entry.diffFormatted %>">
+                      <i class="fa-solid fa-arrow-down text-rose-500 text-[9px]"></i>
+                      <%= entry.diffFormatted %>
+                    </span>
+                  <% } else { %>
+                    <span class="text-stone-400 text-xs font-medium">0 min</span>
+                  <% } %>
+                </td>
+
+                <!-- Status -->
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <% if (entry.isAdjusted) { %>
+                    <div class="space-y-0.5">
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                        <i class="fa-solid fa-pen-nib text-[9px]"></i> Justerad
+                      </span>
+                      <% if (entry.adjustedBy) { %>
+                        <span class="text-[9px] text-stone-400 block">av <%= entry.adjustedBy %></span>
+                      <% } %>
+                    </div>
+                  <% } else { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border <%= entry.statusBadgeClass %>">
+                      <%= entry.statusLabel %>
+                    </span>
+                  <% } %>
+                </td>
+
+                <!-- Notering -->
+                <td class="py-3 px-4 max-w-xs text-stone-600">
+                  <% if (entry.isAdjusted && (entry.hasInAdjusted || entry.hasOutAdjusted)) { %>
+                    <span class="text-amber-800 text-[10px] font-semibold block">
+                      <i class="fa-solid fa-clock-rotate-left mr-1"></i>Orig stämplat: <%= entry.originalCheckInTimeStr || '–' %> – <%= entry.originalCheckOutTimeStr || '–' %>
+                    </span>
+                  <% } %>
+                  <span class="truncate block text-stone-500" title="<%= entry.subtextNote || entry.adminNote %>">
+                    <%= entry.subtextNote || entry.adminNote || '–' %>
+                  </span>
+                </td>
+
+                <!-- Åtgärder -->
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <% if (entry.status === 'INSTAMPLAD') { %>
+                      <button type="button" 
+                              onclick="openQuickClockOutModal('<%= entry.id %>', '<%= entry.fullName %>')"
+                              title="Stämpla ut"
+                              class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                      </button>
+                    <% } %>
+
+                    <!-- Redigera knapp -->
+                        <button type="button"
+                          data-entry="<%- JSON.stringify(entry).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') %>"
+                          onclick="openEditPunchModal(JSON.parse(this.dataset.entry))"
+                            title="Redigera tidsstämpel"
+                            class="w-7 h-7 rounded-lg bg-stone-100 text-stone-700 hover:bg-stone-200 flex items-center justify-center transition cursor-pointer">
+                      <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    </button>
+
+                    <!-- Ta bort knapp -->
+                    <form action="/admin/stampling/delete/<%= entry.id %>" method="POST" onsubmit="return confirm('Vill du radera denna tidsstämpling permanent?');" class="inline">
+                      <button type="submit" 
+                              title="Ta bort tidsstämpel"
+                              class="w-7 h-7 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 flex items-center justify-center transition cursor-pointer">
+                        <i class="fa-regular fa-trash-can text-xs"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="10" class="py-8 text-center text-stone-400">
+                <i class="fa-regular fa-calendar-xmark text-2xl mb-1 block"></i>
+                Inga tidsstämplingar matchar det valda filtret.
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Modal 1: Manuell Stämpling (Lägg till tidsregistrering) -->
+<div id="manualPunchModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl space-y-5 animate-scale-in">
+    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+          <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+        </div>
+        <h3 class="font-extrabold text-stone-900 text-lg">Manuell Stämpling / Ny tidsregistrering</h3>
+      </div>
+      <button type="button" onclick="closeManualPunchModal()" class="text-stone-400 hover:text-stone-600 text-lg p-1">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form action="/admin/stampling/in" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-stone-700 mb-1">Personal *</label>
+        <select name="userId" required class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-emerald-700">
+          <% staffMembers.forEach(user => { %>
+            <option value="<%= user.id %>"><%= user.fullName %> (<%= user.title %>)</option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Datum *</label>
+          <input type="date" name="date" id="manualDate" required class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Status</label>
+          <select name="status" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+            <option value="INSTAMPLAD">Instämplad (Aktiv på plats)</option>
+            <option value="AVSLUTAD" selected>Avslutad pass</option>
+            <option value="JUSTERAD">Justerad</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Instämplad (Tid) *</label>
+          <input type="time" name="checkInTime" value="07:00" required class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Utstämplad (Tid)</label>
+          <input type="time" name="checkOutTime" value="16:00" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+          <span class="text-[10px] text-stone-400">Lämna tomt om passet fortfarande pågår</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Planerad Start</label>
+          <input type="time" name="plannedStartTime" value="07:00" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Planerad Slut</label>
+          <input type="time" name="plannedEndTime" value="16:00" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-stone-700 mb-1">Notering / Kommentar</label>
+        <input type="text" name="subtextNote" placeholder="T.ex. Morgonpass börjar 07:00 / Kvällsfodring avslutad" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-stone-700 mb-1">Administratörsanteckning</label>
+        <textarea name="adminNote" rows="2" placeholder="Intern notering om varför stämplingen lades till manuellt..." class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2"></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+        <button type="button" onclick="closeManualPunchModal()" class="px-4 py-2 rounded-xl text-stone-600 hover:bg-stone-100 text-xs font-bold transition">Avbryt</button>
+        <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition shadow-xs">Spara registrering</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal 2: Redigera Tidsstämpel (Fullt responsiv för mobil & desktop) -->
+<div id="editPunchModal" onclick="if (event.target === this) closeEditPunchModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-2.5 sm:p-4 overflow-y-auto transition-all duration-200">
+  <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full my-auto flex flex-col shadow-2xl animate-scale-in overflow-hidden border border-stone-200/80" style="max-height: calc(100vh - 1.5rem); max-height: calc(100dvh - 1.5rem);">
+
+    <!-- Modal Header (Fastklistrad högst upp) -->
+    <div class="flex items-center justify-between border-b border-stone-100 px-4 sm:px-6 py-3.5 bg-white shrink-0">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-pen-to-square text-sm"></i>
+        </div>
+        <div>
+          <h3 class="font-extrabold text-stone-900 text-base sm:text-lg leading-tight">Redigera Tidsstämpel</h3>
+          <p class="text-[11px] text-stone-400">Justerar faktisk arbetstid med fullständig revisionslogg</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeEditPunchModal()" aria-label="Stäng" class="text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-100 transition cursor-pointer">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form id="editPunchForm" method="POST" action="" class="m-0" style="display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; overflow: hidden;">
+      <input type="hidden" name="overtimeMinutes" id="editOvertimeMinutes" value="0">
+
+      <!-- Rullningsbart innehåll för formulär (Momentum scroll, fungerar sömlöst på touch) -->
+      <div class="px-4 sm:px-6 py-4 space-y-4 overscroll-contain" style="overflow-y: auto; flex: 1 1 auto; min-height: 0;">
+        
+        <!-- Personalväljare / Visning -->
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Personal</label>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+            <input type="text" id="editStaffName" readonly class="w-full text-sm bg-stone-100/80 border border-stone-200 rounded-xl pl-9 pr-3 py-2 font-bold text-stone-800">
+          </div>
+        </div>
+
+        <!-- Personalens Originalstämpling (Orörd historik) Card -->
+        <div class="p-3 sm:p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-2.5 text-xs">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <span class="font-bold text-amber-950 flex items-center gap-1.5">
+              <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
+              Personalens originalregistrering (bevaras orörd)
+            </span>
+            <span id="modalAdjustedBadge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900 border border-amber-300">
+              Tidigare justerad
+            </span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 pt-1 border-t border-amber-200/60 text-[11px]">
+            <div class="bg-white/80 p-2 rounded-xl border border-amber-200/50 shadow-2xs">
+              <span class="text-stone-500 block text-[10px] truncate">Original Instämpl:</span>
+              <strong id="modalOrigCheckIn" class="text-stone-900 text-xs font-mono font-bold block mt-0.5">--</strong>
+            </div>
+            <div class="bg-white/80 p-2 rounded-xl border border-amber-200/50 shadow-2xs">
+              <span class="text-stone-500 block text-[10px] truncate">Original Utstämpl:</span>
+              <strong id="modalOrigCheckOut" class="text-stone-900 text-xs font-mono font-bold block mt-0.5">--</strong>
+            </div>
+            <div class="bg-white/80 p-2 rounded-xl border border-amber-200/50 shadow-2xs">
+              <span class="text-stone-500 block text-[10px] truncate">Original Planerat:</span>
+              <strong id="modalOrigPlanned" class="text-stone-900 text-xs font-mono font-bold block mt-0.5">--</strong>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-1 border-t border-amber-200/50 text-[11px] gap-2">
+            <span id="modalAdjustedByText" class="font-medium text-stone-600 truncate">Orörd stämpling</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button type="button" 
+                      onclick="setFromStaffPunch()" 
+                      id="btnApplyStaffTimes"
+                      title="Kopiera personalens faktiska stämpeltider till redigeringsfälten"
+                      class="flex-1 sm:flex-initial text-blue-800 hover:text-blue-950 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1 cursor-pointer transition text-[11px]">
+                <i class="fa-solid fa-fingerprint text-[10px]"></i>
+                <span class="sm:inline">Använd stämpel</span>
+              </button>
+              <button type="button" 
+                      onclick="revertToOriginalTimes()" 
+                      class="flex-1 sm:flex-initial text-amber-900 hover:text-amber-950 bg-amber-100/70 hover:bg-amber-200/70 border border-amber-200 px-2.5 py-1.5 rounded-lg font-semibold flex items-center justify-center gap-1 cursor-pointer transition text-[11px]">
+                <i class="fa-solid fa-rotate-left text-[10px]"></i>
+                <span>Återställ fält till original</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datum & Status (Responsivt 1 kolumn på liten mobil, 2 på tablet/desktop) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Datum *</label>
+            <input type="date" name="date" id="editDate" required class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Status</label>
+            <select name="status" id="editStatus" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600">
+              <option value="INSTAMPLAD">Instämplad (Pågående)</option>
+              <option value="AVSLUTAD">Avslutad</option>
+              <option value="JUSTERAD">Justerad</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Faktisk Stämpling (2 kolumner) -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="flex items-center justify-between text-xs font-bold text-stone-700 mb-1">
+              <span>Faktisk Instämpling</span>
+              <span class="text-[10px] text-stone-400 font-normal hidden sm:inline">Klockslag</span>
+            </label>
+            <input type="time" name="checkInTime" id="editCheckIn" oninput="updateModalLiveCalc()" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700">
+          </div>
+          <div>
+            <label class="flex items-center justify-between text-xs font-bold text-stone-700 mb-1">
+              <span>Faktisk Utstämpling</span>
+              <span class="text-[10px] text-stone-400 font-normal hidden sm:inline">Klockslag</span>
+            </label>
+            <input type="time" name="checkOutTime" id="editCheckOut" oninput="updateModalLiveCalc()" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700">
+          </div>
+        </div>
+
+        <!-- Planerad Schema-tid (2 kolumner) -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Planerad Starttid</label>
+            <input type="time" name="plannedStartTime" id="editPlannedStart" oninput="updateModalLiveCalc()" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 mb-1">Planerad Sluttid</label>
+            <input type="time" name="plannedEndTime" id="editPlannedEnd" oninput="updateModalLiveCalc()" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+          </div>
+        </div>
+
+        <!-- Live Automatisk Tids- & Övertidsberäkning Widget (Fullt responsiv 2x2 mobil, 1x4 desktop) -->
+        <div class="p-3 sm:p-3.5 bg-stone-50 border border-stone-200/90 rounded-2xl space-y-2.5">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <span class="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-calculator text-emerald-700"></i>
+              Automatisk beräkning & övertid
+            </span>
+            <span id="modalLiveDiffBadge" class="px-2.5 py-0.5 rounded-full text-xs font-black border">
+              <!-- Dynamically populated -->
+            </span>
+          </div>
+
+          <!-- Mått-boxar (2 kolumner på mobil ger gott om utrymme, 4 på desktop) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+            <div class="p-2 sm:p-2.5 bg-white rounded-xl border border-stone-200/70 shadow-2xs">
+              <span class="text-stone-400 block text-[10px] uppercase font-semibold">Tid på plats</span>
+              <span class="font-extrabold text-stone-900 text-sm sm:text-base tracking-tight" id="modalLiveGrossTime">--:--</span>
+            </div>
+            <div class="p-2 sm:p-2.5 bg-white rounded-xl border border-stone-200/70 shadow-2xs">
+              <span class="text-stone-400 block text-[10px] uppercase font-semibold">Rast (avdrag)</span>
+              <span class="font-extrabold text-amber-800 text-sm sm:text-base tracking-tight" id="modalLiveBreak">--:--</span>
+            </div>
+            <div class="p-2 sm:p-2.5 bg-white rounded-xl border border-stone-200/70 shadow-2xs">
+              <span class="text-stone-400 block text-[10px] uppercase font-semibold">Netto Arbetat</span>
+              <span class="font-extrabold text-stone-900 text-sm sm:text-base tracking-tight" id="modalLiveNetTime">--:--</span>
+            </div>
+            <div class="p-2 sm:p-2.5 bg-white rounded-xl border border-stone-200/70 shadow-2xs">
+              <span class="text-stone-400 block text-[10px] uppercase font-semibold">Planerad Tid</span>
+              <span class="font-extrabold text-stone-600 text-sm sm:text-base tracking-tight" id="modalLivePlannedTime">--:--</span>
+            </div>
+          </div>
+
+          <!-- Snabbåtgärder för admin -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t border-stone-200/70 text-[11px] gap-2">
+            <span class="text-stone-500 font-medium" id="modalLiveBreakHint">
+              <i class="fa-solid fa-mug-hot text-amber-600 mr-1"></i>Beräknat från pass
+            </span>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 w-full sm:w-auto">
+              <button type="button" 
+                      onclick="alignToPlannedTimes()" 
+                      title="Sätt in- och utstämpling exakt efter planerat schema (nollställer övertid)"
+                      class="w-full sm:w-auto px-2.5 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-700 font-semibold border border-stone-200 transition shadow-2xs flex items-center justify-center gap-1 cursor-pointer text-xs">
+                <i class="fa-solid fa-scale-balanced text-stone-500 text-[10px]"></i>
+                Jämka till schema (0 övertid)
+              </button>
+              <button type="button" 
+                      onclick="approveOvertimeInNote()" 
+                      id="btnAutoApproveNote"
+                      title="Lägg automatiskt till godkänd övertid i administratörsanteckningen"
+                      class="w-full sm:w-auto px-2.5 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-900 font-semibold border border-purple-200 transition shadow-2xs flex items-center justify-center gap-1 cursor-pointer text-xs">
+                <i class="fa-solid fa-check-double text-purple-700 text-[10px]"></i>
+                Godkänn övertid i anteckning
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-stone-700 mb-1">Notering / Beskrivning</label>
+          <input type="text" name="subtextNote" id="editSubtextNote" placeholder="T.ex. Kvällsfodring avslutad" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+            <label class="block text-xs font-bold text-stone-700">Adminanteckning / Ändringsorsak <span class="text-stone-400 font-normal">(loggas i historik)</span></label>
+          </div>
+          <!-- Snabb-chips för adminanteckning med touch-vänlig padding -->
+          <div class="flex items-center gap-1.5 flex-wrap mb-2">
+            <button type="button" onclick="appendReasonTag('Godkänd övertid')" class="text-xs px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium transition cursor-pointer active:scale-95 border border-stone-200/60">+ Godkänd övertid</button>
+            <button type="button" onclick="appendReasonTag('Glömt stämpla ut')" class="text-xs px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium transition cursor-pointer active:scale-95 border border-stone-200/60">+ Glömt stämpla ut</button>
+            <button type="button" onclick="appendReasonTag('Extra hästskötsel')" class="text-xs px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium transition cursor-pointer active:scale-95 border border-stone-200/60">+ Extra hästskötsel</button>
+            <button type="button" onclick="appendReasonTag('Jämkad enligt schema')" class="text-xs px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium transition cursor-pointer active:scale-95 border border-stone-200/60">+ Jämkad enligt schema</button>
+            <button type="button" onclick="appendReasonTag('Korrigerad stämpling')" class="text-xs px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium transition cursor-pointer active:scale-95 border border-stone-200/60">+ Korrigerad stämpling</button>
+          </div>
+          <textarea name="adminNote" id="editAdminNote" rows="2" placeholder="Beskriv anledningen till tidsändringen..." class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600"></textarea>
+          <p class="text-[10px] text-stone-400 mt-1.5 flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-amber-600"></i> Personalens originalstämpling sparas alltid orörd som underlag.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer (Fastklistrad i botten - alltid synlig även med lång text eller mobiltangentbord) -->
+      <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 px-4 sm:px-6 py-3 border-t border-stone-100 bg-stone-50/90 shrink-0">
+        <button type="button" onclick="closeEditPunchModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-stone-600 hover:bg-stone-200/60 text-xs font-bold transition text-center cursor-pointer">Avbryt</button>
+        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-check text-xs"></i>
+          Spara ändringar
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- Modal 3: Snabb Utstämpling -->
+<div id="quickClockOutModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl space-y-5 animate-scale-in">
+    <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-stone-900 text-white flex items-center justify-center">
+          <i class="fa-solid fa-right-from-bracket text-sm"></i>
+        </div>
+        <h3 class="font-extrabold text-stone-900 text-lg">Stämpla ut personal</h3>
+      </div>
+      <button type="button" onclick="closeQuickClockOutModal()" class="text-stone-400 hover:text-stone-600 text-lg p-1">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form id="quickClockOutForm" method="POST" action="" class="space-y-4">
+      <div>
+        <p class="text-sm text-stone-600">Är du säker på att du vill stämpla ut <strong id="quickClockOutStaffName" class="text-stone-900"></strong>?</p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-stone-700 mb-1">Utstämplingstid (Klockslag)</label>
+        <input type="time" name="checkOutTime" id="quickCheckOutTime" required class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium">
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-stone-700 mb-1">Avslutande kommentar / Anteckning</label>
+        <input type="text" name="adminNote" value="Utstämplad av administratör" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2">
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+        <button type="button" onclick="closeQuickClockOutModal()" class="px-4 py-2 rounded-xl text-stone-600 hover:bg-stone-100 text-xs font-bold transition">Avbryt</button>
+        <button type="submit" class="px-5 py-2 rounded-xl bg-stone-900 hover:bg-black text-white text-xs font-bold transition shadow-xs">Bekräfta Utstämpling</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let currentEditingEntry = null;
+
+  // Manual Punch Modal
+  function openManualPunchModal() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('manualDate').value = today;
+    const modal = document.getElementById('manualPunchModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+  function closeManualPunchModal() {
+    const modal = document.getElementById('manualPunchModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  // Edit Punch Modal
+  function openEditPunchModal(entry) {
+    currentEditingEntry = entry;
+    const form = document.getElementById('editPunchForm');
+    form.action = '/admin/stampling/edit/' + entry.id;
+
+    document.getElementById('editStaffName').value = entry.fullName + ' (' + entry.title + ')';
+    document.getElementById('editDate').value = entry.date;
+    document.getElementById('editStatus').value = entry.status;
+    document.getElementById('editCheckIn').value = entry.checkInTimeStr !== '–' ? entry.checkInTimeStr : '';
+    document.getElementById('editCheckOut').value = (entry.checkOutTimeStr !== 'Pågående...' && entry.checkOutTimeStr !== '–') ? entry.checkOutTimeStr : '';
+    document.getElementById('editPlannedStart').value = entry.plannedStartTime || '07:00';
+    document.getElementById('editPlannedEnd').value = entry.plannedEndTime || '16:00';
+    document.getElementById('editSubtextNote').value = entry.subtextNote || '';
+    document.getElementById('editAdminNote').value = entry.adminNote || '';
+
+    // Original Stamping Info
+    const origIn = entry.originalCheckInTimeStr || entry.checkInTimeStr || '–';
+    const origOut = (entry.originalCheckOutTimeStr && entry.originalCheckOutTimeStr !== '–') ? entry.originalCheckOutTimeStr : (entry.checkOutTimeStr !== 'Pågående...' ? entry.checkOutTimeStr : '–');
+    const origPlanned = entry.originalPlannedPassStr || entry.plannedPassStr || '–';
+
+    document.getElementById('modalOrigCheckIn').textContent = origIn;
+    document.getElementById('modalOrigCheckOut').textContent = origOut;
+    document.getElementById('modalOrigPlanned').textContent = origPlanned;
+
+    const badge = document.getElementById('modalAdjustedBadge');
+    const adjustedText = document.getElementById('modalAdjustedByText');
+    if (entry.isAdjusted) {
+      badge.classList.remove('hidden');
+      adjustedText.textContent = `Senast ändrad av ${entry.adjustedBy || 'Admin'}${entry.adjustedAtStr ? ' kl ' + entry.adjustedAtStr : ''}`;
+    } else {
+      badge.classList.add('hidden');
+      adjustedText.textContent = 'Orörd originalstämpling från personal';
+    }
+
+    const editModal = document.getElementById('editPunchModal');
+    editModal.classList.remove('hidden');
+    editModal.classList.add('flex');
+    updateModalLiveCalc();
+  }
+
+  // Helper to parse time string "HH:MM" to minutes
+  function timeStringToMinutes(str) {
+    if (!str || typeof str !== 'string' || !str.includes(':')) return null;
+    const parts = str.split(':').map(Number);
+    if (isNaN(parts[0]) || isNaN(parts[1])) return null;
+    return parts[0] * 60 + parts[1];
+  }
+
+  // Format minutes into clean duration string (e.g. "8h 15m" or "45m" or "0h 00m")
+  function formatMinutesShort(totalMins) {
+    if (totalMins === null || totalMins === undefined || isNaN(totalMins) || totalMins < 0) return '0h 00m';
+    const h = Math.floor(totalMins / 60);
+    const m = Math.floor(totalMins % 60);
+    return `${h}h ${String(m).padStart(2, '0')}m`;
+  }
+
+  // Live Automatic Overtime & Time Calculation in Edit Modal
+  function updateModalLiveCalc() {
+    const inVal = document.getElementById('editCheckIn').value;
+    const outVal = document.getElementById('editCheckOut').value;
+    const pStartVal = document.getElementById('editPlannedStart').value;
+    const pEndVal = document.getElementById('editPlannedEnd').value;
+
+    const inMin = timeStringToMinutes(inVal);
+    let outMin = timeStringToMinutes(outVal);
+
+    let grossMins = 0;
+    let breakMins = 0;
+    let netMins = 0;
+
+    if (inMin !== null && outMin !== null) {
+      if (outMin < inMin) outMin += 24 * 60; // handles overnight shift
+      grossMins = Math.max(0, outMin - inMin);
+
+      // Swedish standard break deduction rules
+      if (grossMins >= 630) { // >= 10.5h -> 90 min rast
+        breakMins = 90;
+      } else if (grossMins >= 450) { // >= 7.5h -> 60 min rast
+        breakMins = 60;
+      } else if (grossMins >= 300) { // >= 5h -> 30 min rast
+        breakMins = 30;
+      } else {
+        breakMins = 0;
+      }
+
+      netMins = Math.max(0, grossMins - breakMins);
+    }
+
+    // Planned net minutes
+    const pStartMin = timeStringToMinutes(pStartVal);
+    let pEndMin = timeStringToMinutes(pEndVal);
+    let plannedGross = 0;
+    let plannedBreak = 0;
+    let plannedNet = 480; // default 8 hours
+
+    if (pStartMin !== null && pEndMin !== null) {
+      if (pEndMin < pStartMin) pEndMin += 24 * 60;
+      plannedGross = Math.max(0, pEndMin - pStartMin);
+      if (plannedGross >= 630) plannedBreak = 90;
+      else if (plannedGross >= 450) plannedBreak = 60;
+      else if (plannedGross >= 300) plannedBreak = 30;
+      else plannedBreak = 0;
+
+      plannedNet = Math.max(0, plannedGross - plannedBreak);
+    }
+
+    // Diff / Overtime
+    const diff = (inMin !== null && outMin !== null) ? (netMins - plannedNet) : 0;
+    const overtimeMins = diff > 0 ? diff : 0;
+
+    // Update hidden field
+    const editOvertimeInput = document.getElementById('editOvertimeMinutes');
+    if (editOvertimeInput) {
+      editOvertimeInput.value = overtimeMins;
+    }
+
+    // Update displays
+    const grossEl = document.getElementById('modalLiveGrossTime');
+    const breakEl = document.getElementById('modalLiveBreak');
+    const netEl = document.getElementById('modalLiveNetTime');
+    const plannedEl = document.getElementById('modalLivePlannedTime');
+    const diffBadge = document.getElementById('modalLiveDiffBadge');
+    const breakHint = document.getElementById('modalLiveBreakHint');
+
+    if (grossEl) grossEl.textContent = (inMin !== null && outMin !== null) ? formatMinutesShort(grossMins) : '--:--';
+    if (breakEl) breakEl.textContent = (inMin !== null && outMin !== null) ? `${breakMins} min` : '--:--';
+    if (netEl) netEl.textContent = (inMin !== null && outMin !== null) ? formatMinutesShort(netMins) : '--:--';
+    if (plannedEl) plannedEl.textContent = formatMinutesShort(plannedNet);
+
+    if (breakHint) {
+      if (breakMins > 0) {
+        breakHint.innerHTML = `<i class="fa-solid fa-mug-hot text-amber-600 mr-1"></i>Kollektivavtal: ${breakMins} min rast avdragen från bruttotid`;
+      } else {
+        breakHint.innerHTML = `<i class="fa-solid fa-mug-hot text-stone-400 mr-1"></i>Ingen rast (<5 tim sammanhängande pass)`;
+      }
+    }
+
+    if (diffBadge) {
+      if (inMin === null || outMin === null) {
+        diffBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-stone-100 text-stone-500 border border-stone-200';
+        diffBadge.innerHTML = '<i class="fa-regular fa-clock mr-1"></i>Ej avslutad';
+      } else if (diff > 0) {
+        const hrs = Math.floor(diff / 60);
+        const mins = diff % 60;
+        const diffText = hrs > 0 ? `+${hrs}h ${mins > 0 ? mins + 'm' : ''} Övertid` : `+${mins} min Övertid`;
+        diffBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-300 animate-pulse';
+        diffBadge.innerHTML = `<i class="fa-solid fa-arrow-trend-up mr-1 text-purple-700"></i>${diffText}`;
+      } else if (diff < 0) {
+        const absDiff = Math.abs(diff);
+        const hrs = Math.floor(absDiff / 60);
+        const mins = absDiff % 60;
+        const diffText = hrs > 0 ? `-${hrs}h ${mins > 0 ? mins + 'm' : ''} Undertid` : `-${mins} min Undertid`;
+        diffBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200';
+        diffBadge.innerHTML = `<i class="fa-solid fa-arrow-trend-down mr-1 text-rose-600"></i>${diffText}`;
+      } else {
+        diffBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+        diffBadge.innerHTML = '<i class="fa-solid fa-check mr-1 text-emerald-600"></i>Enligt schema (0 min)';
+      }
+    }
+  }
+
+  // Admin Quick Action: Align to planned times
+  function alignToPlannedTimes() {
+    const pStart = document.getElementById('editPlannedStart').value;
+    const pEnd = document.getElementById('editPlannedEnd').value;
+    if (pStart) document.getElementById('editCheckIn').value = pStart;
+    if (pEnd) document.getElementById('editCheckOut').value = pEnd;
+    updateModalLiveCalc();
+    appendReasonTag('Jämkad enligt schema (0 övertid)');
+  }
+
+  // Admin Quick Action: Set from staff's original punch
+  function setFromStaffPunch() {
+    if (!currentEditingEntry) return;
+    const origIn = currentEditingEntry.originalCheckInTimeStr || currentEditingEntry.checkInTimeStr;
+    const origOut = currentEditingEntry.originalCheckOutTimeStr || currentEditingEntry.checkOutTimeStr;
+    if (origIn && origIn !== '–') document.getElementById('editCheckIn').value = origIn;
+    if (origOut && origOut !== '–' && origOut !== 'Pågående...') document.getElementById('editCheckOut').value = origOut;
+    updateModalLiveCalc();
+    appendReasonTag('Korrigerad stämpling (personalens stämpel)');
+  }
+
+  // Admin Quick Action: Approve overtime in note
+  function approveOvertimeInNote() {
+    const overtimeMins = parseInt(document.getElementById('editOvertimeMinutes').value, 10) || 0;
+    if (overtimeMins > 0) {
+      const hrs = Math.floor(overtimeMins / 60);
+      const mins = overtimeMins % 60;
+      const str = hrs > 0 ? `Godkänd övertid: +${hrs} tim ${mins > 0 ? mins + ' min' : ''}` : `Godkänd övertid: +${mins} min`;
+      appendReasonTag(str);
+    } else {
+      appendReasonTag('Godkänd enligt ordinarie schema');
+    }
+  }
+
+  // Append a reason tag to adminNote
+  function appendReasonTag(tag) {
+    const noteEl = document.getElementById('editAdminNote');
+    if (!noteEl) return;
+    let current = noteEl.value.trim();
+    if (!current) {
+      noteEl.value = tag;
+    } else if (!current.includes(tag)) {
+      noteEl.value = current + ' | ' + tag;
+    }
+    noteEl.focus();
+  }
+
+  function revertToOriginalTimes() {
+    if (!currentEditingEntry) return;
+    const origIn = currentEditingEntry.originalCheckInTimeStr || currentEditingEntry.checkInTimeStr;
+    const origOut = currentEditingEntry.originalCheckOutTimeStr || currentEditingEntry.checkOutTimeStr;
+    const origStart = currentEditingEntry.originalPlannedStartTime || currentEditingEntry.plannedStartTime;
+    const origEnd = currentEditingEntry.originalPlannedEndTime || currentEditingEntry.plannedEndTime;
+
+    if (origIn && origIn !== '–') document.getElementById('editCheckIn').value = origIn;
+    if (origOut && origOut !== '–' && origOut !== 'Pågående...') document.getElementById('editCheckOut').value = origOut;
+    if (origStart) document.getElementById('editPlannedStart').value = origStart;
+    if (origEnd) document.getElementById('editPlannedEnd').value = origEnd;
+    updateModalLiveCalc();
+  }
+
+  function closeEditPunchModal() {
+    const editModal = document.getElementById('editPunchModal');
+    editModal.classList.add('hidden');
+    editModal.classList.remove('flex');
+  }
+
+  // Stäng aktiva modaler med Escape-tangenten
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeEditPunchModal();
+      closeManualPunchModal();
+      closeQuickClockOutModal();
+    }
+  });
+
+  // Quick Clock Out Modal
+  function openQuickClockOutModal(id, staffName) {
+    const form = document.getElementById('quickClockOutForm');
+    form.action = '/admin/stampling/out/' + id;
+    document.getElementById('quickClockOutStaffName').textContent = staffName;
+
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('quickCheckOutTime').value = `${h}:${m}`;
+
+    const quickModal = document.getElementById('quickClockOutModal');
+    quickModal.classList.remove('hidden');
+    quickModal.classList.add('flex');
+  }
+  function closeQuickClockOutModal() {
+    const quickModal = document.getElementById('quickClockOutModal');
+    quickModal.classList.add('hidden');
+    quickModal.classList.remove('flex');
+  }
+</script>
