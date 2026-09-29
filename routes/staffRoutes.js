@@ -8,6 +8,14 @@ const { requireAuth, requireRole } = require('../middleware/authMiddleware');
 
 router.use(requireAuth, requireRole('STAFF', 'ADMIN'));
 
+// ============================================================
+// STAFF - Stämpling
+// ============================================================
+
+router.get('/time-tracking', (req, res) => {
+  staffController.getTimeTracking(req, res);
+});
+
 
 // ============================================================
 // STAFF - ÖVERSIKT

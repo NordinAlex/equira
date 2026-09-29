@@ -15,6 +15,10 @@
     <!-- Meny -->
     <nav
         class="flex flex-col font-bold text-gray-500 gap-7 mt-6 ml-4 [&>a]:rounded-lg [&>a]:hover:bg-gray-200 [&>a]:py-2 [&>a]:px-2">
+        <a href="/staff/time-tracking"
+            class="<%= currentPage === 'time-tracking' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
+            <i class="mr-2 fa-regular fa-clock"></i>Stämpling
+        </a>
         <a href="/staff/overview"
             class="<%= currentPage === 'overview-staff' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
             <i class="mr-2 fa-regular fa-calendar-days"></i>Översikt
@@ -24,7 +28,7 @@
             <i class="mr-2 fa-solid fa-list-check"></i>Uppgifter
         </a>
         <a href="/staff/horses" class="<%= currentPage === 'horses' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
-  <img src="/images/horseshoe.svg" alt="Equira logga" class="w-5 h-5 object-contain inline mr-2 opacity-60">Hästar
+  <img src="/images/horseshoe.svg" alt="Equira logga" class="w-4 h-4 object-contain inline mr-2 opacity-60">Hästar
 </a>
         <a href="/staff/schedule"
             class="<%= currentPage === 'schedule' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">

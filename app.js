@@ -63,6 +63,7 @@ app.use(installMiddleware);
 app.use('/', authRouter);
 app.use('/', indexRouter);
 app.use('/staff', staffRoutes);
+app.use('/staff/time-tracking', staffRoutes);
 app.use('/student', studentRouter);
 app.use('/search', searchRouter);
 app.use('/api', apiRouter);
