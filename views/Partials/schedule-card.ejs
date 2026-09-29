@@ -30,7 +30,7 @@
       <h4 class="font-semibold">Häst</h4>
       <div class="flex gap-2 mt-2 text-equira-cognac-800">
         <i class="fa-solid fa-horse-head self-center text-xl"></i>
-        <p class="text-xl font-semibold"><%= booking.horse.name %></p>
+        <p class="text-xl font-semibold"><%= booking.horse ? booking.horse.name : 'Ej tilldelad än' %></p>
       </div>
     </div>
 
