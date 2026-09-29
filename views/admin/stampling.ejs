@@ -396,7 +396,7 @@
 </div>
 
 <!-- Modal 1: Manuell Stämpling (Lägg till tidsregistrering) -->
-<div id="manualPunchModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+<div id="manualPunchModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl space-y-5 animate-scale-in">
     <div class="flex items-center justify-between border-b border-stone-100 pb-3">
       <div class="flex items-center gap-2.5">
@@ -477,7 +477,7 @@
 </div>
 
 <!-- Modal 2: Redigera Tidsstämpel (Fullt responsiv för mobil & desktop) -->
-<div id="editPunchModal" onclick="if (event.target === this) closeEditPunchModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-start sm:items-center justify-center p-2.5 sm:p-4 overflow-y-auto transition-all duration-200">
+<div id="editPunchModal" onclick="if (event.target === this) closeEditPunchModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-2.5 sm:p-4 overflow-y-auto transition-all duration-200">
   <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full my-auto flex flex-col shadow-2xl animate-scale-in overflow-hidden border border-stone-200/80" style="max-height: calc(100vh - 1.5rem); max-height: calc(100dvh - 1.5rem);">
 
     <!-- Modal Header (Fastklistrad högst upp) -->
@@ -578,14 +578,14 @@
         <!-- Faktisk Stämpling (2 kolumner) -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-stone-700 mb-1 flex items-center justify-between">
+            <label class="flex items-center justify-between text-xs font-bold text-stone-700 mb-1">
               <span>Faktisk Instämpling</span>
               <span class="text-[10px] text-stone-400 font-normal hidden sm:inline">Klockslag</span>
             </label>
             <input type="time" name="checkInTime" id="editCheckIn" oninput="updateModalLiveCalc()" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700">
           </div>
           <div>
-            <label class="block text-xs font-bold text-stone-700 mb-1 flex items-center justify-between">
+            <label class="flex items-center justify-between text-xs font-bold text-stone-700 mb-1">
               <span>Faktisk Utstämpling</span>
               <span class="text-[10px] text-stone-400 font-normal hidden sm:inline">Klockslag</span>
             </label>
@@ -701,7 +701,7 @@
 </div>
 
 <!-- Modal 3: Snabb Utstämpling -->
-<div id="quickClockOutModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+<div id="quickClockOutModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl space-y-5 animate-scale-in">
     <div class="flex items-center justify-between border-b border-stone-100 pb-3">
       <div class="flex items-center gap-2.5">
@@ -745,10 +745,14 @@
   function openManualPunchModal() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('manualDate').value = today;
-    document.getElementById('manualPunchModal').classList.remove('hidden');
+    const modal = document.getElementById('manualPunchModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
   }
   function closeManualPunchModal() {
-    document.getElementById('manualPunchModal').classList.add('hidden');
+    const modal = document.getElementById('manualPunchModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
   }
 
   // Edit Punch Modal
@@ -786,7 +790,9 @@
       adjustedText.textContent = 'Orörd originalstämpling från personal';
     }
 
-    document.getElementById('editPunchModal').classList.remove('hidden');
+    const editModal = document.getElementById('editPunchModal');
+    editModal.classList.remove('hidden');
+    editModal.classList.add('flex');
     updateModalLiveCalc();
   }
 
@@ -973,7 +979,9 @@
   }
 
   function closeEditPunchModal() {
-    document.getElementById('editPunchModal').classList.add('hidden');
+    const editModal = document.getElementById('editPunchModal');
+    editModal.classList.add('hidden');
+    editModal.classList.remove('flex');
   }
 
   // Stäng aktiva modaler med Escape-tangenten
@@ -996,9 +1004,13 @@
     const m = String(now.getMinutes()).padStart(2, '0');
     document.getElementById('quickCheckOutTime').value = `${h}:${m}`;
 
-    document.getElementById('quickClockOutModal').classList.remove('hidden');
+    const quickModal = document.getElementById('quickClockOutModal');
+    quickModal.classList.remove('hidden');
+    quickModal.classList.add('flex');
   }
   function closeQuickClockOutModal() {
-    document.getElementById('quickClockOutModal').classList.add('hidden');
+    const quickModal = document.getElementById('quickClockOutModal');
+    quickModal.classList.add('hidden');
+    quickModal.classList.remove('flex');
   }
 </script>
