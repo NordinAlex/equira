@@ -16,6 +16,13 @@ router.get('/time-tracking', (req, res) => {
   staffController.getTimeTracking(req, res);
 });
 
+router.post('/time-tracking/clock-in', (req, res) => {
+  staffController.clockIn(req, res);
+});
+
+router.post('/time-tracking/clock-out', (req, res) => {
+  staffController.clockOut(req, res);
+});
 
 // ============================================================
 // STAFF - ÖVERSIKT
