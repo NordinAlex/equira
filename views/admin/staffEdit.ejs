@@ -9,7 +9,7 @@
       </div>
       <div class="flex items-center gap-3 mt-1">
         <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight"><%= staff.fullName %></h2>
-        <% if (typeof currentUserId !== 'undefined' && currentUserId === staff.id) { %>
+        <% if (typeof currentUserId !== 'undefined' && Number(currentUserId) === Number(staff.id)) { %>
           <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800">Inloggad som du</span>
         <% } %>
       </div>
@@ -119,26 +119,6 @@
           </div>
         </div>
 
-        <!-- 3. Raderingszon -->
-        <div class="bg-rose-50/50 rounded-2xl border border-rose-200 p-6 space-y-3">
-          <div class="flex items-center justify-between">
-            <div>
-              <h4 class="text-xs font-bold text-rose-900 uppercase tracking-wider">Ta bort personalmedlem</h4>
-              <p class="text-xs text-rose-700/80 mt-0.5">Raderar personalen och profilen. Eventuella lektioner och stalluppgifter avlänkas säkert.</p>
-            </div>
-            <% if (typeof currentUserId !== 'undefined' && currentUserId === staff.id) { %>
-              <button type="button" disabled class="px-4 py-2 bg-stone-200 text-stone-400 text-xs font-semibold rounded-xl cursor-not-allowed" title="Du kan inte ta bort ditt eget konto">
-                Kan inte ta bort dig själv
-              </button>
-            <% } else { %>
-              <button type="button" onclick="confirmDelete()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-xs transition hover-lift">
-                <i class="fa-regular fa-trash-can mr-1.5"></i>
-                Ta bort personal
-              </button>
-            <% } %>
-          </div>
-        </div>
-
       </div>
 
       <!-- Right Column (4 cols) -->
@@ -215,20 +195,92 @@
             </div>
           </div>
         </div>
+
+        <!-- Administratörskonto / Skyddad zon (Eget aktivt konto) -->
+        <% if (typeof currentUserId !== 'undefined' && Number(currentUserId) === Number(staff.id)) { %>
+          <div class="bg-amber-50/60 rounded-2xl border border-amber-200 p-6 shadow-xs space-y-3">
+            <h3 class="text-sm font-bold text-amber-900 flex items-center gap-2">
+              <i class="fa-solid fa-shield-halved text-amber-600"></i> Ditt eget konto
+            </h3>
+            <div class="p-3 bg-white/90 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed flex items-start gap-2.5">
+              <i class="fa-solid fa-circle-info text-amber-600 mt-0.5 shrink-0 text-sm"></i>
+              <div>
+                <span class="font-bold">OBS:</span> Du kan inte ta bort ditt eget konto som är aktivt just nu.
+              </div>
+            </div>
+            <button type="button" disabled class="w-full py-2.5 px-4 bg-stone-100 text-stone-400 font-semibold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2" title="Du kan inte ta bort ditt eget inloggade konto">
+              <i class="fa-solid fa-user-lock"></i>
+              <span>Kan inte ta bort dig själv</span>
+            </button>
+          </div>
+        <% } else { %>
+          <!-- Farlig zon / Ta bort personal -->
+          <div class="bg-white rounded-2xl border border-rose-200 p-6 shadow-xs space-y-3">
+            <h3 class="text-sm font-bold text-rose-800 flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> Farlig zon
+            </h3>
+            <p class="text-xs text-stone-500">
+              Raderar personalen och profilen permanent. Schemalagda lektioner och stalluppgifter avlänkas automatiskt.
+            </p>
+            <button type="button" onclick="openDeleteStaffModal()" class="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fa-regular fa-trash-can"></i>
+              <span>Ta bort denna personal</span>
+            </button>
+          </div>
+        <% } %>
       </div>
     </div>
   </form>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteStaffModal" onclick="if(event.target === this) closeDeleteStaffModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-stone-900">Ta bort personal?</h3>
+          <p class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
+        </div>
+      </div>
+      <p class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-100">
+        Är du säker på att du vill ta bort personalen <strong class="text-stone-900">"<%= staff.fullName %>"</strong>? Profil och arbetspass raderas permanent. Hänvisningar i schemalagda lektioner och stalluppgifter avlänkas automatiskt.
+      </p>
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button type="button" onclick="closeDeleteStaffModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
+          Avbryt
+        </button>
+        <button type="button" onclick="document.getElementById('deleteStaffForm').submit()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Ja, ta bort personal</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Hidden Delete Form -->
   <form id="deleteStaffForm" action="/admin/staff/<%= staff.id %>/delete" method="POST" class="hidden"></form>
 </div>
 
 <script>
-  function confirmDelete() {
-    if (confirm('Är du säker på att du vill ta bort personalen "<%= staff.fullName %>"?\n\nHänvisningar i schemalagda lektioner och stalluppgifter avlänkas säkert.')) {
-      document.getElementById('deleteStaffForm').submit();
-    }
+  function openDeleteStaffModal() {
+    const modal = document.getElementById('deleteStaffModal');
+    if (modal) modal.classList.remove('hidden');
   }
+
+  function closeDeleteStaffModal() {
+    const modal = document.getElementById('deleteStaffModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function confirmDelete() {
+    openDeleteStaffModal();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDeleteStaffModal();
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('avatarFileInput');

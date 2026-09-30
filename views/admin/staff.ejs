@@ -197,7 +197,7 @@
                   <div>
                     <div class="font-bold text-stone-900 text-sm flex items-center gap-1.5">
                       <span><%= s.fullName %></span>
-                      <% if (typeof currentUserId !== 'undefined' && currentUserId === s.id) { %>
+                      <% if (typeof currentUserId !== 'undefined' && Number(currentUserId) === Number(s.id)) { %>
                         <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">Du</span>
                       <% } %>
                     </div>
@@ -259,23 +259,24 @@
                     <span>Redigera</span>
                   </a>
                   
-                  <% if (typeof currentUserId !== 'undefined' && currentUserId === s.id) { %>
+                  <% if (typeof currentUserId !== 'undefined' && Number(currentUserId) === Number(s.id)) { %>
                     <button type="button" 
                             disabled 
                             class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-stone-300 bg-stone-50 border border-stone-100 rounded-xl cursor-not-allowed" 
-                            title="Du kan inte ta bort ditt eget inloggade administratörskonto">
-                      <i class="fa-regular fa-trash-can text-[11px]"></i>
+                            title="OBS: Du kan inte ta bort ditt eget konto som är aktivt nu">
+                      <i class="fa-solid fa-user-lock text-[11px]"></i>
                       <span>Ta bort</span>
                     </button>
                   <% } else { %>
-                    <form action="/admin/staff/<%= s.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Är du säker på att du vill ta bort personalen <%= s.fullName %>?\n\nHänvisningar i lektioner och uppgifter tas bort automatiskt.');">
-                      <button type="submit" 
-                              class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition" 
-                              title="Ta bort personal">
-                        <i class="fa-regular fa-trash-can text-[11px]"></i>
-                        <span>Ta bort</span>
-                      </button>
-                    </form>
+                    <button type="button"
+                            data-id="<%= s.id %>"
+                            data-name="<%= s.fullName || '' %>"
+                            onclick="openGlobalDeleteStaffModal(this.dataset.id, this.dataset.name)"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition cursor-pointer" 
+                            title="Ta bort personal">
+                      <i class="fa-regular fa-trash-can text-[11px]"></i>
+                      <span>Ta bort</span>
+                    </button>
                   <% } %>
                 </div>
               </td>
@@ -306,8 +307,55 @@
   </div>
 </div>
 
-<!-- Instant Live Search & Filter Client Script -->
+<!-- Global Delete Staff Confirmation Modal -->
+<div id="globalDeleteStaffModal" onclick="if(event.target === this) closeGlobalDeleteStaffModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-stone-900">Ta bort personal?</h3>
+        <p class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
+      </div>
+    </div>
+    <p class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-100">
+      Är du säker på att du vill ta bort personalen <strong class="text-stone-900" id="globalDeleteStaffName">personalen</strong>? Profil och arbetspass raderas permanent. Hänvisningar i schemalagda lektioner och stalluppgifter avlänkas automatiskt.
+    </p>
+    <div class="flex items-center justify-end gap-2.5 pt-2">
+      <button type="button" onclick="closeGlobalDeleteStaffModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
+        Avbryt
+      </button>
+      <form id="globalDeleteStaffForm" action="" method="POST" class="inline m-0 p-0">
+        <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Ja, ta bort personal</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts: Search, Filter, Modal -->
 <script>
+  function openGlobalDeleteStaffModal(id, name) {
+    const modal = document.getElementById('globalDeleteStaffModal');
+    const nameEl = document.getElementById('globalDeleteStaffName');
+    const form = document.getElementById('globalDeleteStaffForm');
+    if (nameEl) nameEl.textContent = `"${name || 'personalen'}"`;
+    if (form) form.action = `/admin/staff/${id}/delete`;
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeGlobalDeleteStaffModal() {
+    const modal = document.getElementById('globalDeleteStaffModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeGlobalDeleteStaffModal();
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('staffSearchInput');
     const clearBtn = document.getElementById('clearStaffSearchBtn');

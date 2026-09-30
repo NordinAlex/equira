@@ -31,16 +31,28 @@
   <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
     <div class="p-4 border-b border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div class="flex items-center gap-3 flex-1 max-w-md w-full">
-        <div class="relative w-full">
-          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
+        <form id="studentSearchForm" action="/admin/students" method="GET" class="relative flex-1 max-w-md w-full">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
             <i class="fa-solid fa-magnifying-glass text-xs"></i>
           </span>
-          <input type="text" placeholder="Sök elevnamn..."
-            class="w-full pl-8 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
-        </div>
+          <input type="text" 
+                 id="studentSearchInput" 
+                 name="q" 
+                 value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+                 autocomplete="off"
+                 placeholder="Sök på namn, e-post, ridnivå eller grupp..."
+                 class="w-full pl-9 pr-10 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white transition">
+          
+          <button type="button" 
+                  id="clearStudentSearchBtn" 
+                  class="<%= (typeof searchQuery !== 'undefined' && searchQuery) ? '' : 'hidden' %> absolute inset-y-0 right-0 pr-3.5 flex items-center text-stone-400 hover:text-stone-600 transition cursor-pointer" 
+                  title="Rensa sökning">
+            <i class="fa-solid fa-circle-xmark text-sm"></i>
+          </button>
+        </form>
       </div>
-      <div class="flex items-center gap-2 text-xs text-stone-400 self-end sm:self-center">
-        <span>Visar <%= students.length %> elever</span>
+      <div class="flex items-center gap-2 text-xs text-stone-500 self-end sm:self-center">
+        <span id="studentCountText">Visar <%= students.length %> elever</span>
       </div>
     </div>
 
@@ -48,6 +60,20 @@
     <div class="block sm:hidden px-4 py-2 bg-stone-50 border-b border-stone-100 text-[11px] text-stone-500 flex items-center gap-1.5">
       <i class="fa-solid fa-arrows-left-right text-stone-400"></i>
       <span>Svep i sidled för att se alla elevuppgifter</span>
+    </div>
+
+    <!-- No results state (live filtering) -->
+    <div id="noStudentsMatch" class="hidden p-12 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-stone-100 text-stone-400 flex items-center justify-center text-xl mx-auto mb-3">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+      <h3 class="text-sm font-bold text-stone-800">Inga elever matchar sökningen</h3>
+      <p id="noStudentsMatchText" class="text-xs text-stone-500 mt-1 max-w-sm mx-auto">
+        Kunde inte hitta några elever som stämmer överens med din sökterm.
+      </p>
+      <button type="button" id="resetSearchBtn" class="mt-4 px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold text-xs rounded-xl transition cursor-pointer">
+        Rensa sökning
+      </button>
     </div>
 
     <div class="overflow-x-auto touch-scroll">
@@ -64,70 +90,213 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-stone-100">
-          <% students.forEach(s => { %>
-            <tr class="hover:bg-stone-50/80 transition">
-              <!-- Namn -->
-              <td class="py-4 px-6 whitespace-nowrap">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
-                    <%= s.initials %>
-                  </div>
-                  <div>
-                    <div class="font-bold text-stone-900 text-sm"><%= s.fullName %></div>
-                    <div class="text-stone-400 text-[11px]"><%= s.email %></div>
-                  </div>
-                </div>
-              </td>
-
-              <!-- Ridnivå -->
-              <td class="py-4 px-6 whitespace-nowrap">
-                <span class="font-semibold text-stone-800"><%= s.ridingLevel %></span>
-              </td>
-
-              <!-- Grupp -->
-              <td class="py-4 px-6 whitespace-nowrap">
-                <span class="px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700 font-medium text-[11px]">
-                  <%= s.groupName %>
-                </span>
-              </td>
-
-              <!-- Fysisk data för SvRF bärighet -->
-              <td class="py-4 px-6 whitespace-nowrap">
-                <span class="font-bold text-stone-800"><%= s.weightKg %> kg</span>
-                <span class="text-stone-400 text-[11px]">/ <%= s.heightCm %> cm</span>
-              </td>
-
-              <!-- Nödkontakt -->
-              <td class="py-4 px-6 text-stone-600 whitespace-nowrap">
-                <%= s.emergencyContact %>
-              </td>
-
-              <!-- Status -->
-              <td class="py-4 px-6 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border <%= s.membershipClass %>">
-                  <%= s.membershipStatus %>
-                </span>
-              </td>
-
-              <!-- Actions -->
-              <td class="py-4 px-6 text-right whitespace-nowrap">
-                <div class="flex items-center justify-end gap-2">
-                  <a href="/admin/students/<%= s.id %>/edit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-lg transition" title="Redigera elev">
-                    <i class="fa-solid fa-pen-to-square text-[11px]"></i>
-                    <span>Redigera</span>
+          <% if (students.length === 0) { %>
+            <tr>
+              <td colspan="7" class="py-12 text-center text-stone-500">
+                <i class="fa-solid fa-user-slash text-2xl text-stone-300 block mb-2"></i>
+                <span class="font-medium">Inga elever hittades.</span>
+                <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                  <p class="text-xs text-stone-400 mt-1">Inga elever matchade "<%= searchQuery %>".</p>
+                  <a href="/admin/students" class="inline-block mt-3 px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-lg transition">
+                    Rensa sökning
                   </a>
-                  <form action="/admin/students/<%= s.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Är du säker på att du vill ta bort eleven <%= s.fullName %>?\n\nKopplade bokningar och provresultat tas också bort.');">
-                    <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition" title="Ta bort elev">
+                <% } %>
+              </td>
+            </tr>
+          <% } else { %>
+            <% students.forEach(s => { %>
+              <tr class="student-row hover:bg-stone-50/80 transition" data-search="<%= (s.fullName + ' ' + s.email + ' ' + s.ridingLevel + ' ' + s.groupName + ' ' + s.emergencyContact).toLowerCase() %>">
+                <!-- Namn -->
+                <td class="py-4 px-6 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+                      <%= s.initials %>
+                    </div>
+                    <div>
+                      <div class="font-bold text-stone-900 text-sm"><%= s.fullName %></div>
+                      <div class="text-stone-400 text-[11px]"><%= s.email %></div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Ridnivå -->
+                <td class="py-4 px-6 whitespace-nowrap">
+                  <span class="font-semibold text-stone-800"><%= s.ridingLevel %></span>
+                </td>
+
+                <!-- Grupp -->
+                <td class="py-4 px-6 whitespace-nowrap">
+                  <span class="px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700 font-medium text-[11px]">
+                    <%= s.groupName %>
+                  </span>
+                </td>
+
+                <!-- Fysisk data för SvRF bärighet -->
+                <td class="py-4 px-6 whitespace-nowrap">
+                  <span class="font-bold text-stone-800"><%= s.weightKg %> kg</span>
+                  <span class="text-stone-400 text-[11px]">/ <%= s.heightCm %> cm</span>
+                </td>
+
+                <!-- Nödkontakt -->
+                <td class="py-4 px-6 text-stone-600 whitespace-nowrap">
+                  <%= s.emergencyContact %>
+                </td>
+
+                <!-- Status -->
+                <td class="py-4 px-6 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border <%= s.membershipClass %>">
+                    <%= s.membershipStatus %>
+                  </span>
+                </td>
+
+                <!-- Actions -->
+                <td class="py-4 px-6 text-right whitespace-nowrap">
+                  <div class="flex items-center justify-end gap-2">
+                    <a href="/admin/students/<%= s.id %>/edit" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-stone-700 bg-stone-100 hover:bg-stone-200 rounded-lg transition" title="Redigera elev">
+                      <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                      <span>Redigera</span>
+                    </a>
+                    <button type="button" data-id="<%= s.id %>" data-name="<%= s.fullName %>" onclick="openGlobalDeleteStudentModal(this.dataset.id, this.dataset.name)" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition cursor-pointer" title="Ta bort elev">
                       <i class="fa-regular fa-trash-can text-[11px]"></i>
                       <span>Ta bort</span>
                     </button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-          <% }); %>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          <% } %>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
+<!-- Global Delete Student Confirmation Modal -->
+<div id="globalDeleteStudentModal" onclick="if(event.target === this) closeGlobalDeleteStudentModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-stone-900">Ta bort elev?</h3>
+        <p class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
+      </div>
+    </div>
+    <p class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-100">
+      Är du säker på att du vill ta bort eleven <strong class="text-stone-900" id="globalDeleteStudentName">eleven</strong>? Även profil, relaterade bokningar och provresultat raderas permanent.
+    </p>
+    <div class="flex items-center justify-end gap-2.5 pt-2">
+      <button type="button" onclick="closeGlobalDeleteStudentModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
+        Avbryt
+      </button>
+      <form id="globalDeleteStudentForm" action="" method="POST" class="inline m-0 p-0">
+        <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Ja, ta bort elev</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openGlobalDeleteStudentModal(id, name) {
+    const modal = document.getElementById('globalDeleteStudentModal');
+    const nameEl = document.getElementById('globalDeleteStudentName');
+    const form = document.getElementById('globalDeleteStudentForm');
+    if (nameEl) nameEl.textContent = `"${name || 'eleven'}"`;
+    if (form) form.action = `/admin/students/${id}/delete`;
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeGlobalDeleteStudentModal() {
+    const modal = document.getElementById('globalDeleteStudentModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeGlobalDeleteStudentModal();
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('studentSearchInput');
+    const clearBtn = document.getElementById('clearStudentSearchBtn');
+    const countText = document.getElementById('studentCountText');
+    const rows = document.querySelectorAll('.student-row');
+    const noMatch = document.getElementById('noStudentsMatch');
+    const noMatchText = document.getElementById('noStudentsMatchText');
+    const resetBtn = document.getElementById('resetSearchBtn');
+    const tableContainer = document.querySelector('.overflow-x-auto');
+
+    const totalStudents = rows.length;
+
+    function filterStudentsLive() {
+      const q = (searchInput?.value || '').trim().toLowerCase();
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        const searchData = row.getAttribute('data-search') || '';
+        const matches = !q || searchData.includes(q);
+
+        if (matches) {
+          row.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          row.classList.add('hidden');
+        }
+      });
+
+      if (clearBtn) {
+        if (q) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+
+      if (countText) {
+        if (q) {
+          countText.textContent = `Visar ${visibleCount} av ${totalStudents} elever`;
+        } else {
+          countText.textContent = `Visar ${totalStudents} elever`;
+        }
+      }
+
+      if (visibleCount === 0 && totalStudents > 0) {
+        if (tableContainer) tableContainer.classList.add('hidden');
+        if (noMatch) {
+          noMatch.classList.remove('hidden');
+          if (noMatchText && q) {
+            noMatchText.textContent = `Inga elever matchade "${searchInput.value.trim()}".`;
+          }
+        }
+      } else {
+        if (tableContainer) tableContainer.classList.remove('hidden');
+        if (noMatch) noMatch.classList.add('hidden');
+      }
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', filterStudentsLive);
+    }
+
+    function resetSearch() {
+      if (window.location.search.includes('q=')) {
+        window.location.href = '/admin/students';
+      } else if (searchInput) {
+        searchInput.value = '';
+        filterStudentsLive();
+        searchInput.focus();
+      }
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', resetSearch);
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', resetSearch);
+    }
+  });
+</script>

@@ -225,7 +225,7 @@ class StaffService {
     const parsedId = parseInt(id, 10);
 
     if (currentUserId && parseInt(currentUserId, 10) === parsedId) {
-      throw new Error('Du kan inte ta bort ditt eget inloggade administratörskonto.');
+      throw new Error('OBS: Du kan inte ta bort ditt eget inloggade konto som är aktivt nu.');
     }
 
     const user = await userRepo.findOne({ where: { id: parsedId } });
@@ -239,6 +239,19 @@ class StaffService {
     // Detach from tasks
     await taskRepo.update({ assignedToUserId: parsedId }, { assignedToUserId: null });
     await taskRepo.update({ completedByUserId: parsedId }, { completedByUserId: null });
+
+    // Clean up time entries & punches explicitly
+    try {
+      const timeEntryRepo = await this._getRepository('TimeEntry');
+      await timeEntryRepo.delete({ userId: parsedId });
+    } catch (e) {
+      // Ignore if TimeEntry repository not available
+    }
+    try {
+      await userRepo.query('DELETE FROM time_punches WHERE userId = ?', [parsedId]);
+    } catch (e) {
+      // Ignore if table not present
+    }
 
     // Delete staff profile
     await profileRepo.delete({ userId: parsedId });

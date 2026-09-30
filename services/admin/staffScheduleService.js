@@ -384,11 +384,25 @@ class AdminStaffScheduleService {
   }
 
   /**
+   * Get single shift by ID
+   */
+  async getShiftById(id) {
+    const timeRepo = await this._getRepository('TimeEntry');
+    return await timeRepo.findOne({ where: { id: parseInt(id, 10) } });
+  }
+
+  /**
    * Delete a shift from the database
    */
   async deleteShift(id) {
     const timeRepo = await this._getRepository('TimeEntry');
-    return await timeRepo.delete(parseInt(id, 10));
+    const parsedId = parseInt(id, 10);
+    const shift = await timeRepo.findOne({ where: { id: parsedId } });
+    if (!shift) {
+      throw new Error('Arbetspasset kunde inte hittas.');
+    }
+    await timeRepo.delete(parsedId);
+    return shift;
   }
 }
 

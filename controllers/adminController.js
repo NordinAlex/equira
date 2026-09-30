@@ -396,12 +396,14 @@ class AdminController {
 
   async getStudents(req, res) {
     try {
-      const students = await studentsService.getAllStudents();
+      const searchQuery = (req.query.q || '').trim();
+      const students = await studentsService.getAllStudents(searchQuery);
       const formatted = AdminViewModel.formatStudents(students);
 
       res.render('admin/students', {
         title: 'Equira - Elever',
         students: formatted,
+        searchQuery,
         success: req.query.success || null,
         error: req.query.error || null,
         layout: 'layouts/adminLayout',
@@ -1250,7 +1252,7 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('success', 'Tidsstämpeln har raderats.');
       }
-      res.redirect('/admin/stampling');
+      res.redirect('/admin/stampling?success=' + encodeURIComponent('Tidsstämplingen har tagits bort.'));
     } catch (err) {
       console.error('Error deleting time entry:', err);
       if (req.setFlash) {
@@ -1259,7 +1261,7 @@ class AdminController {
           err.message || 'Kunde inte ta bort tidsstämpeln.',
         );
       }
-      res.redirect('/admin/stampling');
+      res.redirect('/admin/stampling?error=' + encodeURIComponent(err.message || 'Kunde inte ta bort tidsstämpeln.'));
     }
   }
 
@@ -1281,6 +1283,8 @@ class AdminController {
         title: 'Equira - Personalschema & Schemaläggning',
         data: scheduleData,
         currentPath: '/admin/staff-schedule',
+        success: req.query.success || null,
+        error: req.query.error || null,
         layout: 'layouts/adminLayout',
       });
     } catch (err) {
@@ -1380,17 +1384,22 @@ class AdminController {
   async postDeleteStaffShift(req, res) {
     try {
       const { id } = req.params;
-      await staffScheduleService.deleteShift(id);
+      const deletedShift = await staffScheduleService.deleteShift(id);
       if (req.setFlash) {
         req.setFlash('success', 'Arbetspasset har tagits bort från schemat.');
       }
-      res.redirect(req.headers.referer || '/admin/staff-schedule');
+      const monthKey = deletedShift?.date ? deletedShift.date.substring(0, 7) : (req.query.month || '');
+      const redirectUrl = monthKey 
+        ? `/admin/staff-schedule?month=${monthKey}&success=` + encodeURIComponent('Arbetspasset har tagits bort från schemat.')
+        : '/admin/staff-schedule?success=' + encodeURIComponent('Arbetspasset har tagits bort från schemat.');
+
+      res.redirect(redirectUrl);
     } catch (err) {
       console.error('Error deleting shift:', err);
       if (req.setFlash) {
         req.setFlash('error', err.message || 'Kunde inte ta bort passet.');
       }
-      res.redirect('/admin/staff-schedule');
+      res.redirect('/admin/staff-schedule?error=' + encodeURIComponent(err.message || 'Kunde inte ta bort passet.'));
     }
   }
 }
