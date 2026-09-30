@@ -41,42 +41,6 @@ class AdminStaffScheduleService {
   }
 
   /**
-   * Ensure standard shifts exist in DB for default staff demo (Johan) if not yet seeded
-   */
-  async _ensureInitialShiftsForJohan(timeRepo) {
-    const userRepo = await this._getRepository('User');
-    const johan = await userRepo.findOne({ where: { username: 'johan' } });
-    if (!johan) return;
-
-    const existing = await timeRepo.findOne({
-      where: { userId: johan.id, date: '2026-09-07' },
-    });
-    if (!existing) {
-      const defaultDates = [
-        '2026-09-07', '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-11',
-        '2026-09-14', '2026-09-15', '2026-09-16', '2026-09-17', '2026-09-18',
-        '2026-09-21', '2026-09-22', '2026-09-23', '2026-09-24', '2026-09-25',
-        '2026-09-28', '2026-09-29', '2026-09-30',
-      ];
-      for (const d of defaultDates) {
-        const shift = timeRepo.create({
-          userId: johan.id,
-          date: d,
-          plannedStartTime: '12:00',
-          plannedEndTime: '21:00',
-          plannedHours: 8.0,
-          breakMinutes: 60,
-          shiftName: 'Stallpersonal (6851)',
-          status: 'BOKAD',
-          subtextNote: 'Planerat arbetspass',
-          location: 'Huvudstallet',
-        });
-        await timeRepo.save(shift);
-      }
-    }
-  }
-
-  /**
    * Retrieves all staff users available for scheduling
    */
   async getStaffUsers() {
@@ -102,16 +66,18 @@ class AdminStaffScheduleService {
   /**
    * Retrieves monthly workforce schedule overview for admin directly from database
    * 
-   * @param {string} [monthKey='2026-09'] - 'YYYY-MM'
+   * @param {string|null} [monthKey=null] - 'YYYY-MM'
    * @param {number|string|null} [selectedUserId=null]
    */
-  async getMonthlyScheduleOverview(monthKey = '2026-09', selectedUserId = null) {
-    let [yearStr, monthStr] = (monthKey || '2026-09').split('-');
+  async getMonthlyScheduleOverview(monthKey = null, selectedUserId = null) {
+    const now = new Date();
+    const defaultMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    let [yearStr, monthStr] = (monthKey || defaultMonthKey).split('-');
     let year = parseInt(yearStr, 10);
     let monthIndex = parseInt(monthStr, 10) - 1;
     if (isNaN(year) || isNaN(monthIndex) || monthIndex < 0 || monthIndex > 11) {
-      year = 2026;
-      monthIndex = 8;
+      year = now.getFullYear();
+      monthIndex = now.getMonth();
     }
 
     const swedishMonths = [
@@ -137,11 +103,6 @@ class AdminStaffScheduleService {
 
     // Query TimeEntry for the period
     const timeRepo = await this._getRepository('TimeEntry');
-
-    // Ensure Johan has shifts in Sep 2026
-    if (year === 2026 && monthIndex === 8) {
-      await this._ensureInitialShiftsForJohan(timeRepo);
-    }
 
     const startStr = this._formatDateKey(startMonday);
     const endStr = this._formatDateKey(endSunday);
@@ -226,7 +187,7 @@ class AdminStaffScheduleService {
     // Build weekly calendars
     const weeks = [];
     const dayNames = ['Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör', 'Sön'];
-    const todayStr = '2026-09-27';
+    const todayStr = this._formatDateKey(new Date());
 
     let curr = new Date(startMonday);
     while (curr <= endSunday) {
@@ -277,7 +238,7 @@ class AdminStaffScheduleService {
 
       weeks.push({
         weekNumber,
-        isCurrentWeek: weekNumber === 39 && year === 2026,
+        isCurrentWeek: days.some(d => d.isToday),
         mondayDateStr,
         days,
         staffRows,
@@ -289,6 +250,8 @@ class AdminStaffScheduleService {
       monthKey: `${year}-${String(monthIndex + 1).padStart(2, '0')}`,
       prevMonthKey,
       nextMonthKey,
+      todayStr,
+      hasCurrentWeek: weeks.some(w => w.isCurrentWeek),
       selectedUserId: selectedUserId ? parseInt(selectedUserId, 10) : null,
       staffUsers,
       totalPlannedHours: Math.round(totalPlannedHours),

@@ -1,3 +1,11 @@
+/**
+ * AdminMapper (Admin Domain)
+ * 
+ * Maps raw TypeORM entities into normalized Admin DTOs for horses, lessons,
+ * students, staff, quizzes, and tasks, ensuring consistent data structures
+ * for the admin portal.
+ * 
+ */
 class AdminMapper {
   /**
    * Safely parses JSON strings with a fallback default.
@@ -273,4 +281,3 @@ class AdminMapper {
 }
 
 module.exports = AdminMapper;
-

@@ -11,7 +11,14 @@ const timeTrackingService = require('../services/admin/timeTrackingService');
 const staffScheduleService = require('../services/admin/staffScheduleService');
 const AdminViewModel = require('../models/viewModels/admin/AdminViewModel');
 
-
+/**
+ * AdminController (Admin Domain)
+ *
+ * Handles HTTP requests for the admin portal, orchestrating services
+ * to retrieve, process, and render data for the admin dashboard, horse management,
+ * lesson scheduling, student and staff management, stable tasks, quizzes, and profile administration.
+ * 
+ */
 class AdminController {
   async getOverview(req, res) {
     try {
@@ -51,8 +58,6 @@ class AdminController {
       res.render('admin/horses', {
         title: 'Equira - Hästar',
         data,
-        success: req.query.success || null,
-        error: req.query.error || null,
         layout: 'layouts/adminLayout',
       });
     } catch (err) {
@@ -70,7 +75,6 @@ class AdminController {
     res.render('admin/horseCreate', {
       title: 'Equira - Registrera Häst',
       error: null,
-      formData: {},
       layout: 'layouts/adminLayout',
     });
   }
@@ -81,80 +85,37 @@ class AdminController {
         req.body.photoUrl = '/images/uploads/horses/' + req.file.filename;
       }
       await horsesService.createHorse(req.body);
-      res.redirect('/admin/horses?success=' + encodeURIComponent('Ny häst har registrerats!'));
+      res.redirect('/admin/horses');
     } catch (err) {
       console.error('Error creating horse:', err);
       res.render('admin/horseCreate', {
         title: 'Equira - Registrera Häst',
         error: 'Kunde inte spara hästen: ' + err.message,
-        formData: req.body,
         layout: 'layouts/adminLayout',
       });
     }
   }
 
-    async getHorseProfile(req, res) {
+  async getHorseProfile(req, res) {
     try {
       const horse = await horsesService.getHorseById(req.params.id);
-
       if (!horse) {
         return res.redirect(
-          '/admin/horses?error=' +
-            encodeURIComponent('Hästen kunde inte hittas.')
+          '/admin/horses?error=' + encodeURIComponent('Hästen kunde inte hittas.'),
         );
       }
-
-      const tasks = await tasksService.getStableTasks();
-
-      const horseTasks = tasks.filter(
-        task => Number(task.horseId) === Number(horse.id)
-      );
 
       res.render('admin/horseProfile', {
         title: `Equira - ${horse.name}`,
         horse,
-        tasks: horseTasks,
-        error: req.query.error || null,
+        tasks: horse.tasks || [],
         success: req.query.success || null,
+        error: req.query.error || null,
         layout: 'layouts/adminLayout',
       });
     } catch (err) {
       console.error('Error loading horse profile:', err);
-
-      res.status(500).render('error', {
-        message: 'Kunde inte läsa in hästens profil',
-        error: err,
-      });
-    }
-  }
-
-  async postHorseTask(req, res) {
-    try {
-      const horse = await horsesService.getHorseById(req.params.id);
-
-      if (!horse) {
-        return res.redirect(
-          '/admin/horses?error=' +
-            encodeURIComponent('Hästen kunde inte hittas.')
-        );
-      }
-
-      await tasksService.createStableTask({
-        ...req.body,
-        horseId: horse.id,
-      });
-
-      res.redirect(
-        `/admin/horses/${horse.id}?success=` +
-          encodeURIComponent('Åtgärden har lagts till.')
-      );
-    } catch (err) {
-      console.error('Error creating horse task:', err);
-
-      res.redirect(
-        `/admin/horses/${req.params.id}?error=` +
-          encodeURIComponent('Kunde inte skapa åtgärden: ' + err.message)
-      );
+      res.redirect('/admin/horses?error=' + encodeURIComponent(err.message));
     }
   }
 
@@ -162,7 +123,9 @@ class AdminController {
     try {
       const horse = await horsesService.getHorseById(req.params.id);
       if (!horse) {
-        return res.redirect('/admin/horses?error=' + encodeURIComponent('Hästen kunde inte hittas.'));
+        return res.redirect(
+          '/admin/horses?error=' + encodeURIComponent('Hästen kunde inte hittas.'),
+        );
       }
 
       res.render('admin/horseEdit', {
@@ -183,7 +146,10 @@ class AdminController {
         req.body.photoUrl = '/images/uploads/horses/' + req.file.filename;
       }
       await horsesService.updateHorse(req.params.id, req.body);
-      res.redirect('/admin/horses?success=' + encodeURIComponent('Hästens uppgifter har uppdaterats!'));
+      res.redirect(
+        `/admin/horses/${req.params.id}?success=` +
+          encodeURIComponent('Hästens uppgifter har uppdaterats!'),
+      );
     } catch (err) {
       console.error('Error updating horse:', err);
       const horse = await horsesService.getHorseById(req.params.id);
@@ -199,10 +165,29 @@ class AdminController {
   async postHorseDelete(req, res) {
     try {
       await horsesService.deleteHorse(req.params.id);
-      res.redirect('/admin/horses?success=' + encodeURIComponent('Hästen har tagits bort från systemet.'));
+      res.redirect(
+        '/admin/horses?success=' + encodeURIComponent('Hästen har tagits bort.'),
+      );
     } catch (err) {
       console.error('Error deleting horse:', err);
-      res.redirect('/admin/horses?error=' + encodeURIComponent('Kunde inte ta bort hästen: ' + err.message));
+      res.redirect('/admin/horses?error=' + encodeURIComponent(err.message));
+    }
+  }
+
+  async postHorseTask(req, res) {
+    try {
+      req.body.horseId = req.params.id;
+      await tasksService.createStableTask(req.body);
+      res.redirect(
+        `/admin/horses/${req.params.id}?success=` +
+          encodeURIComponent('Åtgärd har skapats!'),
+      );
+    } catch (err) {
+      console.error('Error creating horse task:', err);
+      res.redirect(
+        `/admin/horses/${req.params.id}?error=` +
+          encodeURIComponent('Kunde inte skapa åtgärd: ' + err.message),
+      );
     }
   }
 
@@ -284,6 +269,8 @@ class AdminController {
       res.render('admin/lessons', {
         title: 'Equira - Lektioner',
         data,
+        success: req.query.success || null,
+        error: req.query.error || null,
         layout: 'layouts/adminLayout',
       });
     } catch (err) {
@@ -324,12 +311,86 @@ class AdminController {
   async postLessonCreate(req, res) {
     try {
       await lessonsService.createLesson(req.body);
-      res.redirect('/admin/lessons');
+      res.redirect('/admin/lessons?success=' + encodeURIComponent('Ny lektion har skapats!'));
     } catch (err) {
       console.error('Error creating lesson:', err);
       res.redirect(
         '/admin/lessons/create?error=' + encodeURIComponent(err.message),
       );
+    }
+  }
+
+  async getLessonEdit(req, res) {
+    try {
+      const lesson = await lessonsService.getLessonById(req.params.id);
+      if (!lesson) {
+        return res.redirect(
+          '/admin/lessons?error=' + encodeURIComponent('Lektionen kunde inte hittas.'),
+        );
+      }
+
+      const { arenas, instructors, students } =
+        await lessonsService.getLessonCreateFormData();
+
+      const bookedStudentIds = (lesson.bookings || []).map(b => b.studentId);
+
+      res.render('admin/lessonEdit', {
+        title: `Equira - Redigera ${lesson.title}`,
+        lesson,
+        arenas,
+        instructors,
+        students,
+        bookedStudentIds,
+        error: req.query.error || null,
+        layout: 'layouts/adminLayout',
+      });
+    } catch (err) {
+      console.error('Error loading lesson edit form:', err);
+      res.redirect('/admin/lessons?error=' + encodeURIComponent(err.message));
+    }
+  }
+
+  async postLessonEdit(req, res) {
+    try {
+      await lessonsService.updateLesson(req.params.id, req.body);
+      res.redirect(
+        '/admin/lessons?success=' + encodeURIComponent('Lektionen har uppdaterats!'),
+      );
+    } catch (err) {
+      console.error('Error updating lesson:', err);
+      try {
+        const lesson = await lessonsService.getLessonById(req.params.id);
+        const { arenas, instructors, students } =
+          await lessonsService.getLessonCreateFormData();
+        const bookedStudentIds = (lesson?.bookings || []).map(b => b.studentId);
+
+        res.render('admin/lessonEdit', {
+          title: 'Equira - Redigera lektion',
+          lesson: lesson || { id: req.params.id, ...req.body },
+          arenas,
+          instructors,
+          students,
+          bookedStudentIds,
+          error: 'Kunde inte uppdatera lektionen: ' + err.message,
+          layout: 'layouts/adminLayout',
+        });
+      } catch (innerErr) {
+        res.redirect(
+          `/admin/lessons/${req.params.id}/edit?error=` + encodeURIComponent(err.message),
+        );
+      }
+    }
+  }
+
+  async postLessonDelete(req, res) {
+    try {
+      await lessonsService.deleteLesson(req.params.id);
+      res.redirect(
+        '/admin/lessons?success=' + encodeURIComponent('Lektionen har tagits bort.'),
+      );
+    } catch (err) {
+      console.error('Error deleting lesson:', err);
+      res.redirect('/admin/lessons?error=' + encodeURIComponent(err.message));
     }
   }
 
@@ -357,7 +418,6 @@ class AdminController {
     res.render('admin/studentCreate', {
       title: 'Equira - Registrera Elev',
       error: null,
-      formData: {},
       layout: 'layouts/adminLayout',
     });
   }
@@ -377,7 +437,6 @@ class AdminController {
       res.render('admin/studentCreate', {
         title: 'Equira - Registrera Elev',
         error: err.message,
-        formData: req.body,
         layout: 'layouts/adminLayout',
       });
     }
@@ -851,11 +910,9 @@ class AdminController {
     try {
       const quiz = await quizzesService.getQuizById(req.params.id);
       if (!quiz) {
-        return res.status(404).render('error', {
-          message: 'Quizet kunde inte hittas',
-          error: { status: 404 },
-          layout: false,
-        });
+        return res
+          .status(404)
+          .render('error', { message: 'Quizet kunde inte hittas' });
       }
 
       res.render('admin/quizEdit', {
@@ -1012,7 +1069,7 @@ class AdminController {
   async postProfileAvatar(req, res) {
     try {
       if (req.file && req.session.user) {
-        const avatarUrl = '/images/uploads/avatars/' + req.file.filename;
+        const avatarUrl = '/uploads/avatars/' + req.file.filename;
         await profileService.updateAvatar(req.session.user.id, avatarUrl);
         req.session.user.avatarUrl = avatarUrl;
         if (req.setFlash) {
@@ -1064,7 +1121,7 @@ class AdminController {
     }
   }
 
-   /**
+  /**
    * GET /admin/stampling
    * Overview of active staff on site, time punches, filterable logs, and manual punch controls.
    */
@@ -1102,13 +1159,19 @@ class AdminController {
     try {
       await timeTrackingService.manualClockIn(req.body);
       if (req.setFlash) {
-        req.setFlash('success', 'Personal har stämplats in / ny tidsregistrering skapad!');
+        req.setFlash(
+          'success',
+          'Personal har stämplats in / ny tidsregistrering skapad!',
+        );
       }
       res.redirect('/admin/stampling');
     } catch (err) {
       console.error('Error admin clocking in:', err);
       if (req.setFlash) {
-        req.setFlash('error', err.message || 'Kunde inte stämpla in personalen.');
+        req.setFlash(
+          'error',
+          err.message || 'Kunde inte stämpla in personalen.',
+        );
       }
       res.redirect('/admin/stampling');
     }
@@ -1131,7 +1194,10 @@ class AdminController {
     } catch (err) {
       console.error('Error admin clocking out:', err);
       if (req.setFlash) {
-        req.setFlash('error', err.message || 'Kunde inte stämpla ut personalen.');
+        req.setFlash(
+          'error',
+          err.message || 'Kunde inte stämpla ut personalen.',
+        );
       }
       res.redirect('/admin/stampling');
     }
@@ -1144,20 +1210,29 @@ class AdminController {
   async postAdminEditTimeEntry(req, res) {
     try {
       const { id } = req.params;
-      const adminName = req.session.user?.fullName || req.session.user?.username || 'Administratör';
+      const adminName =
+        req.session.user?.fullName ||
+        req.session.user?.username ||
+        'Administratör';
       await timeTrackingService.updateTimeEntry(id, {
         ...req.body,
         adjustedBy: adminName,
       });
 
       if (req.setFlash) {
-        req.setFlash('success', 'Tidsstämpeln har uppdaterats (personalens originalstämpling har bevarats)!');
+        req.setFlash(
+          'success',
+          'Tidsstämpeln har uppdaterats (personalens originalstämpling har bevarats)!',
+        );
       }
       res.redirect('/admin/stampling');
     } catch (err) {
       console.error('Error editing time entry:', err);
       if (req.setFlash) {
-        req.setFlash('error', err.message || 'Kunde inte uppdatera tidsstämpeln.');
+        req.setFlash(
+          'error',
+          err.message || 'Kunde inte uppdatera tidsstämpeln.',
+        );
       }
       res.redirect('/admin/stampling');
     }
@@ -1179,7 +1254,10 @@ class AdminController {
     } catch (err) {
       console.error('Error deleting time entry:', err);
       if (req.setFlash) {
-        req.setFlash('error', err.message || 'Kunde inte ta bort tidsstämpeln.');
+        req.setFlash(
+          'error',
+          err.message || 'Kunde inte ta bort tidsstämpeln.',
+        );
       }
       res.redirect('/admin/stampling');
     }
@@ -1191,10 +1269,13 @@ class AdminController {
    */
   async getStaffSchedule(req, res) {
     try {
-      const month = req.query.month || '2026-09';
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const month = req.query.month || currentMonthKey;
       const staffId = req.query.staffId || null;
 
-      const scheduleData = await staffScheduleService.getMonthlyScheduleOverview(month, staffId);
+      const scheduleData =
+        await staffScheduleService.getMonthlyScheduleOverview(month, staffId);
 
       res.render('admin/staffSchedule', {
         title: 'Equira - Personalschema & Schemaläggning',
@@ -1221,7 +1302,11 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('success', 'Arbetspasset har schemalagts!');
       }
-      const month = req.body.date ? req.body.date.substring(0, 7) : '2026-09';
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const month = req.body.date
+        ? req.body.date.substring(0, 7)
+        : currentMonthKey;
       res.redirect(`/admin/staff-schedule?month=${month}`);
     } catch (err) {
       console.error('Error creating staff shift:', err);
@@ -1242,7 +1327,11 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('success', 'Standardvecka (Mån–Fre) har schemalagts!');
       }
-      const month = req.body.mondayDate ? req.body.mondayDate.substring(0, 7) : '2026-09';
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const month = req.body.mondayDate
+        ? req.body.mondayDate.substring(0, 7)
+        : currentMonthKey;
       res.redirect(`/admin/staff-schedule?month=${month}`);
     } catch (err) {
       console.error('Error quick scheduling week:', err);
@@ -1260,13 +1349,19 @@ class AdminController {
   async postEditStaffShift(req, res) {
     try {
       const { id } = req.params;
-      const adminName = req.session.user?.fullName || req.session.user?.username || 'Administratör';
+      const adminName =
+        req.session.user?.fullName ||
+        req.session.user?.username ||
+        'Administratör';
       await staffScheduleService.updateShift(id, {
         ...req.body,
         adjustedBy: adminName,
       });
       if (req.setFlash) {
-        req.setFlash('success', 'Arbetspasset har uppdaterats (original planerad tid bevarad)!');
+        req.setFlash(
+          'success',
+          'Arbetspasset har uppdaterats (original planerad tid bevarad)!',
+        );
       }
       res.redirect(req.headers.referer || '/admin/staff-schedule');
     } catch (err) {

@@ -16,6 +16,20 @@
     </div>
   </div>
 
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2">
+      <i class="fa-solid fa-circle-check text-emerald-500"></i>
+      <span><%= success %></span>
+    </div>
+  <% } %>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
   <!-- KPI Cards Row (Matching PDF 3 page 4) -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
@@ -97,8 +111,10 @@
           <% data.lessons.forEach(l => { %>
             <tr class="hover:bg-stone-50/80 transition">
               <td class="py-4 px-6 whitespace-nowrap">
-                <div class="font-bold text-stone-900 text-sm"><%= l.title %></div>
-                <div class="text-stone-400 text-[11px]"><%= l.date %> &bull; <%= l.time %> &bull; <%= l.arenaName %></div>
+                <a href="/admin/lessons/<%= l.id %>/edit" class="font-bold text-stone-900 text-sm hover:underline hover:text-[#4a2828] transition block">
+                  <%= l.title %>
+                </a>
+                <div class="text-stone-400 text-[11px] mt-0.5"><%= l.date %> &bull; <%= l.time %> &bull; <%= l.arenaName %></div>
               </td>
 
               <td class="py-4 px-6 whitespace-nowrap">
@@ -135,10 +151,18 @@
               </td>
 
               <td class="py-4 px-6 text-right whitespace-nowrap">
-                <a href="/admin/assign/<%= l.id %>" class="px-3 py-1.5 bg-[#4a2828] hover:bg-[#381e1e] text-white rounded-lg font-medium transition shadow-sm inline-flex items-center gap-1">
-                  <span>Tilldela</span>
-                  <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                </a>
+                <div class="inline-flex items-center justify-end gap-1.5">
+                  <a href="/admin/assign/<%= l.id %>" class="px-2.5 py-1.5 bg-[#4a2828] hover:bg-[#381e1e] text-white rounded-lg font-medium text-xs transition shadow-xs inline-flex items-center gap-1" title="Tilldela hästar">
+                    <span>Tilldela</span>
+                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                  </a>
+                  <a href="/admin/lessons/<%= l.id %>/edit" class="p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition" title="Redigera lektion">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                  </a>
+                  <button type="button" data-id="<%= l.id %>" data-title="<%= l.title %>" onclick="confirmDeleteLesson(this.dataset.id, this.dataset.title)" class="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer" title="Ta bort lektion">
+                    <i class="fa-regular fa-trash-can text-xs"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           <% }); %>
@@ -147,3 +171,16 @@
     </div>
   </div>
 </div>
+
+<!-- Hidden Delete Form -->
+<form id="globalDeleteLessonForm" action="" method="POST" class="hidden"></form>
+
+<script>
+  function confirmDeleteLesson(id, title) {
+    if (confirm(`Är du säker på att du vill ta bort lektionen "${title}"?\n\nDetta raderar lektionspasset och alla tillhörande bokningar permanent.`)) {
+      const form = document.getElementById('globalDeleteLessonForm');
+      form.action = `/admin/lessons/${id}/delete`;
+      form.submit();
+    }
+  }
+</script>

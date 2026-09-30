@@ -2,7 +2,13 @@ const { getDataSource } = require('../../config/database');
 const { hashPassword } = require('../../config/auth');
 const AdminMapper = require('./adminMapper');
 
-
+/**
+ * Service for managing staff members and their profiles.
+ * 
+ * Handles full administrative CRUD operations for staff members, instructors,
+ * and their associated staff profiles.
+ * 
+ */
 class StaffService {
   /**
    * Helper to retrieve a TypeORM repository instance safely.

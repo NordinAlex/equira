@@ -1,5 +1,12 @@
 const { getDataSource } = require('../../config/database');
 
+/**
+ * HorseAllocationService (Admin Domain)
+ * 
+ * SvRF Horse Welfare & Allocation Rules Engine:
+ * Validates and allocates horses according to Svenska Ridsportförbundets (SvRF)
+ * welfare regulations, weight carrying capacity, resting times, and health constraints.
+ */
 class HorseAllocationService {
   /**
    * Helper to retrieve a TypeORM repository instance safely.
