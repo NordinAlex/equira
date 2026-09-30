@@ -44,7 +44,6 @@ function getDateString() {
 
 const staffController = {
 
-
   // =========================
   // STÄMPLING
   // =========================
@@ -88,7 +87,7 @@ const staffController = {
 
     let isClockedIn = false;
     let workedMinutes = 0;
-
+    let checkInTime = null;
     let plannedStartTime = '07:00';
     let plannedEndTime = '16:00';
 
@@ -106,25 +105,29 @@ const staffController = {
       // INSTÄMPLAD
       // =========================
 
-      if (entry.checkInTime && !entry.checkOutTime) {
+      if (
+        entry.checkInTime &&
+        !entry.checkOutTime
+      ) {
 
         isClockedIn = true;
+        checkInTime = entry.checkInTime;
 
-        const checkIn = new Date(entry.checkInTime);
+        const checkIn =
+          new Date(entry.checkInTime);
 
-        const elapsedMinutes = Math.max(
-          0,
-          Math.floor((now - checkIn) / 60000)
-        );
+        const elapsedMinutes =
+          Math.max(
+            0,
+            Math.floor(
+              (now - checkIn) / 60000
+            )
+          );
 
-        const breakMinutes =
-          Number(entry.breakMinutes || 0);
-
-        // Arbetad tid = faktisk tid minus planerad rast
-        workedMinutes = Math.max(
-          0,
-          elapsedMinutes - breakMinutes
-        );
+        // Visa faktisk tid sedan instämpling.
+        // Den schemalagda rasten dras inte av här.
+        workedMinutes =
+          elapsedMinutes;
       }
 
 
@@ -137,35 +140,8 @@ const staffController = {
         entry.checkOutTime
       ) {
 
-        if (
-          entry.durationMinutes !== null &&
-          entry.durationMinutes !== undefined
-        ) {
-          workedMinutes =
-            Number(entry.durationMinutes) || 0;
-        } else {
-
-          const checkIn =
-            new Date(entry.checkInTime);
-
-          const checkOut =
-            new Date(entry.checkOutTime);
-
-          const elapsedMinutes = Math.max(
-            0,
-            Math.floor(
-              (checkOut - checkIn) / 60000
-            )
-          );
-
-          const breakMinutes =
-            Number(entry.breakMinutes || 0);
-
-          workedMinutes = Math.max(
-            0,
-            elapsedMinutes - breakMinutes
-          );
-        }
+        workedMinutes =
+          Number(entry.durationMinutes || 0);
       }
     }
 
@@ -181,7 +157,9 @@ const staffController = {
       workedMinutes % 60;
 
     const workedTime =
-      `${workedHours}h ${String(remainingMinutes).padStart(2, '0')}m`;
+      `${workedHours}h ${String(
+        remainingMinutes
+      ).padStart(2, '0')}m`;
 
 
     // =========================
@@ -210,6 +188,7 @@ const staffController = {
     let progress = 0;
 
     if (totalShiftMinutes > 0) {
+
       progress = Math.min(
         100,
         Math.max(
@@ -240,7 +219,8 @@ const staffController = {
       workedTime,
 
       plannedStartTime,
-      plannedEndTime
+      plannedEndTime,
+      checkInTime
     });
   },
 
@@ -291,7 +271,7 @@ const staffController = {
 
 
     // =========================
-    // FINNS DET EN RAD FÖR IDAG?
+    // HÄMTA EVENTUELL RAD FÖR IDAG
     // =========================
 
     const todayEntry = db.prepare(`
@@ -326,6 +306,7 @@ const staffController = {
       );
 
     }
+
 
     // =========================
     // SKAPA NY RAD
@@ -408,23 +389,25 @@ const staffController = {
     const checkOut =
       now;
 
-    const elapsedMinutes = Math.max(
-      0,
-      Math.floor(
-        (checkOut - checkIn) / 60000
-      )
-    );
-
-
-    const breakMinutes =
-      Number(entry.breakMinutes || 0);
-
-
-    const durationMinutes =
+    const elapsedMinutes =
       Math.max(
         0,
-        elapsedMinutes - breakMinutes
+        Math.floor(
+          (checkOut - checkIn) / 60000
+        )
       );
+
+
+    // =========================
+    // SPARA UTSTÄMPLING
+    // =========================
+
+    // Vi sparar faktisk arbetad tid.
+    // Den schemalagda rasten dras inte bort
+    // automatiskt från ett kort testpass.
+
+    const durationMinutes =
+      elapsedMinutes;
 
 
     // =========================
