@@ -182,9 +182,14 @@
 
   <script>
     function confirmDeleteTask() {
-      if (confirm('Är du säker på att du vill ta bort stalluppgiften "<%= task.title %>"?\n\nÅtgärden kan inte ångras.')) {
-        document.getElementById('deleteTaskForm').submit();
-      }
+      openGlobalDeleteModal({
+        action: '/admin/tasks/<%= task.id %>/delete',
+        title: 'Ta bort stalluppgift?',
+        itemName: '<%= task.title %>',
+        prefix: 'Är du säker på att du vill ta bort stalluppgiften',
+        warning: 'Åtgärden kan inte ångras och tar bort uppgiften permanent.',
+        submitText: 'Ja, ta bort uppgift'
+      });
     }
   </script>
 </div>

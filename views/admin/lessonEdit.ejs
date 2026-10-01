@@ -249,7 +249,14 @@
           <p class="text-xs text-stone-500">
             Om lektionen tas bort raderas passet och alla tillhörande bokningar permanent.
           </p>
-          <button type="button" onclick="openDeleteModal()" class="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+          <button type="button" 
+            data-delete-action="/admin/lessons/<%= lesson.id %>/delete"
+            data-delete-title="Ta bort lektion?"
+            data-delete-item="<%= lesson.title %>"
+            data-delete-prefix="Är du säker på att du vill ta bort lektionspasset"
+            data-delete-warning="Alla kopplade elev- och hästbokningar raderas permanent."
+            data-delete-submit="Ja, ta bort lektion"
+            class="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
             <i class="fa-regular fa-trash-can"></i>
             <span>Ta bort denna lektion</span>
           </button>
@@ -260,55 +267,8 @@
     </div>
   </form>
 
-  <!-- Delete Confirmation Modal -->
-  <div id="deleteModal" onclick="if(event.target === this) closeDeleteModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-        <div>
-          <h3 class="text-base font-bold text-stone-900">Ta bort lektion?</h3>
-          <p class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
-        </div>
-      </div>
-      <p class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-100">
-        Är du säker på att du vill ta bort lektionspasset <strong class="text-stone-900"><%= lesson.title %></strong>? Alla kopplade elev- och hästbokningar raderas permanent.
-      </p>
-      <div class="flex items-center justify-end gap-2.5 pt-2">
-        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
-          Avbryt
-        </button>
-        <form id="deleteLessonForm" action="/admin/lessons/<%= lesson.id %>/delete" method="POST" class="inline m-0 p-0">
-          <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
-            <i class="fa-regular fa-trash-can"></i>
-            <span>Ja, ta bort lektion</span>
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Live Preview & Delete Scripts -->
+<!-- Live Preview Script -->
 <script>
-  function openDeleteModal() {
-    const modal = document.getElementById('deleteModal');
-    if (modal) modal.classList.remove('hidden');
-  }
-
-  function closeDeleteModal() {
-    const modal = document.getElementById('deleteModal');
-    if (modal) modal.classList.add('hidden');
-  }
-
-  function confirmDeleteLesson() {
-    openDeleteModal();
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeDeleteModal();
-  });
 
   document.addEventListener('DOMContentLoaded', () => {
     const titleInput = document.getElementById('lessonTitleInput');

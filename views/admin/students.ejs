@@ -13,21 +13,9 @@
     </div>
   </div>
 
-  <% if (locals.success) { %>
-    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl flex items-center gap-2.5 shadow-sm">
-      <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
-      <span><%= success %></span>
-    </div>
-  <% } %>
 
-  <% if (locals.error) { %>
-    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-sm rounded-xl flex items-center gap-2.5 shadow-sm">
-      <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base"></i>
-      <span><%= error %></span>
-    </div>
-  <% } %>
 
-  <!-- Students Table Container (Matching PDF 3 page 1) -->
+  <!-- Elevregister: Sökfält och tabellöversikt över ridskolans elever -->
   <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
     <div class="p-4 border-b border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div class="flex items-center gap-3 flex-1 max-w-md w-full">
@@ -171,53 +159,7 @@
   </div>
 </div>
 
-<!-- Global Delete Student Confirmation Modal -->
-<div id="globalDeleteStudentModal" onclick="if(event.target === this) closeGlobalDeleteStudentModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4">
-  <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4">
-    <div class="flex items-center gap-3">
-      <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-      </div>
-      <div>
-        <h3 class="text-base font-bold text-stone-900">Ta bort elev?</h3>
-        <p class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
-      </div>
-    </div>
-    <p class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-100">
-      Är du säker på att du vill ta bort eleven <strong class="text-stone-900" id="globalDeleteStudentName">eleven</strong>? Även profil, relaterade bokningar och provresultat raderas permanent.
-    </p>
-    <div class="flex items-center justify-end gap-2.5 pt-2">
-      <button type="button" onclick="closeGlobalDeleteStudentModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
-        Avbryt
-      </button>
-      <form id="globalDeleteStudentForm" action="" method="POST" class="inline m-0 p-0">
-        <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
-          <i class="fa-regular fa-trash-can"></i>
-          <span>Ja, ta bort elev</span>
-        </button>
-      </form>
-    </div>
-  </div>
-</div>
-
 <script>
-  function openGlobalDeleteStudentModal(id, name) {
-    const modal = document.getElementById('globalDeleteStudentModal');
-    const nameEl = document.getElementById('globalDeleteStudentName');
-    const form = document.getElementById('globalDeleteStudentForm');
-    if (nameEl) nameEl.textContent = `"${name || 'eleven'}"`;
-    if (form) form.action = `/admin/students/${id}/delete`;
-    if (modal) modal.classList.remove('hidden');
-  }
-
-  function closeGlobalDeleteStudentModal() {
-    const modal = document.getElementById('globalDeleteStudentModal');
-    if (modal) modal.classList.add('hidden');
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeGlobalDeleteStudentModal();
-  });
 
   document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('studentSearchInput');

@@ -1,0 +1,352 @@
+<%
+  // Resolve any flash or notification message passed from server
+  let alertData = null;
+  if (typeof flash !== 'undefined' && flash) {
+    if (typeof flash === 'string' && flash.trim()) {
+      alertData = { type: 'info', message: flash };
+    } else if (flash.message) {
+      alertData = { type: flash.type || 'info', message: flash.message };
+    }
+  } else if (typeof success !== 'undefined' && success) {
+    alertData = { type: 'success', message: success };
+  } else if (typeof locals !== 'undefined' && locals.success) {
+    alertData = { type: 'success', message: locals.success };
+  } else if (typeof error !== 'undefined' && error) {
+    alertData = { type: 'error', message: error };
+  } else if (typeof locals !== 'undefined' && locals.error) {
+    alertData = { type: 'error', message: locals.error };
+  } else if (typeof warning !== 'undefined' && warning) {
+    alertData = { type: 'warning', message: warning };
+  } else if (typeof locals !== 'undefined' && locals.warning) {
+    alertData = { type: 'warning', message: locals.warning };
+  } else if (typeof info !== 'undefined' && info) {
+    alertData = { type: 'info', message: info };
+  } else if (typeof locals !== 'undefined' && locals.info) {
+    alertData = { type: 'info', message: locals.info };
+  }
+
+  const hasServerAlert = !!alertData;
+  const initialType = alertData ? alertData.type : 'info';
+  const initialMessage = alertData ? alertData.message : '';
+
+  const typeConfig = {
+    success: {
+      bg: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+      icon: 'fa-circle-check text-emerald-600'
+    },
+    error: {
+      bg: 'bg-rose-50 border-rose-200 text-rose-900',
+      icon: 'fa-circle-exclamation text-rose-600'
+    },
+    warning: {
+      bg: 'bg-amber-50 border-amber-200 text-amber-900',
+      icon: 'fa-triangle-exclamation text-amber-600'
+    },
+    info: {
+      bg: 'bg-blue-50 border-blue-200 text-blue-900',
+      icon: 'fa-circle-info text-blue-600'
+    }
+  };
+
+  const initialStyle = typeConfig[initialType] || typeConfig.info;
+%>
+
+<style>
+  @keyframes adminAlertCountdown {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+</style>
+
+<!-- Global Admin Notification Alert Banner -->
+<div id="globalAdminAlertContainer" class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 <%= hasServerAlert ? '' : 'hidden' %>">
+  <div id="globalAdminAlertBox" class="relative overflow-hidden p-4 rounded-2xl border flex items-center justify-between shadow-xs transition-all duration-300 <%= initialStyle.bg %> select-none">
+    <div class="flex items-center gap-3 min-w-0 pr-2">
+      <i id="globalAdminAlertIcon" class="fa-solid <%= initialStyle.icon %> text-lg shrink-0"></i>
+      <span id="globalAdminAlertText" class="text-xs sm:text-sm font-medium leading-relaxed truncate-words"><%= initialMessage %></span>
+    </div>
+    <div class="flex items-center gap-1.5 shrink-0 ml-3">
+      <button type="button" 
+              onclick="closeAdminAlert()" 
+              class="text-stone-400 hover:text-stone-800 p-2 rounded-xl hover:bg-black/5 transition cursor-pointer flex items-center justify-center" 
+              title="Stäng avisering (Ta bort)" 
+              aria-label="Stäng avisering">
+        <i class="fa-solid fa-xmark text-base"></i>
+      </button>
+    </div>
+    <!-- Visual Countdown Progress Line (pauses on hover) -->
+    <div id="globalAdminAlertProgress" class="absolute bottom-0 left-0 h-1 bg-current opacity-25 pointer-events-none rounded-b-2xl"></div>
+  </div>
+</div>
+
+<!-- Global Admin Toast Container for dynamic interactive notifications -->
+<div id="globalAdminToastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none p-4 sm:p-0"></div>
+
+<script>
+  (function() {
+    let alertTimeout = null;
+    let isHovered = false;
+    const DEFAULT_DURATION = 5000; // 5 sekunder
+
+    const styles = {
+      success: {
+        banner: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+        icon: 'fa-circle-check text-emerald-600',
+        toast: 'bg-white border-emerald-200 text-stone-800 shadow-xl'
+      },
+      error: {
+        banner: 'bg-rose-50 border-rose-200 text-rose-900',
+        icon: 'fa-circle-exclamation text-rose-600',
+        toast: 'bg-white border-rose-200 text-stone-800 shadow-xl'
+      },
+      warning: {
+        banner: 'bg-amber-50 border-amber-200 text-amber-900',
+        icon: 'fa-triangle-exclamation text-amber-600',
+        toast: 'bg-white border-amber-200 text-stone-800 shadow-xl'
+      },
+      info: {
+        banner: 'bg-blue-50 border-blue-200 text-blue-900',
+        icon: 'fa-circle-info text-blue-600',
+        toast: 'bg-white border-blue-200 text-stone-800 shadow-xl'
+      }
+    };
+
+    /**
+     * Start the 5-second countdown timer for the top alert banner
+     * Pauses when hovered, resumes when mouse leaves
+     */
+    function startBannerCountdown(duration = DEFAULT_DURATION) {
+      if (alertTimeout) {
+        clearTimeout(alertTimeout);
+        alertTimeout = null;
+      }
+
+      const progressBar = document.getElementById('globalAdminAlertProgress');
+      if (progressBar) {
+        progressBar.style.animation = 'none';
+        void progressBar.offsetWidth; // Force DOM reflow
+        progressBar.style.animation = `adminAlertCountdown ${duration}ms linear forwards`;
+        progressBar.style.animationPlayState = isHovered ? 'paused' : 'running';
+      }
+
+      if (!isHovered && duration > 0) {
+        alertTimeout = setTimeout(() => {
+          if (!isHovered) {
+            closeAdminAlert();
+          }
+        }, duration);
+      }
+    }
+
+    /**
+     * Show or update the top global admin alert banner
+     * @param {'success'|'error'|'warning'|'info'} type
+     * @param {string} message
+     * @param {number} [duration=5000] - Duration in ms (default 5000ms = 5 sekunder)
+     */
+    window.showAdminAlert = function(type, message, duration = DEFAULT_DURATION) {
+      if (!message) return;
+      const container = document.getElementById('globalAdminAlertContainer');
+      const box = document.getElementById('globalAdminAlertBox');
+      const icon = document.getElementById('globalAdminAlertIcon');
+      const text = document.getElementById('globalAdminAlertText');
+
+      if (!container || !box || !text) return;
+
+      const currentStyle = styles[type] || styles.info;
+
+      // Update styling and content
+      box.className = `relative overflow-hidden p-4 rounded-2xl border flex items-center justify-between shadow-xs transition-all duration-300 ${currentStyle.banner} select-none`;
+      if (icon) {
+        icon.className = `fa-solid ${currentStyle.icon} text-lg shrink-0`;
+      }
+      text.textContent = message;
+
+      container.classList.remove('hidden');
+      box.style.opacity = '1';
+      box.style.transform = 'translateY(0)';
+
+      startBannerCountdown(duration);
+    };
+
+    /**
+     * Close the top global admin alert banner with a smooth fade-out
+     */
+    window.closeAdminAlert = function() {
+      if (alertTimeout) {
+        clearTimeout(alertTimeout);
+        alertTimeout = null;
+      }
+      isHovered = false;
+
+      const container = document.getElementById('globalAdminAlertContainer');
+      const box = document.getElementById('globalAdminAlertBox');
+      if (!container || !box) return;
+
+      box.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      box.style.opacity = '0';
+      box.style.transform = 'translateY(-8px)';
+
+      setTimeout(() => {
+        container.classList.add('hidden');
+      }, 3000);
+    };
+
+    /**
+     * Show a sleek floating toast notification in the top right
+     * Stays for 5 seconds and pauses on hover as well
+     * @param {string} message
+     * @param {'success'|'error'|'warning'|'info'} [type='info']
+     * @param {number} [duration=5000]
+     */
+    window.showToast = function(message, type = 'info', duration = DEFAULT_DURATION) {
+      const toastContainer = document.getElementById('globalAdminToastContainer');
+      if (!toastContainer || !message) return;
+
+      const currentStyle = styles[type] || styles.info;
+      const toast = document.createElement('div');
+      toast.className = `relative overflow-hidden pointer-events-auto border rounded-2xl p-4 flex items-center gap-3 backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0 ${currentStyle.toast}`;
+
+      toast.innerHTML = `
+        <i class="fa-solid ${currentStyle.icon} text-lg shrink-0"></i>
+        <div class="flex-1 text-xs sm:text-sm font-medium leading-snug">${message}</div>
+        <button type="button" class="text-stone-400 hover:text-stone-800 p-1.5 rounded-xl hover:bg-stone-100 transition cursor-pointer shrink-0" title="Stäng (Ta bort)" aria-label="Stäng">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+        <div class="toast-progress absolute bottom-0 left-0 h-1 bg-current opacity-20 pointer-events-none rounded-b-2xl"></div>
+      `;
+
+      const progressBar = toast.querySelector('.toast-progress');
+      if (progressBar) {
+        progressBar.style.animation = `adminAlertCountdown ${duration}ms linear forwards`;
+      }
+
+      let toastTimeout = null;
+      let toastHovered = false;
+
+      const removeToast = () => {
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-8px)';
+        setTimeout(() => toast.remove(), 3000);
+      };
+
+      const startToastCountdown = () => {
+        if (toastTimeout) clearTimeout(toastTimeout);
+        if (progressBar) {
+          progressBar.style.animation = 'none';
+          void progressBar.offsetWidth;
+          progressBar.style.animation = `adminAlertCountdown ${DEFAULT_DURATION}ms linear forwards`;
+          progressBar.style.animationPlayState = 'running';
+        }
+        toastTimeout = setTimeout(() => {
+          if (!toastHovered) {
+            removeToast();
+          }
+        }, DEFAULT_DURATION);
+      };
+
+      toast.addEventListener('mouseenter', () => {
+        toastHovered = true;
+        if (toastTimeout) {
+          clearTimeout(toastTimeout);
+          toastTimeout = null;
+        }
+        if (progressBar) {
+          progressBar.style.animationPlayState = 'paused';
+        }
+      });
+
+      toast.addEventListener('mouseleave', () => {
+        toastHovered = false;
+        startToastCountdown();
+      });
+
+      const closeBtn = toast.querySelector('button');
+      if (closeBtn) closeBtn.onclick = removeToast;
+
+      toastContainer.appendChild(toast);
+
+      // Trigger enter animation
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      startToastCountdown();
+    };
+
+    // Attach hover listeners to the main banner alert box
+    document.addEventListener('DOMContentLoaded', function() {
+      const alertBox = document.getElementById('globalAdminAlertBox');
+      const alertContainer = document.getElementById('globalAdminAlertContainer');
+
+      if (alertBox) {
+        // Pause timer when mouse is over the alert
+        alertBox.addEventListener('mouseenter', function() {
+          isHovered = true;
+          if (alertTimeout) {
+            clearTimeout(alertTimeout);
+            alertTimeout = null;
+          }
+          const progressBar = document.getElementById('globalAdminAlertProgress');
+          if (progressBar) {
+            progressBar.style.animationPlayState = 'paused';
+          }
+        });
+
+        // Resume / start 5 seconds countdown when mouse leaves the alert
+        alertBox.addEventListener('mouseleave', function() {
+          isHovered = false;
+          startBannerCountdown(DEFAULT_DURATION);
+        });
+      }
+
+      // If alert was rendered directly from server (flash / success / error)
+      if (alertContainer && !alertContainer.classList.contains('hidden') && alertBox) {
+        startBannerCountdown(DEFAULT_DURATION);
+      }
+
+      // Auto-detect and handle URL query parameters (?success=..., ?error=..., ?deleted=1)
+      const params = new URLSearchParams(window.location.search);
+      const successParam = params.get('success');
+      const errorParam = params.get('error');
+      const warningParam = params.get('warning');
+      const infoParam = params.get('info') || params.get('message');
+      const deletedParam = params.get('deleted');
+
+      let queryMessage = null;
+      let queryType = 'info';
+
+      if (successParam) {
+        queryMessage = successParam;
+        queryType = 'success';
+      } else if (deletedParam) {
+        queryMessage = 'Objektet har raderats permanent.';
+        queryType = 'success';
+      } else if (errorParam) {
+        queryMessage = errorParam;
+        queryType = 'error';
+      } else if (warningParam) {
+        queryMessage = warningParam;
+        queryType = 'warning';
+      } else if (infoParam) {
+        queryMessage = infoParam;
+        queryType = 'info';
+      }
+
+      if (queryMessage) {
+        showAdminAlert(queryType, queryMessage, DEFAULT_DURATION);
+
+        // Clean query parameters from URL without page reload
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('success');
+        cleanUrl.searchParams.delete('error');
+        cleanUrl.searchParams.delete('warning');
+        cleanUrl.searchParams.delete('info');
+        cleanUrl.searchParams.delete('message');
+        cleanUrl.searchParams.delete('deleted');
+        window.history.replaceState({}, document.title, cleanUrl.pathname + (cleanUrl.search ? '?' + cleanUrl.searchParams.toString() : ''));
+      }
+    });
+  })();
+</script>

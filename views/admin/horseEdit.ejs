@@ -303,9 +303,14 @@
 <!-- Horse Photo Live Preview & Delete Scripts -->
 <script>
   function confirmDeleteHorse() {
-    if (confirm('Är du säker på att du vill ta bort hästen "<%= horse.name %>"?\n\nDetta raderar hästprofilen permanent.')) {
-      document.getElementById('deleteHorseForm').submit();
-    }
+    openGlobalDeleteModal({
+      action: '/admin/horses/<%= horse.id %>/delete',
+      title: 'Ta bort häst?',
+      itemName: '<%= horse.name %>',
+      prefix: 'Är du säker på att du vill ta bort hästen',
+      warning: 'Hästprofilen, historik och kopplingar raderas permanent.',
+      submitText: 'Ja, ta bort häst'
+    });
   }
 
   document.addEventListener('DOMContentLoaded', () => {

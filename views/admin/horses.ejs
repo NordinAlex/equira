@@ -13,7 +13,7 @@
     </div>
   </div>
 
-  <!-- KPI Metrics Bar (Matching PDF 3 page 2) -->
+  <!-- Nyckeltalsöversikt: Totalt antal hästar, lediga och vilande -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
     <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
       <div>
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <!-- Filter Pills Bar (Matching PDF 3 page 2) -->
+  <!-- Filterknappar: Filtrera hästar efter tillgänglighet och nivå -->
   <div class="flex items-center gap-2 overflow-x-auto no-scrollbar touch-scroll pb-1 text-xs font-medium">
     <a href="/admin/horses?filter=all" class="px-4 py-2 rounded-xl whitespace-nowrap transition <%= data.currentFilter === 'all' ? 'bg-stone-800 text-white font-semibold shadow-sm' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50' %>">
       Alla hästar
@@ -65,7 +65,7 @@
     </a>
   </div>
 
-  <!-- Horse Cards Grid (Matching PDF 3 page 2) -->
+  <!-- Hästkatalog: Kortvy med profil, utbildningsnivå, maxvikt och snabbåtgärder -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
     <% data.horses.forEach(horse => { %>
       <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden flex flex-col hover-lift">

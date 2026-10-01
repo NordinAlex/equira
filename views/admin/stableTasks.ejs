@@ -14,21 +14,9 @@
     </div>
   </div>
 
-  <% if (locals.success) { %>
-    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl flex items-center gap-2.5 shadow-sm">
-      <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
-      <span><%= success %></span>
-    </div>
-  <% } %>
 
-  <% if (locals.error) { %>
-    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-sm rounded-xl flex items-center gap-2.5 shadow-sm">
-      <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base"></i>
-      <span><%= error %></span>
-    </div>
-  <% } %>
 
-  <!-- Aktuella Uppgifter Section (Matching PDF 3 page 12) -->
+  <!-- Aktuella och pågående stalluppgifter -->
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-base sm:text-lg font-bold text-stone-900">
@@ -71,12 +59,18 @@
               <i class="fa-solid fa-pen-to-square text-[11px]"></i>
               <span>Redigera</span>
             </a>
-            <form action="/admin/tasks/<%= task.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Är du säker på att du vill ta bort stalluppgiften &quot;<%= task.title %>&quot;?');">
-              <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold rounded-xl transition" title="Ta bort stalluppgift">
-                <i class="fa-regular fa-trash-can text-[11px]"></i>
-                <span>Ta bort</span>
-              </button>
-            </form>
+            <button type="button" 
+              data-delete-action="/admin/tasks/<%= task.id %>/delete"
+              data-delete-title="Ta bort stalluppgift?"
+              data-delete-item="<%= task.title %>"
+              data-delete-prefix="Är du säker på att du vill ta bort stalluppgiften"
+              data-delete-warning="Uppgiften tas bort från schemat permanent."
+              data-delete-submit="Ja, ta bort uppgift"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold rounded-xl transition cursor-pointer" 
+              title="Ta bort stalluppgift">
+              <i class="fa-regular fa-trash-can text-[11px]"></i>
+              <span>Ta bort</span>
+            </button>
             <form action="/staff/tasks/<%= task.id %>/complete" method="POST" class="inline">
               <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow-sm flex items-center gap-1.5">
                 <i class="fa-regular fa-circle-check"></i>
@@ -89,7 +83,7 @@
     </div>
   </div>
 
-  <!-- Klara Uppgifter Section (Matching PDF 3 page 12) -->
+  <!-- Slutförda och kvitterade stalluppgifter (Dagens historik) -->
   <div class="space-y-4 pt-4 border-t border-stone-200">
     <div class="flex items-center justify-between">
       <h3 class="text-base sm:text-lg font-bold text-stone-900">
@@ -117,11 +111,17 @@
             <a href="/admin/tasks/<%= task.id %>/edit" class="p-2 text-stone-400 hover:text-stone-700 hover:bg-stone-200/60 rounded-lg transition" title="Redigera">
               <i class="fa-solid fa-pen-to-square text-xs"></i>
             </a>
-            <form action="/admin/tasks/<%= task.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Är du säker på att du vill ta bort stalluppgiften &quot;<%= task.title %>&quot;?');">
-              <button type="submit" class="p-2 text-rose-400 hover:text-rose-700 hover:bg-rose-100/60 rounded-lg transition" title="Ta bort">
-                <i class="fa-regular fa-trash-can text-xs"></i>
-              </button>
-            </form>
+            <button type="button" 
+              data-delete-action="/admin/tasks/<%= task.id %>/delete"
+              data-delete-title="Ta bort stalluppgift?"
+              data-delete-item="<%= task.title %>"
+              data-delete-prefix="Är du säker på att du vill ta bort stalluppgiften"
+              data-delete-warning="Den slutförda uppgiften och dess historik tas bort permanent."
+              data-delete-submit="Ja, ta bort uppgift"
+              class="p-2 text-rose-400 hover:text-rose-700 hover:bg-rose-100/60 rounded-lg transition cursor-pointer" 
+              title="Ta bort">
+              <i class="fa-regular fa-trash-can text-xs"></i>
+            </button>
           </div>
         </div>
       <% }); %>

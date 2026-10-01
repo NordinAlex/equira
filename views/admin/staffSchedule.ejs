@@ -39,30 +39,7 @@
     </div>
   </div>
 
-  <!-- Success / Error Alert Banners -->
-  <% if (locals.success) { %>
-    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm rounded-2xl flex items-center justify-between shadow-xs">
-      <div class="flex items-center gap-3">
-        <i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>
-        <span><%= success %></span>
-      </div>
-      <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700 cursor-pointer">
-        <i class="fa-solid fa-xmark text-sm"></i>
-      </button>
-    </div>
-  <% } %>
 
-  <% if (locals.error) { %>
-    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm rounded-2xl flex items-center justify-between shadow-xs">
-      <div class="flex items-center gap-3">
-        <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base"></i>
-        <span><%= error %></span>
-      </div>
-      <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 cursor-pointer">
-        <i class="fa-solid fa-xmark text-sm"></i>
-      </button>
-    </div>
-  <% } %>
 
   <!-- KPI / Stats Overview Row -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -773,17 +750,18 @@
   }
 
   function openConfirmDeleteShiftModal(shiftId, detailsText) {
-    const modal = document.getElementById('deleteShiftModal');
-    const form = document.getElementById('deleteShiftForm');
-    const text = document.getElementById('deleteShiftDetailsText');
-    if (form) form.action = `/admin/staff-schedule/delete/${shiftId}`;
-    if (text) text.textContent = detailsText || 'arbetspasset';
-    if (modal) modal.classList.remove('hidden');
+    openGlobalDeleteModal({
+      action: `/admin/staff-schedule/delete/${shiftId}`,
+      title: 'Ta bort arbetspass?',
+      itemName: detailsText || 'arbetspasset',
+      prefix: 'Är du säker på att du vill ta bort',
+      warning: 'Passet tas bort permanent från schemat.',
+      submitText: 'Ja, ta bort pass'
+    });
   }
 
   function closeDeleteShiftModal() {
-    const modal = document.getElementById('deleteShiftModal');
-    if (modal) modal.classList.add('hidden');
+    closeGlobalDeleteModal();
   }
 
   function triggerDeleteCurrentShift() {
@@ -801,31 +779,3 @@
   });
 </script>
 
-<!-- Delete Shift Confirmation Modal -->
-<div id="deleteShiftModal" onclick="if(event.target === this) closeDeleteShiftModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4">
-  <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4">
-    <div class="flex items-center gap-3">
-      <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-      </div>
-      <div>
-        <h3 class="text-base font-bold text-stone-900">Ta bort arbetspass?</h3>
-        <p class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
-      </div>
-    </div>
-    <p class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-100">
-      Är du säker på att du vill ta bort <strong class="text-stone-900" id="deleteShiftDetailsText">arbetspasset</strong>? Passet tas bort permanent från schemat.
-    </p>
-    <div class="flex items-center justify-end gap-2.5 pt-2">
-      <button type="button" onclick="closeDeleteShiftModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
-        Avbryt
-      </button>
-      <form id="deleteShiftForm" action="" method="POST" class="inline m-0 p-0">
-        <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
-          <i class="fa-regular fa-trash-can"></i>
-          <span>Ja, ta bort pass</span>
-        </button>
-      </form>
-    </div>
-  </div>
-</div>
