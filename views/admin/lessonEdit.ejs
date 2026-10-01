@@ -134,7 +134,12 @@
               <select id="lessonArenaSelect" name="arenaId" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
                 <option value="">Ingen vald</option>
                 <% arenas.forEach(arena => { %>
-                  <option value="<%= arena.id %>" <%= lesson.arenaId === arena.id ? 'selected' : '' %> data-name="<%= arena.name %>" data-dimensions="<%= arena.dimensions || '20×60m' %>">
+                  <option value="<%= arena.id %>" 
+                          <%= lesson.arenaId === arena.id ? 'selected' : '' %> 
+                          data-image="<%= arena.imageUrl || (arena.isIndoor ? '/images/arena-preview.jpg' : '/images/arena-outdoor.jpg') %>"
+                          data-surface="<%= arena.surfaceType || 'Fibersand' %>"
+                          data-name="<%= arena.name %>" 
+                          data-dimensions="<%= arena.dimensions || '20×60m' %>">
                     <%= arena.name %> (<%= arena.dimensions || '20×60m' %>, <%= arena.surfaceType || 'Fibersand' %>)
                   </option>
                 <% }); %>
@@ -223,6 +228,18 @@
               <span class="text-stone-600 font-medium">Inbokade:</span>
               <span id="previewBooked" class="font-bold text-stone-900"><%= bookedStudentIds.length %> deltagare</span>
             </div>
+
+            <div class="rounded-xl overflow-hidden h-32 relative shadow-inner bg-stone-100 group">
+              <img id="previewLessonImage" 
+                   src="<%= (lesson.arena && lesson.arena.imageUrl) || (lesson.arena && lesson.arena.isIndoor ? '/images/arena-preview.jpg' : '/images/arena-outdoor.jpg') %>" 
+                   alt="Förhandsgranskning av Ridbana" 
+                   class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                   onerror="this.onerror=null; this.src='/images/arena-preview.jpg';">
+              <div id="previewSurfaceBadge" class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-white text-[10px] font-medium flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-layer-group text-[9px] text-amber-300"></i>
+                <span id="previewSurfaceText">Underlag: <%= (lesson.arena && lesson.arena.surfaceType) || 'Fibersand' %></span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -298,7 +315,18 @@
       if (arenaSelect && previewArena) {
         const opt = arenaSelect.options[arenaSelect.selectedIndex];
         const name = opt ? (opt.getAttribute('data-name') || opt.text) : 'Ridhus';
+        const img = opt ? opt.getAttribute('data-image') : null;
+        const surf = opt ? opt.getAttribute('data-surface') : null;
+
         previewArena.innerHTML = `<i class="fa-solid fa-location-dot mr-1"></i> ${name}`;
+        if (img) {
+          const previewImg = document.getElementById('previewLessonImage');
+          if (previewImg) previewImg.src = img;
+        }
+        if (surf) {
+          const surfEl = document.getElementById('previewSurfaceText');
+          if (surfEl) surfEl.textContent = `Underlag: ${surf}`;
+        }
       }
       if (startInput && endInput && previewTime) {
         previewTime.textContent = `${startInput.value || '17:30'} - ${endInput.value || '18:30'}`;

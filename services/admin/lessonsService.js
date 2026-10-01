@@ -173,7 +173,11 @@ class LessonsService {
     const arenaRepo = await this._getRepository('Arena');
     const userRepo = await this._getRepository('User');
 
-    const arenas = await arenaRepo.find();
+    const rawArenas = await arenaRepo.find();
+    const arenas = rawArenas.map(a => ({
+      ...a,
+      imageUrl: a.imageUrl || (a.isIndoor ? '/images/arena-preview.jpg' : '/images/arena-outdoor.jpg'),
+    }));
     const instructors = await userRepo
       .createQueryBuilder('u')
       .innerJoinAndSelect('u.staffProfile', 'staffProfile')

@@ -132,6 +132,12 @@
             config.prefix = 'Är du säker på att du vill ta bort quizet';
             config.warning = 'Alla frågor i detta quiz raderas permanent.';
             config.submitText = 'Ja, ta bort quiz';
+          } else if (currentPath.includes('/arenas')) {
+            config.action = `/admin/arenas/${id}/delete`;
+            config.title = 'Ta bort ridbana?';
+            config.prefix = 'Är du säker på att du vill ta bort ridbanan';
+            config.warning = 'Ridbanan raderas permanent. Schemalagda lektioner avlänkas automatiskt.';
+            config.submitText = 'Ja, ta bort ridbana';
           } else {
             config.action = `${currentPath.replace(/\/$/, '')}/${id}/delete`;
           }

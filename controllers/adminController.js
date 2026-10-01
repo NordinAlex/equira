@@ -9,6 +9,7 @@ const staffService = require('../services/admin/staffService');
 const profileService = require('../services/admin/profileService');
 const timeTrackingService = require('../services/admin/timeTrackingService');
 const staffScheduleService = require('../services/admin/staffScheduleService');
+const arenasService = require('../services/admin/arenasService');
 const AdminViewModel = require('../models/viewModels/admin/AdminViewModel');
 
 /**
@@ -1400,6 +1401,160 @@ class AdminController {
         req.setFlash('error', err.message || 'Kunde inte ta bort passet.');
       }
       res.redirect('/admin/staff-schedule?error=' + encodeURIComponent(err.message || 'Kunde inte ta bort passet.'));
+    }
+  }
+
+  // ==========================================
+  // ARENA / RIDBANA MANAGEMENT (CRUD)
+  // ==========================================
+
+  /**
+   * GET /admin/arenas
+   * Displays the arena registry overview with KPI cards, indoor/outdoor filters, and search.
+   */
+  async getArenas(req, res) {
+    try {
+      const filter = req.query.filter || 'all';
+      const arenas = await arenasService.getArenas(filter);
+      const kpis = arenasService.getArenaKPIs(arenas);
+
+      res.render('admin/arenas', {
+        title: 'Equira - Ridbanor & Arenor',
+        arenas,
+        kpis,
+        filter,
+        success: req.query.success,
+        error: req.query.error,
+        layout: 'layouts/adminLayout',
+      });
+    } catch (err) {
+      console.error('Error loading arenas:', err);
+      res.status(500).render('error', {
+        message: 'Kunde inte läsa in ridbanorna',
+        error: err,
+      });
+    }
+  }
+
+  /**
+   * GET /admin/arenas/create
+   * Displays the creation form for a new riding arena.
+   */
+  async getArenaCreate(req, res) {
+    res.render('admin/arenaCreate', {
+      title: 'Equira - Skapa Ridbana',
+      arena: {
+        name: '',
+        dimensions: '20×60m',
+        surfaceType: 'Fibersand',
+        isIndoor: true,
+        notes: '',
+      },
+      error: null,
+      layout: 'layouts/adminLayout',
+    });
+  }
+
+  /**
+   * POST /admin/arenas/create
+   * Handles creation submission for a new riding arena.
+   */
+  async postArenaCreate(req, res) {
+    try {
+      if (req.file) {
+        req.body.imageUrl = '/images/uploads/arenas/' + req.file.filename;
+      }
+      const newArena = await arenasService.createArena(req.body);
+      const successMsg = `Ridbanan "${newArena.name}" har skapats!`;
+      if (req.setFlash) {
+        req.setFlash('success', successMsg);
+      }
+      res.redirect('/admin/arenas?success=' + encodeURIComponent(successMsg));
+    } catch (err) {
+      console.error('Error creating arena:', err);
+      res.render('admin/arenaCreate', {
+        title: 'Equira - Skapa Ridbana',
+        arena: {
+          name: req.body.name || '',
+          dimensions: req.body.dimensions || '',
+          surfaceType: req.body.surfaceType || '',
+          isIndoor: req.body.isIndoor === 'true' || req.body.isIndoor === true || req.body.isIndoor === '1' || req.body.isIndoor === 'on',
+          notes: req.body.notes || '',
+          imageUrl: req.body.imageUrl || '',
+        },
+        error: 'Kunde inte skapa ridbanan: ' + (err.message || 'Okänt fel inträffade.'),
+        layout: 'layouts/adminLayout',
+      });
+    }
+  }
+
+  /**
+   * GET /admin/arenas/:id/edit
+   * Displays the edit form for an existing arena.
+   */
+  async getArenaEdit(req, res) {
+    try {
+      const arena = await arenasService.getArenaById(req.params.id);
+      if (!arena) {
+        return res.redirect(
+          '/admin/arenas?error=' + encodeURIComponent('Ridbanan kunde inte hittas.'),
+        );
+      }
+
+      res.render('admin/arenaEdit', {
+        title: `Equira - Redigera ${arena.name}`,
+        arena,
+        error: null,
+        layout: 'layouts/adminLayout',
+      });
+    } catch (err) {
+      console.error('Error loading arena for edit:', err);
+      res.redirect('/admin/arenas?error=' + encodeURIComponent(err.message));
+    }
+  }
+
+  /**
+   * POST /admin/arenas/:id/edit
+   * Updates an existing arena.
+   */
+  async postArenaEdit(req, res) {
+    try {
+      if (req.file) {
+        req.body.imageUrl = '/images/uploads/arenas/' + req.file.filename;
+      }
+      const updatedArena = await arenasService.updateArena(req.params.id, req.body);
+      const successMsg = `Ridbanan "${updatedArena.name}" har uppdaterats!`;
+      if (req.setFlash) {
+        req.setFlash('success', successMsg);
+      }
+      res.redirect('/admin/arenas?success=' + encodeURIComponent(successMsg));
+    } catch (err) {
+      console.error('Error updating arena:', err);
+      const arena = await arenasService.getArenaById(req.params.id);
+      res.render('admin/arenaEdit', {
+        title: 'Equira - Redigera ridbana',
+        arena: arena || { id: req.params.id, ...req.body },
+        error: 'Kunde inte uppdatera ridbanan: ' + (err.message || 'Okänt fel inträffade.'),
+        layout: 'layouts/adminLayout',
+      });
+    }
+  }
+
+  /**
+   * POST /admin/arenas/:id/delete
+   * Removes an arena and unlinks any associated lessons.
+   */
+  async postArenaDelete(req, res) {
+    try {
+      await arenasService.deleteArena(req.params.id);
+      const successMsg = 'Ridbanan har tagits bort.';
+      if (req.setFlash) {
+        req.setFlash('success', successMsg);
+      }
+      res.redirect('/admin/arenas?success=' + encodeURIComponent(successMsg));
+    } catch (err) {
+      console.error('Error deleting arena:', err);
+      res.redirect('/admin/arenas?error=' + encodeURIComponent(err.message || 'Kunde inte ta bort ridbanan.'));
     }
   }
 }
