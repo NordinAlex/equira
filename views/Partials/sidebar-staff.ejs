@@ -2,56 +2,157 @@
 
     <!-- Logga -->
     <div class="flex items-start gap-2 ml-4 mt-7">
+
         <!-- Ikon -->
-<div class="bg-[#2c1a0e] rounded-xl p-3">
-  <img src="/images/horseshoe.png" alt="Equira logga" class="w-8 h-8 object-contain" />
-</div>
-        <div class="flex flex-col">
-            <h1 class="text-3xl font-bold">Equira</h1>
-            <p class="text-gray-500 text-sm">Stallportal</p>
+        <div class="bg-[#2c1a0e] rounded-xl p-3">
+
+            <img
+                src="/images/horseshoe.png"
+                alt="Equira logga"
+                class="w-8 h-8 object-contain"
+            />
+
         </div>
+
+        <div class="flex flex-col">
+
+            <h1 class="text-3xl font-bold">
+                Equira
+            </h1>
+
+            <p class="text-gray-500 text-sm">
+                Stallportal
+            </p>
+
+        </div>
+
     </div>
+
 
     <!-- Meny -->
     <nav
-        class="flex flex-col font-bold text-gray-500 gap-7 mt-6 ml-4 [&>a]:rounded-lg [&>a]:hover:bg-gray-200 [&>a]:py-2 [&>a]:px-2">
-        <a href="/staff/time-tracking"
-            class="<%= currentPage === 'time-tracking' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
-            <i class="mr-2 fa-regular fa-clock"></i>Stämpling
+        class="flex flex-col font-bold text-gray-500 gap-7 mt-6 ml-4 [&>a]:rounded-lg [&>a]:hover:bg-gray-200 [&>a]:py-2 [&>a]:px-2"
+    >
+
+        <a
+            href="/staff/time-tracking"
+            class="<%= currentPage === 'time-tracking' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>"
+        >
+
+            <i class="mr-2 fa-regular fa-clock"></i>
+
+            Stämpling
+
         </a>
-        <a href="/staff/overview"
-            class="<%= currentPage === 'overview-staff' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
-            <i class="mr-2 fa-regular fa-calendar-days"></i>Översikt
+
+
+        <a
+            href="/staff/overview"
+            class="<%= currentPage === 'overview-staff' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>"
+        >
+
+            <i class="mr-2 fa-regular fa-calendar-days"></i>
+
+            Översikt
+
         </a>
-        <a href="/staff/tasks"
-            class="<%= currentPage === 'tasks' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
-            <i class="mr-2 fa-solid fa-list-check"></i>Uppgifter
+
+
+        <a
+            href="/staff/tasks"
+            class="<%= currentPage === 'tasks' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>"
+        >
+
+            <i class="mr-2 fa-solid fa-list-check"></i>
+
+            Uppgifter
+
         </a>
-        <a href="/staff/horses" class="<%= currentPage === 'horses' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
-  <img src="/images/horseshoe.svg" alt="Equira logga" class="w-4 h-4 object-contain inline mr-2 opacity-60">Hästar
-</a>
-        <a href="/staff/schedule"
-            class="<%= currentPage === 'schedule' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
-            <i class="mr-2 fa-regular fa-calendar-days"></i>Schema
+
+
+        <a
+            href="/staff/horses"
+            class="<%= currentPage === 'horses' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>"
+        >
+
+            <img
+                src="/images/horseshoe.svg"
+                alt="Equira logga"
+                class="w-4 h-4 object-contain inline mr-2 opacity-60"
+            >
+
+            Hästar
+
         </a>
-        <a href="/staff/profile"
-            class="<%= currentPage === 'profile' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>">
-            <i class="mr-2 fa-regular fa-circle-user"></i>Profil
+
+
+        <a
+            href="/staff/schedule"
+            class="<%= currentPage === 'schedule' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>"
+        >
+
+            <i class="mr-2 fa-regular fa-calendar-days"></i>
+
+            Schema
+
         </a>
+
+
+        <a
+            href="/staff/profile"
+            class="<%= currentPage === 'profile' ? 'text-gray-900 bg-gray-200 border-r-4 border-gray-900' : '' %>"
+        >
+
+            <i class="mr-2 fa-regular fa-circle-user"></i>
+
+            Profil
+
+        </a>
+
     </nav>
+
 
     <!-- Användare längst ner -->
     <div class="mt-auto pb-6 flex flex-col gap-3 ml-4">
+
         <div class="flex items-center gap-3">
-            <img src="/images/avatar.jpg" alt="avatar" class="size-10 rounded-full object-cover" />
+
+            <img
+                src="<%= typeof user !== 'undefined' && user.avatarUrl ? user.avatarUrl : '/images/avatar.jpg' %>"
+                class="size-16 rounded-full object-cover"
+                alt="Profilbild"
+            />
+
             <div>
-                <p class="text-sm font-semibold text-gray-900">Johan Svensson</p>
-                <p class="text-xs text-gray-500">Stallpersonal</p>
+
+                <h2 class="text-sm font-bold">
+
+                    <%= typeof user !== 'undefined' && (user.fullName || user.fullname)
+                        ? (user.fullName || user.fullname)
+                        : 'Personal' %>
+
+                </h2>
+
+                <p class="text-xs text-gray-500">
+                    Stallpersonal
+                </p>
+
             </div>
+
         </div>
-        <a href="/logout" class="text-sm hover:text-red-700">
-            <i class="mr-2 fa-solid fa-right-from-bracket"></i>Logga ut
+
+
+        <a
+            href="/logout"
+            class="text-sm hover:text-red-700"
+        >
+
+            <i class="mr-2 fa-solid fa-right-from-bracket"></i>
+
+            Logga ut
+
         </a>
+
     </div>
 
 </div>

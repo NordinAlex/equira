@@ -7,6 +7,7 @@ const db = require('better-sqlite3')('data/equira.sqlite');
 // =========================
 
 function getDateString() {
+
   const now = new Date();
 
   const days = [
@@ -39,10 +40,31 @@ function getDateString() {
 
 
 // =========================
+// HJÄLPFUNKTION FÖR INLOGGAD ANVÄNDARE
+// =========================
+
+function getCurrentUser(req) {
+
+  const userId = req.session?.user?.id;
+
+  if (!userId) {
+    return null;
+  }
+
+  return db.prepare(`
+    SELECT id, username, email, fullName, phone, avatarUrl, role
+    FROM users
+    WHERE id = ?
+  `).get(userId);
+}
+
+
+// =========================
 // STAFF CONTROLLER
 // =========================
 
 const staffController = {
+
 
   // =========================
   // STÄMPLING
@@ -56,14 +78,26 @@ const staffController = {
       return res.redirect('/login');
     }
 
+    const user = getCurrentUser(req);
+
+    if (!user) {
+      return res.redirect('/login');
+    }
+
     const now = new Date();
 
-    // Aktuell tid
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const currentTime = `${hours}:${minutes}`;
+    const hours =
+      String(now.getHours()).padStart(2, '0');
+
+    const minutes =
+      String(now.getMinutes()).padStart(2, '0');
+
+    const currentTime =
+      `${hours}:${minutes}`;
+
 
     // Dagens datum
+
     const date = [
       now.getFullYear(),
       String(now.getMonth() + 1).padStart(2, '0'),
@@ -88,6 +122,7 @@ const staffController = {
     let isClockedIn = false;
     let workedMinutes = 0;
     let checkInTime = null;
+
     let plannedStartTime = '07:00';
     let plannedEndTime = '16:00';
 
@@ -111,10 +146,14 @@ const staffController = {
       ) {
 
         isClockedIn = true;
-        checkInTime = entry.checkInTime;
+
+        checkInTime =
+          entry.checkInTime;
+
 
         const checkIn =
           new Date(entry.checkInTime);
+
 
         const elapsedMinutes =
           Math.max(
@@ -124,8 +163,7 @@ const staffController = {
             )
           );
 
-        // Visa faktisk tid sedan instämpling.
-        // Den schemalagda rasten dras inte av här.
+
         workedMinutes =
           elapsedMinutes;
       }
@@ -156,6 +194,7 @@ const staffController = {
     const remainingMinutes =
       workedMinutes % 60;
 
+
     const workedTime =
       `${workedHours}h ${String(
         remainingMinutes
@@ -166,39 +205,59 @@ const staffController = {
     // PROGRESS
     // =========================
 
-    const [startHour, startMinute] =
-      plannedStartTime.split(':').map(Number);
+    const [
+      startHour,
+      startMinute
+    ] =
+      plannedStartTime
+        .split(':')
+        .map(Number);
 
-    const [endHour, endMinute] =
-      plannedEndTime.split(':').map(Number);
+
+    const [
+      endHour,
+      endMinute
+    ] =
+      plannedEndTime
+        .split(':')
+        .map(Number);
+
 
     const shiftStart =
-      startHour * 60 + startMinute;
+      startHour * 60 +
+      startMinute;
+
 
     const shiftEnd =
-      endHour * 60 + endMinute;
+      endHour * 60 +
+      endMinute;
+
 
     const totalShiftMinutes =
       shiftEnd - shiftStart;
+
 
     const currentMinutes =
       now.getHours() * 60 +
       now.getMinutes();
 
+
     let progress = 0;
+
 
     if (totalShiftMinutes > 0) {
 
-      progress = Math.min(
-        100,
-        Math.max(
-          0,
-          (
-            (currentMinutes - shiftStart) /
-            totalShiftMinutes
-          ) * 100
-        )
-      );
+      progress =
+        Math.min(
+          100,
+          Math.max(
+            0,
+            (
+              (currentMinutes - shiftStart) /
+              totalShiftMinutes
+            ) * 100
+          )
+        );
     }
 
 
@@ -207,20 +266,31 @@ const staffController = {
     // =========================
 
     res.render('Staff/time-tracking', {
+
       title: 'Stämpling',
+
       currentPage: 'time-tracking',
+
       layout: false,
 
-      dateString: getDateString(),
+      dateString:
+        getDateString(),
+
       currentTime,
 
       isClockedIn,
+
       progress,
+
       workedTime,
 
+      checkInTime,
+
       plannedStartTime,
+
       plannedEndTime,
-      checkInTime
+
+      user
     });
   },
 
@@ -231,19 +301,25 @@ const staffController = {
 
   clockIn: (req, res) => {
 
-    const userId = req.session?.user?.id;
+    const userId =
+      req.session?.user?.id;
+
 
     if (!userId) {
       return res.redirect('/login');
     }
 
-    const now = new Date();
+
+    const now =
+      new Date();
+
 
     const date = [
       now.getFullYear(),
       String(now.getMonth() + 1).padStart(2, '0'),
       String(now.getDate()).padStart(2, '0')
     ].join('-');
+
 
     const timestamp =
       now.toISOString();
@@ -253,35 +329,45 @@ const staffController = {
     // KOLLA OM REDAN INSTÄMPLAD
     // =========================
 
-    const existingEntry = db.prepare(`
-      SELECT *
-      FROM time_entries
-      WHERE userId = ?
-        AND date = ?
-        AND checkInTime IS NOT NULL
-        AND checkOutTime IS NULL
-      ORDER BY id DESC
-      LIMIT 1
-    `).get(userId, date);
+    const existingEntry =
+      db.prepare(`
+        SELECT *
+        FROM time_entries
+        WHERE userId = ?
+          AND date = ?
+          AND checkInTime IS NOT NULL
+          AND checkOutTime IS NULL
+        ORDER BY id DESC
+        LIMIT 1
+      `).get(
+        userId,
+        date
+      );
 
 
     if (existingEntry) {
-      return res.redirect('/staff/time-tracking');
+      return res.redirect(
+        '/staff/time-tracking'
+      );
     }
 
 
     // =========================
-    // HÄMTA EVENTUELL RAD FÖR IDAG
+    // HÄMTA DAGENS RAD
     // =========================
 
-    const todayEntry = db.prepare(`
-      SELECT *
-      FROM time_entries
-      WHERE userId = ?
-        AND date = ?
-      ORDER BY id DESC
-      LIMIT 1
-    `).get(userId, date);
+    const todayEntry =
+      db.prepare(`
+        SELECT *
+        FROM time_entries
+        WHERE userId = ?
+          AND date = ?
+        ORDER BY id DESC
+        LIMIT 1
+      `).get(
+        userId,
+        date
+      );
 
 
     // =========================
@@ -330,7 +416,9 @@ const staffController = {
     }
 
 
-    res.redirect('/staff/time-tracking');
+    res.redirect(
+      '/staff/time-tracking'
+    );
   },
 
 
@@ -340,19 +428,25 @@ const staffController = {
 
   clockOut: (req, res) => {
 
-    const userId = req.session?.user?.id;
+    const userId =
+      req.session?.user?.id;
+
 
     if (!userId) {
       return res.redirect('/login');
     }
 
-    const now = new Date();
+
+    const now =
+      new Date();
+
 
     const date = [
       now.getFullYear(),
       String(now.getMonth() + 1).padStart(2, '0'),
       String(now.getDate()).padStart(2, '0')
     ].join('-');
+
 
     const timestamp =
       now.toISOString();
@@ -362,20 +456,26 @@ const staffController = {
     // HÄMTA AKTIV STÄMPLING
     // =========================
 
-    const entry = db.prepare(`
-      SELECT *
-      FROM time_entries
-      WHERE userId = ?
-        AND date = ?
-        AND checkInTime IS NOT NULL
-        AND checkOutTime IS NULL
-      ORDER BY id DESC
-      LIMIT 1
-    `).get(userId, date);
+    const entry =
+      db.prepare(`
+        SELECT *
+        FROM time_entries
+        WHERE userId = ?
+          AND date = ?
+          AND checkInTime IS NOT NULL
+          AND checkOutTime IS NULL
+        ORDER BY id DESC
+        LIMIT 1
+      `).get(
+        userId,
+        date
+      );
 
 
     if (!entry) {
-      return res.redirect('/staff/time-tracking');
+      return res.redirect(
+        '/staff/time-tracking'
+      );
     }
 
 
@@ -386,8 +486,10 @@ const staffController = {
     const checkIn =
       new Date(entry.checkInTime);
 
+
     const checkOut =
       now;
+
 
     const elapsedMinutes =
       Math.max(
@@ -398,16 +500,17 @@ const staffController = {
       );
 
 
-    // =========================
-    // SPARA UTSTÄMPLING
-    // =========================
+    const breakMinutes =
+      Number(
+        entry.breakMinutes || 0
+      );
 
-    // Vi sparar faktisk arbetad tid.
-    // Den schemalagda rasten dras inte bort
-    // automatiskt från ett kort testpass.
 
     const durationMinutes =
-      elapsedMinutes;
+      Math.max(
+        0,
+        elapsedMinutes - breakMinutes
+      );
 
 
     // =========================
@@ -415,15 +518,20 @@ const staffController = {
     // =========================
 
     const plannedHours =
-      Number(entry.plannedHours || 8);
+      Number(
+        entry.plannedHours || 8
+      );
+
 
     const plannedMinutes =
       plannedHours * 60;
 
+
     const overtimeMinutes =
       Math.max(
         0,
-        durationMinutes - plannedMinutes
+        durationMinutes -
+        plannedMinutes
       );
 
 
@@ -448,7 +556,9 @@ const staffController = {
     );
 
 
-    res.redirect('/staff/time-tracking');
+    res.redirect(
+      '/staff/time-tracking'
+    );
   },
 
 
@@ -458,28 +568,29 @@ const staffController = {
 
   getOverview: (req, res) => {
 
+    const user = getCurrentUser(req);
+
+    if (!user) {
+      return res.redirect('/login');
+    }
+
+
     const allTasks = db.prepare(`
-      SELECT stable_tasks.*,
-             horses.name as horseName,
-             horses.paddockNumber,
-             horses.photoUrl
+      SELECT stable_tasks.*, horses.name as horseName, horses.paddockNumber, horses.photoUrl
       FROM stable_tasks
-      LEFT JOIN horses
-        ON stable_tasks.horseId = horses.id
-      WHERE date(stable_tasks.dueDate) = date('now')
-         OR stable_tasks.dueDate IS NULL
+      LEFT JOIN horses ON stable_tasks.horseId = horses.id
     `).all();
 
 
     const todoCount =
       allTasks.filter(
-        t => t.status !== 'Klar'
+        task => task.status !== 'Klar'
       ).length;
 
 
     const doneCount =
       allTasks.filter(
-        t => t.status === 'Klar'
+        task => task.status === 'Klar'
       ).length;
 
 
@@ -502,13 +613,24 @@ const staffController = {
 
 
     res.render('Staff/overview', {
+
       title: 'Översikt',
-      currentPage: 'overview-staff',
+
+      currentPage:
+        'overview-staff',
+
       layout: false,
-      dateString: getDateString(),
+
+      dateString:
+        getDateString(),
+
       todoCount,
+
       doneCount,
-      grouped
+
+      grouped,
+
+      user
     });
   },
 
@@ -519,81 +641,160 @@ const staffController = {
 
   getTasks: (req, res) => {
 
-    stableTaskService.resetCompletedTasks();
+    const user = getCurrentUser(req);
+
+    if (!user) {
+      return res.redirect('/login');
+    }
+
+
+    stableTaskService
+      .resetCompletedTasks();
+
 
     const tasks =
-      stableTaskService.getAllTasks();
+      stableTaskService
+        .getAllTasks();
 
 
     res.render('Staff/tasks', {
+
       title: 'Uppgifter',
-      currentPage: 'tasks',
+
+      currentPage:
+        'tasks',
+
       tasks,
+
       layout: false,
-      dateString: getDateString()
+
+      dateString:
+        getDateString(),
+
+      user
     });
   },
 
 
   getTaskDetail: (req, res) => {
 
-    res.redirect('/staff/tasks');
+    res.redirect(
+      '/staff/tasks'
+    );
   },
 
 
   postCompleteTask: (req, res) => {
 
-    stableTaskService.markTaskComplete(
-      req.params.id
-    );
+    stableTaskService
+      .markTaskComplete(
+        req.params.id
+      );
+
+
+    const userId =
+      req.session?.user?.id;
+
+
+    // Spara vem som slutförde uppgiften
+
+    if (userId) {
+
+      db.prepare(`
+        UPDATE stable_tasks
+        SET
+          completedByUserId = ?,
+          completedAt =
+            COALESCE(
+              completedAt,
+              datetime('now')
+            ),
+          updatedAt =
+            datetime('now')
+        WHERE id = ?
+          AND status = 'Klar'
+      `).run(
+        userId,
+        req.params.id
+      );
+    }
+
 
     const referer =
       req.headers.referer ||
       '/staff/tasks';
 
 
-    res.redirect(referer);
+    res.redirect(
+      referer
+    );
   },
 
 
   postToggleChecklist: (req, res) => {
 
-    res.redirect('/staff/tasks');
+    res.redirect(
+      '/staff/tasks'
+    );
   },
 
 
   addTask: (req, res) => {
 
-    stableTaskService.addTask(
-      req.body
-    );
+    stableTaskService
+      .addTask(
+        req.body
+      );
 
-    res.redirect('/staff/tasks');
+
+    res.redirect(
+      '/staff/tasks'
+    );
   },
 
 
   deleteTask: (req, res) => {
 
-    stableTaskService.deleteTask(
-      req.params.id
-    );
+    stableTaskService
+      .deleteTask(
+        req.params.id
+      );
 
-    res.redirect('/staff/tasks');
+
+    res.redirect(
+      '/staff/tasks'
+    );
   },
 
 
   unmarkTask: (req, res) => {
 
-    stableTaskService.unmarkTaskComplete(
+    stableTaskService
+      .unmarkTaskComplete(
+        req.params.id
+      );
+
+
+    db.prepare(`
+      UPDATE stable_tasks
+      SET
+        completedByUserId = NULL,
+        completedAt = NULL,
+        updatedAt = datetime('now')
+      WHERE id = ?
+    `).run(
       req.params.id
     );
+
 
     const referer =
       req.headers.referer ||
       '/staff/tasks';
 
 
-    res.redirect(referer);
+    res.redirect(
+      referer
+    );
   },
 
 
@@ -604,10 +805,16 @@ const staffController = {
   getSchedule: (req, res) => {
 
     res.render('Staff/schedule', {
+
       title: 'Schema',
-      currentPage: 'schedule',
+
+      currentPage:
+        'schedule',
+
       layout: false,
-      dateString: getDateString()
+
+      dateString:
+        getDateString()
     });
   },
 
@@ -618,18 +825,28 @@ const staffController = {
 
   getHorses: (req, res) => {
 
-    const horses = db.prepare(`
-      SELECT *
-      FROM horses
-      WHERE status = 'Aktiv & Tjänstbar'
-    `).all();
+    const user = getCurrentUser(req);
+
+    if (!user) {
+      return res.redirect('/login');
+    }
 
 
-    const tasks = db.prepare(`
-      SELECT *
-      FROM stable_tasks
-      WHERE horseId IS NOT NULL
-    `).all();
+    const horses =
+      db.prepare(`
+        SELECT *
+        FROM horses
+        WHERE status =
+          'Aktiv & Tjänstbar'
+      `).all();
+
+
+    const tasks =
+      db.prepare(`
+        SELECT *
+        FROM stable_tasks
+        WHERE horseId IS NOT NULL
+      `).all();
 
 
     const horsesWithTasks =
@@ -637,57 +854,87 @@ const staffController = {
 
         ...horse,
 
-        tasks: tasks.filter(
-          t =>
-            Number(t.horseId) ===
-            Number(horse.id)
-        )
+        tasks:
+          tasks.filter(
+            task =>
+              Number(task.horseId) ===
+              Number(horse.id)
+          )
       }));
 
 
     res.render('Staff/horses', {
+
       title: 'Hästar',
-      currentPage: 'horses',
+
+      currentPage:
+        'horses',
+
       layout: false,
-      dateString: getDateString(),
-      horses: horsesWithTasks
+
+      dateString:
+        getDateString(),
+
+      horses:
+        horsesWithTasks,
+
+      user
     });
   },
 
 
   getHorseProfile: (req, res) => {
 
-    const horse = db.prepare(`
-      SELECT *
-      FROM horses
-      WHERE id = ?
-    `).get(req.params.id);
+    const horse =
+      db.prepare(`
+        SELECT *
+        FROM horses
+        WHERE id = ?
+      `).get(
+        req.params.id
+      );
 
 
     if (!horse) {
-      return res.redirect('/staff/horses');
+
+      return res.redirect(
+        '/staff/horses'
+      );
     }
 
 
-    const tasks = db.prepare(`
-      SELECT *
-      FROM stable_tasks
-      WHERE horseId = ?
-      ORDER BY
-        CASE
-          WHEN status = 'Klar' THEN 1
-          ELSE 0
-        END,
-        dueTime ASC
-    `).all(req.params.id);
+    const tasks =
+      db.prepare(`
+        SELECT *
+        FROM stable_tasks
+        WHERE horseId = ?
+        ORDER BY
+          CASE
+            WHEN status = 'Klar'
+            THEN 1
+            ELSE 0
+          END,
+          dueTime ASC
+      `).all(
+        req.params.id
+      );
 
 
     res.render('Staff/horseProfile', {
-      title: horse.name || 'Häst',
-      currentPage: 'horses',
+
+      title:
+        horse.name || 'Häst',
+
+      currentPage:
+        'horses',
+
       layout: false,
-      dateString: getDateString(),
+
+      dateString:
+        getDateString(),
+
       horse,
+
       tasks
     });
   },
@@ -699,11 +946,94 @@ const staffController = {
 
   getProfile: (req, res) => {
 
+    const userId = req.session?.user?.id;
+
+    if (!userId) {
+      return res.redirect('/login');
+    }
+
+    const user = db.prepare(`
+      SELECT id, username, email, fullName, phone, avatarUrl, role
+      FROM users
+      WHERE id = ?
+    `).get(userId);
+
+    if (!user) {
+      return res.redirect('/login');
+    }
+
+
+    // Använd rätt datumformat för databasen
+
+    const now = new Date();
+
+    const today = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      String(now.getDate()).padStart(2, '0')
+    ].join('-');
+
+
+    const todayTasks = db.prepare(`
+      SELECT *
+      FROM stable_tasks
+      WHERE dueDate = ?
+         OR dueDate IS NULL
+    `).all(today);
+
+
+    const completedTasks =
+      todayTasks.filter(
+        t => t.status === 'Klar'
+      ).length;
+
+
+    const totalTasks =
+      todayTasks.length;
+
+
+    const completionPercentage =
+      totalTasks > 0
+        ? Math.round(
+            (completedTasks / totalTasks) * 100
+          )
+        : 0;
+
+
+    const recentActivities = db.prepare(`
+      SELECT
+        stable_tasks.*,
+        horses.name AS horseName
+      FROM stable_tasks
+      LEFT JOIN horses
+        ON horses.id = stable_tasks.horseId
+      WHERE stable_tasks.status = 'Klar'
+      ORDER BY stable_tasks.completedAt DESC
+      LIMIT 5
+    `).all();
+
+
     res.render('Staff/profile', {
+
       title: 'Min Profil',
-      currentPage: 'profile',
+
+      currentPage:
+        'profile',
+
       layout: false,
-      dateString: getDateString()
+
+      dateString:
+        getDateString(),
+
+      user,
+
+      completedTasks,
+
+      totalTasks,
+
+      completionPercentage,
+
+      recentActivities
     });
   }
 
