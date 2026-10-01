@@ -1,7 +1,13 @@
 const { getDataSource } = require('../../config/database');
 const { verifyPassword, hashPassword } = require('../../config/auth');
 
-
+/**
+ * ProfileService (Admin Domain)
+ * 
+ * Handles personal profile data, contact details, avatar updates,
+ * password changes, and riding school summary statistics for the administrator.
+ * 
+ */
 class ProfileService {
   /**
    * Helper to retrieve a TypeORM repository instance safely.

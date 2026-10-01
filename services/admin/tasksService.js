@@ -1,7 +1,13 @@
 const { getDataSource } = require('../../config/database');
 const AdminMapper = require('./adminMapper');
 
-
+/**
+ * Service for handling administrative tasks.
+ * 
+ * Handles full administrative CRUD operations for stable tasks,
+ * checklists, and staff task assignments.
+ * 
+ */
 class TasksService {
   /**
    * Helper to retrieve a TypeORM repository instance safely.
@@ -128,29 +134,31 @@ class TasksService {
    */
   async updateStableTask(id, data) {
     const taskRepo = await this._getRepository('StableTask');
+    const taskId = parseInt(id, 10);
 
-    const task = await taskRepo.findOne({ where: { id: parseInt(id, 10) } });
+    const task = await taskRepo.findOne({ where: { id: taskId } });
     if (!task) throw new Error('Stalluppgiften kunde inte hittas.');
 
-    task.title = data.title !== undefined ? data.title : task.title;
-    task.taskType = data.taskType !== undefined ? data.taskType : task.taskType;
-    task.location = data.location !== undefined ? data.location : task.location;
-    task.horseId = data.horseId !== undefined ? (data.horseId ? parseInt(data.horseId, 10) : null) : task.horseId;
-    task.assignedToUserId = data.assignedToUserId !== undefined ? (data.assignedToUserId ? parseInt(data.assignedToUserId, 10) : null) : task.assignedToUserId;
-    task.dueDate = data.dueDate !== undefined ? data.dueDate : task.dueDate;
-    task.dueTime = data.dueTime !== undefined ? data.dueTime : task.dueTime;
-    task.priority = data.priority !== undefined ? data.priority : task.priority;
-    task.status = data.status !== undefined ? data.status : task.status;
-    task.description = data.description !== undefined ? data.description : task.description;
-    task.instructions = data.instructions !== undefined ? data.instructions : (task.instructions || task.description);
-    task.notes = data.notes !== undefined ? data.notes : task.notes;
+    const updateData = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.taskType !== undefined) updateData.taskType = data.taskType;
+    if (data.location !== undefined) updateData.location = data.location;
+    if (data.horseId !== undefined) updateData.horseId = data.horseId ? parseInt(data.horseId, 10) : null;
+    if (data.assignedToUserId !== undefined) updateData.assignedToUserId = data.assignedToUserId ? parseInt(data.assignedToUserId, 10) : null;
+    if (data.dueDate !== undefined) updateData.dueDate = data.dueDate;
+    if (data.dueTime !== undefined) updateData.dueTime = data.dueTime;
+    if (data.priority !== undefined) updateData.priority = data.priority;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.instructions !== undefined) updateData.instructions = data.instructions;
+    if (data.notes !== undefined) updateData.notes = data.notes;
 
     if (data.checklist !== undefined) {
-      task.checklist = typeof data.checklist === 'string' ? data.checklist : JSON.stringify(data.checklist);
+      updateData.checklist = typeof data.checklist === 'string' ? data.checklist : JSON.stringify(data.checklist);
     }
 
-    const saved = await taskRepo.save(task);
-    return AdminMapper.toTaskDTO(saved);
+    await taskRepo.update(taskId, updateData);
+    return await this.getStableTaskById(taskId);
   }
 
   /**

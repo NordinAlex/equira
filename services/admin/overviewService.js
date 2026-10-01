@@ -1,11 +1,17 @@
 const { getDataSource } = require('../../config/database');
 const AdminMapper = require('./adminMapper');
 
-
+/**
+ * OverviewService (Admin Domain)
+ *
+ * Handles aggregation of data for the Admin Dashboard overview:
+ * lessons for today, active horses, and registered students.
+ *
+ */
 class OverviewService {
   /**
    * Helper to retrieve a TypeORM repository instance safely.
-   * 
+   *
    * @private
    * @param {string} entityName - Name of the registered TypeORM entity
    * @returns {Promise<import('typeorm').Repository<any>>}
@@ -17,8 +23,7 @@ class OverviewService {
 
   /**
    * Returns today's ISO date string in YYYY-MM-DD format.
-   * Internal helper avoiding external shared dependencies (KISS).
-   * 
+   *
    * @private
    * @returns {string}
    */
@@ -28,7 +33,7 @@ class OverviewService {
 
   /**
    * Retrieves complete admin dashboard overview data.
-   * 
+   *
    * @param {string} [dateStr] - Optional date string YYYY-MM-DD
    * @returns {Promise<{lessons: Array<Object>, horses: Array<Object>, students: Array<Object>}>}
    */
@@ -60,9 +65,9 @@ class OverviewService {
       .getMany();
 
     return {
-      lessons: lessonsRaw.map(l => AdminMapper.toLessonDTO(l)),
-      horses: horsesRaw.map(h => AdminMapper.toHorseDTO(h)),
-      students: studentsRaw.map(s => AdminMapper.toStudentDTO(s)),
+      lessons: lessonsRaw.map((l) => AdminMapper.toLessonDTO(l)),
+      horses: horsesRaw.map((h) => AdminMapper.toHorseDTO(h)),
+      students: studentsRaw.map((s) => AdminMapper.toStudentDTO(s)),
     };
   }
 }

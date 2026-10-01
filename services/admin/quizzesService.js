@@ -1,11 +1,17 @@
 const { getDataSource } = require('../../config/database');
 const AdminMapper = require('./adminMapper');
 
-
+/**
+ * QuizzesService (Admin Domain)
+ * 
+ * Handles administration, metrics aggregation, and creation of
+ * equestrian knowledge quizzes.
+ *
+ */
 class QuizzesService {
   /**
    * Helper to retrieve a TypeORM repository instance safely.
-   * 
+   *
    * @private
    * @param {string} entityName - Name of the registered TypeORM entity
    * @returns {Promise<import('typeorm').Repository<any>>}
@@ -17,7 +23,7 @@ class QuizzesService {
 
   /**
    * Retrieves all quizzes with questions and student attempts for admin overview.
-   * 
+   *
    * @returns {Promise<Array<Object>>} List of QuizAdminDTOs
    */
   async getAllQuizzes() {
@@ -30,12 +36,12 @@ class QuizzesService {
       .orderBy('q.id', 'ASC')
       .getMany();
 
-    return quizzes.map(q => AdminMapper.toQuizDTO(q));
+    return quizzes.map((q) => AdminMapper.toQuizDTO(q));
   }
 
   /**
    * Retrieves a single quiz by ID with its questions and options.
-   * 
+   *
    * @param {number|string} id - Quiz ID
    * @returns {Promise<Object|null>}
    */
@@ -56,7 +62,7 @@ class QuizzesService {
 
   /**
    * Creates a new quiz with associated questions and multiple-choice options.
-   * 
+   *
    * @param {Object} data - Quiz creation payload
    * @returns {Promise<Object>} Created Quiz entity
    */
@@ -70,8 +76,12 @@ class QuizzesService {
       category: data.category || 'Hästkunskap',
       description: data.description || '',
       difficulty: data.difficulty || 'Medel',
-      timeLimitMinutes: data.timeLimitMinutes ? parseInt(data.timeLimitMinutes, 10) : 10,
-      passPercentage: data.passPercentage ? parseInt(data.passPercentage, 10) : 70,
+      timeLimitMinutes: data.timeLimitMinutes
+        ? parseInt(data.timeLimitMinutes, 10)
+        : 10,
+      passPercentage: data.passPercentage
+        ? parseInt(data.passPercentage, 10)
+        : 70,
       equestrianBadge: data.equestrianBadge || 'Märke 1',
       targetLevel: data.targetLevel || 'Nivå 1',
       isPublished: true,
@@ -97,8 +107,12 @@ class QuizzesService {
         if (qData.options && Array.isArray(qData.options)) {
           for (let j = 0; j < qData.options.length; j++) {
             const optData = qData.options[j];
-            const optText = typeof optData === 'string' ? optData : (optData.text || optData.optionText || `Alternativ ${j + 1}`);
-            const isCorrect = typeof optData === 'object' ? Boolean(optData.isCorrect) : false;
+            const optText =
+              typeof optData === 'string'
+                ? optData
+                : optData.text || optData.optionText || `Alternativ ${j + 1}`;
+            const isCorrect =
+              typeof optData === 'object' ? Boolean(optData.isCorrect) : false;
 
             const option = optionRepo.create({
               questionId: savedQuestion.id,
@@ -118,7 +132,7 @@ class QuizzesService {
 
   /**
    * Updates an existing quiz and its associated questions & options.
-   * 
+   *
    * @param {number|string} id - Quiz ID
    * @param {Object} data - Update payload
    * @returns {Promise<Object>} Updated quiz entity
@@ -136,18 +150,32 @@ class QuizzesService {
 
     quiz.title = data.title !== undefined ? data.title : quiz.title;
     quiz.category = data.category !== undefined ? data.category : quiz.category;
-    quiz.description = data.description !== undefined ? data.description : quiz.description;
-    quiz.difficulty = data.difficulty !== undefined ? data.difficulty : quiz.difficulty;
-    quiz.timeLimitMinutes = data.timeLimitMinutes !== undefined ? parseInt(data.timeLimitMinutes, 10) : quiz.timeLimitMinutes;
-    quiz.passPercentage = data.passPercentage !== undefined ? parseInt(data.passPercentage, 10) : quiz.passPercentage;
-    quiz.equestrianBadge = data.equestrianBadge !== undefined ? data.equestrianBadge : quiz.equestrianBadge;
-    quiz.targetLevel = data.targetLevel !== undefined ? data.targetLevel : quiz.targetLevel;
+    quiz.description =
+      data.description !== undefined ? data.description : quiz.description;
+    quiz.difficulty =
+      data.difficulty !== undefined ? data.difficulty : quiz.difficulty;
+    quiz.timeLimitMinutes =
+      data.timeLimitMinutes !== undefined
+        ? parseInt(data.timeLimitMinutes, 10)
+        : quiz.timeLimitMinutes;
+    quiz.passPercentage =
+      data.passPercentage !== undefined
+        ? parseInt(data.passPercentage, 10)
+        : quiz.passPercentage;
+    quiz.equestrianBadge =
+      data.equestrianBadge !== undefined
+        ? data.equestrianBadge
+        : quiz.equestrianBadge;
+    quiz.targetLevel =
+      data.targetLevel !== undefined ? data.targetLevel : quiz.targetLevel;
 
     await quizRepo.save(quiz);
 
     // If questions are provided, replace them cleanly
     if (data.questions && Array.isArray(data.questions)) {
-      const existingQuestions = await questionRepo.find({ where: { quizId: parsedId } });
+      const existingQuestions = await questionRepo.find({
+        where: { quizId: parsedId },
+      });
       for (const eq of existingQuestions) {
         await optionRepo.delete({ questionId: eq.id });
         await questionRepo.delete({ id: eq.id });
@@ -170,8 +198,12 @@ class QuizzesService {
         if (qData.options && Array.isArray(qData.options)) {
           for (let j = 0; j < qData.options.length; j++) {
             const optData = qData.options[j];
-            const optText = typeof optData === 'string' ? optData : (optData.text || optData.optionText || `Alternativ ${j + 1}`);
-            const isCorrect = typeof optData === 'object' ? Boolean(optData.isCorrect) : false;
+            const optText =
+              typeof optData === 'string'
+                ? optData
+                : optData.text || optData.optionText || `Alternativ ${j + 1}`;
+            const isCorrect =
+              typeof optData === 'object' ? Boolean(optData.isCorrect) : false;
 
             const option = optionRepo.create({
               questionId: savedQuestion.id,
@@ -191,7 +223,7 @@ class QuizzesService {
 
   /**
    * Deletes a quiz and all associated attempts, questions, and options.
-   * 
+   *
    * @param {number|string} id - Quiz ID
    * @returns {Promise<boolean>}
    */

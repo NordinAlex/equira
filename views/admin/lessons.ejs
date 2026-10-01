@@ -16,6 +16,20 @@
     </div>
   </div>
 
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2">
+      <i class="fa-solid fa-circle-check text-emerald-500"></i>
+      <span><%= success %></span>
+    </div>
+  <% } %>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
   <!-- KPI Cards Row (Matching PDF 3 page 4) -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm flex items-center justify-between">
@@ -81,64 +95,82 @@
     </div>
 
     <div class="overflow-x-auto touch-scroll">
-      <table class="w-full text-left border-collapse text-xs min-w-[760px]">
+      <table class="w-full text-left border-collapse text-xs min-w-[640px] md:min-w-full">
         <thead>
           <tr class="bg-stone-50 text-stone-500 font-bold uppercase tracking-wider border-b border-stone-200">
-            <th class="py-3 px-6">Lektion & Tid</th>
-            <th class="py-3 px-6">Instruktör</th>
-            <th class="py-3 px-6">Disciplin & Nivå</th>
-            <th class="py-3 px-6">Beläggning</th>
-            <th class="py-3 px-6">Hästtilldelning</th>
-            <th class="py-3 px-6">Status</th>
-            <th class="py-3 px-6 text-right">Åtgärd</th>
+            <th class="py-3 px-3 sm:px-4">Lektion & Tid</th>
+            <th class="py-3 px-3 sm:px-4">Instruktör</th>
+            <th class="py-3 px-3 sm:px-4">Disciplin & Nivå</th>
+            <th class="py-3 px-3 sm:px-4">Beläggning</th>
+            <th class="py-3 px-3 sm:px-4">Hästtilldelning</th>
+            <th class="py-3 px-3 sm:px-4">Status</th>
+            <th class="py-3 px-3 sm:px-4 text-right">Åtgärd</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-stone-100">
           <% data.lessons.forEach(l => { %>
             <tr class="hover:bg-stone-50/80 transition">
-              <td class="py-4 px-6 whitespace-nowrap">
-                <div class="font-bold text-stone-900 text-sm"><%= l.title %></div>
-                <div class="text-stone-400 text-[11px]"><%= l.date %> &bull; <%= l.time %> &bull; <%= l.arenaName %></div>
+              <td class="py-3.5 px-3 sm:px-4">
+                <a href="/admin/lessons/<%= l.id %>/edit" class="font-bold text-stone-900 text-sm hover:underline hover:text-[#4a2828] transition block">
+                  <%= l.title %>
+                </a>
+                <div class="text-stone-400 text-[11px] mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                  <span><%= l.date %></span>
+                  <span class="text-stone-300">&bull;</span>
+                  <span><%= l.time %></span>
+                  <span class="text-stone-300">&bull;</span>
+                  <span><%= l.arenaName %></span>
+                </div>
               </td>
 
-              <td class="py-4 px-6 whitespace-nowrap">
+              <td class="py-3.5 px-3 sm:px-4 whitespace-nowrap">
                 <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full bg-stone-200 text-stone-700 flex items-center justify-center font-bold text-[10px]">
+                  <div class="w-6 h-6 rounded-full bg-stone-200 text-stone-700 flex items-center justify-center font-bold text-[10px] shrink-0">
                     <%= l.instructorName.charAt(0) %>
                   </div>
                   <span class="font-medium text-stone-800"><%= l.instructorName %></span>
                 </div>
               </td>
 
-              <td class="py-4 px-6 whitespace-nowrap">
-                <span class="inline-block px-2 py-0.5 rounded bg-amber-50 text-amber-900 font-medium text-[10px] border border-amber-200 mr-1">
-                  <%= l.lessonType %>
-                </span>
-                <span class="text-stone-500"><%= l.level %></span>
+              <td class="py-3.5 px-3 sm:px-4 whitespace-nowrap">
+                <div class="inline-flex items-center gap-1.5 flex-wrap">
+                  <span class="inline-block px-2 py-0.5 rounded bg-amber-50 text-amber-900 font-medium text-[10px] border border-amber-200 shrink-0">
+                    <%= l.lessonType %>
+                  </span>
+                  <span class="text-stone-500"><%= l.level %></span>
+                </div>
               </td>
 
-              <td class="py-4 px-6 whitespace-nowrap">
+              <td class="py-3.5 px-3 sm:px-4 whitespace-nowrap">
                 <span class="font-semibold text-stone-800"><%= l.occupancyText %></span>
               </td>
 
-              <td class="py-4 px-6 whitespace-nowrap">
+              <td class="py-3.5 px-3 sm:px-4 whitespace-nowrap">
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border <%= l.allocationBadge.class %>">
                   <%= l.allocationBadge.label %>
                 </span>
               </td>
 
-              <td class="py-4 px-6 whitespace-nowrap">
+              <td class="py-3.5 px-3 sm:px-4 whitespace-nowrap">
                 <span class="inline-flex items-center gap-1.5 text-stone-600">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
                   <%= l.status %>
                 </span>
               </td>
 
-              <td class="py-4 px-6 text-right whitespace-nowrap">
-                <a href="/admin/assign/<%= l.id %>" class="px-3 py-1.5 bg-[#4a2828] hover:bg-[#381e1e] text-white rounded-lg font-medium transition shadow-sm inline-flex items-center gap-1">
-                  <span>Tilldela</span>
-                  <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                </a>
+              <td class="py-3.5 px-3 sm:px-4 text-right whitespace-nowrap">
+                <div class="inline-flex items-center justify-end gap-1.5">
+                  <a href="/admin/assign/<%= l.id %>" class="px-2.5 py-1.5 bg-[#4a2828] hover:bg-[#381e1e] text-white rounded-lg font-medium text-xs transition shadow-xs inline-flex items-center gap-1" title="Tilldela hästar">
+                    <span>Tilldela</span>
+                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                  </a>
+                  <a href="/admin/lessons/<%= l.id %>/edit" class="p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition" title="Redigera lektion">
+                    <i class="fa-solid fa-pen text-xs"></i>
+                  </a>
+                  <button type="button" data-id="<%= l.id %>" data-title="<%= l.title %>" onclick="openGlobalDeleteModal(this.dataset.id, this.dataset.title)" class="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer" title="Ta bort lektion">
+                    <i class="fa-regular fa-trash-can text-xs"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           <% }); %>
@@ -147,3 +179,56 @@
     </div>
   </div>
 </div>
+
+<!-- Global Delete Confirmation Modal -->
+<div id="globalDeleteModal" onclick="if(event.target === this) closeGlobalDeleteModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-stone-900">Ta bort lektion?</h3>
+        <p class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
+      </div>
+    </div>
+    <p class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-100">
+      Är du säker på att du vill ta bort lektionspasset <strong class="text-stone-900" id="globalDeleteLessonTitle">lektionen</strong>? Alla kopplade elev- och hästbokningar raderas permanent.
+    </p>
+    <div class="flex items-center justify-end gap-2.5 pt-2">
+      <button type="button" onclick="closeGlobalDeleteModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
+        Avbryt
+      </button>
+      <form id="globalDeleteLessonForm" action="" method="POST" class="inline m-0 p-0">
+        <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Ja, ta bort lektion</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openGlobalDeleteModal(id, title) {
+    const modal = document.getElementById('globalDeleteModal');
+    const titleEl = document.getElementById('globalDeleteLessonTitle');
+    const form = document.getElementById('globalDeleteLessonForm');
+    if (titleEl) titleEl.textContent = `"${title || 'lektionen'}"`;
+    if (form) form.action = `/admin/lessons/${id}/delete`;
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeGlobalDeleteModal() {
+    const modal = document.getElementById('globalDeleteModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function confirmDeleteLesson(id, title) {
+    openGlobalDeleteModal(id, title);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeGlobalDeleteModal();
+  });
+</script>

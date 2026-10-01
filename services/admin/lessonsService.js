@@ -1,7 +1,13 @@
 const { getDataSource } = require('../../config/database');
 const AdminMapper = require('./adminMapper');
 
-
+/**
+ * LessonsService (Admin Domain)
+ * 
+ * Handles lesson scheduling, timetable queries, lesson creation,
+ * and associated student booking initialization.
+ * 
+ */
 class LessonsService {
   /**
    * Helper to retrieve a TypeORM repository instance safely.
@@ -236,6 +242,111 @@ class LessonsService {
     }
 
     return AdminMapper.toLessonDTO(savedLesson);
+  }
+
+  /**
+   * Retrieves a single lesson by ID with arena, instructor, and bookings.
+   * 
+   * @param {string|number} id - Lesson ID
+   * @returns {Promise<Object|null>} LessonAdminDTO or null
+   */
+  async getLessonById(id) {
+    const lessonRepo = await this._getRepository('Lesson');
+
+    const lesson = await lessonRepo
+      .createQueryBuilder('l')
+      .leftJoinAndSelect('l.arena', 'arena')
+      .leftJoinAndSelect('l.instructor', 'instructor')
+      .leftJoinAndSelect('l.ridingGroup', 'ridingGroup')
+      .leftJoinAndSelect('l.bookings', 'bookings')
+      .leftJoinAndSelect('bookings.student', 'student')
+      .leftJoinAndSelect('student.studentProfile', 'studentProfile')
+      .leftJoinAndSelect('bookings.horse', 'horse')
+      .where('l.id = :id', { id: parseInt(id, 10) })
+      .getOne();
+
+    return lesson ? AdminMapper.toLessonDTO(lesson) : null;
+  }
+
+  /**
+   * Updates an existing lesson and synchronizes student bookings.
+   * 
+   * @param {string|number} id - Lesson ID
+   * @param {Object} body - Lesson form fields
+   * @returns {Promise<Object>} Updated LessonAdminDTO
+   */
+  async updateLesson(id, body) {
+    const lessonRepo = await this._getRepository('Lesson');
+    const bookingRepo = await this._getRepository('LessonBooking');
+    const lesson = await lessonRepo.findOne({ where: { id: parseInt(id, 10) } });
+    if (!lesson) throw new Error('Lektionen kunde inte hittas');
+
+    if (body.title !== undefined) lesson.title = body.title;
+    if (body.lessonType !== undefined) lesson.lessonType = body.lessonType;
+    if (body.level !== undefined) lesson.level = body.level;
+    if (body.targetGroup !== undefined) lesson.targetGroup = body.targetGroup;
+    if (body.date !== undefined) lesson.date = body.date;
+    if (body.startTime !== undefined) lesson.startTime = body.startTime;
+    if (body.endTime !== undefined) lesson.endTime = body.endTime;
+    if (body.arenaId !== undefined) lesson.arenaId = body.arenaId ? parseInt(body.arenaId, 10) : null;
+    if (body.instructorId !== undefined) lesson.instructorId = body.instructorId ? parseInt(body.instructorId, 10) : null;
+    if (body.maxParticipants !== undefined) lesson.maxParticipants = parseInt(body.maxParticipants, 10);
+    if (body.minParticipants !== undefined) lesson.minParticipants = parseInt(body.minParticipants, 10);
+    if (body.status !== undefined) lesson.status = body.status;
+    if (body.description !== undefined) lesson.description = body.description;
+    if (body.staffInstructions !== undefined) lesson.staffInstructions = body.staffInstructions;
+    if (body.equipmentRequirements !== undefined) lesson.equipmentRequirements = body.equipmentRequirements;
+
+    const savedLesson = await lessonRepo.save(lesson);
+
+    // Synchronize student bookings if hasStudentSelection was posted
+    if (body.hasStudentSelection !== undefined) {
+      const rawStudentIds = body.studentIds || [];
+      const selectedStudentIds = (
+        Array.isArray(rawStudentIds) ? rawStudentIds : [rawStudentIds]
+      ).map(sid => parseInt(sid, 10)).filter(Boolean);
+
+      const existingBookings = await bookingRepo.find({ where: { lessonId: savedLesson.id } });
+      const existingStudentIds = existingBookings.map(b => b.studentId);
+
+      // Remove unselected bookings
+      for (const booking of existingBookings) {
+        if (!selectedStudentIds.includes(booking.studentId)) {
+          await bookingRepo.delete({ id: booking.id });
+        }
+      }
+
+      // Add newly selected bookings
+      for (const sid of selectedStudentIds) {
+        if (!existingStudentIds.includes(sid)) {
+          const newBooking = bookingRepo.create({
+            lessonId: savedLesson.id,
+            studentId: sid,
+            horseId: null,
+            status: 'Bokad',
+            assignedAt: new Date(),
+          });
+          await bookingRepo.save(newBooking);
+        }
+      }
+    }
+
+    return await this.getLessonById(savedLesson.id);
+  }
+
+  /**
+   * Deletes a lesson and all associated bookings.
+   * 
+   * @param {string|number} id - Lesson ID
+   * @returns {Promise<any>}
+   */
+  async deleteLesson(id) {
+    const lessonId = parseInt(id, 10);
+    const bookingRepo = await this._getRepository('LessonBooking');
+    const lessonRepo = await this._getRepository('Lesson');
+
+    await bookingRepo.delete({ lessonId });
+    return await lessonRepo.delete({ id: lessonId });
   }
 }
 

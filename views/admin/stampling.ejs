@@ -14,7 +14,7 @@
       </div>
     </div>
     
-    <div class="flex items-center gap-2.5">     
+    <div class="flex items-center gap-2.5">      
       <button type="button" 
               onclick="openManualPunchModal()"
               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition shadow-xs cursor-pointer">
@@ -359,22 +359,23 @@
                     <% } %>
 
                     <!-- Redigera knapp -->
-                        <button type="button"
-                          data-entry="<%- JSON.stringify(entry).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;') %>"
-                          onclick="openEditPunchModal(JSON.parse(this.dataset.entry))"
+                    <button type="button"
+                            data-entry="<%= JSON.stringify(entry) %>"
+                            onclick="openEditPunchModal(JSON.parse(this.dataset.entry))"
                             title="Redigera tidsstämpel"
                             class="w-7 h-7 rounded-lg bg-stone-100 text-stone-700 hover:bg-stone-200 flex items-center justify-center transition cursor-pointer">
                       <i class="fa-solid fa-pen-to-square text-xs"></i>
                     </button>
 
                     <!-- Ta bort knapp -->
-                    <form action="/admin/stampling/delete/<%= entry.id %>" method="POST" onsubmit="return confirm('Vill du radera denna tidsstämpling permanent?');" class="inline">
-                      <button type="submit" 
-                              title="Ta bort tidsstämpel"
-                              class="w-7 h-7 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 flex items-center justify-center transition cursor-pointer">
-                        <i class="fa-regular fa-trash-can text-xs"></i>
-                      </button>
-                    </form>
+                    <button type="button" 
+                            data-id="<%= entry.id %>"
+                            data-details="<%= entry.fullName %> (<%= entry.date %>)"
+                            onclick="openConfirmDeletePunchModal(this.dataset.id, this.dataset.details)"
+                            title="Ta bort tidsstämpel"
+                            class="w-7 h-7 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 flex items-center justify-center transition cursor-pointer">
+                      <i class="fa-regular fa-trash-can text-xs"></i>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -396,7 +397,7 @@
 </div>
 
 <!-- Modal 1: Manuell Stämpling (Lägg till tidsregistrering) -->
-<div id="manualPunchModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+<div id="manualPunchModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
   <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl space-y-5 animate-scale-in">
     <div class="flex items-center justify-between border-b border-stone-100 pb-3">
       <div class="flex items-center gap-2.5">
@@ -477,7 +478,7 @@
 </div>
 
 <!-- Modal 2: Redigera Tidsstämpel (Fullt responsiv för mobil & desktop) -->
-<div id="editPunchModal" onclick="if (event.target === this) closeEditPunchModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden items-start sm:items-center justify-center p-2.5 sm:p-4 overflow-y-auto transition-all duration-200">
+<div id="editPunchModal" onclick="if (event.target === this) closeEditPunchModal()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-start sm:items-center justify-center p-2.5 sm:p-4 overflow-y-auto transition-all duration-200">
   <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full my-auto flex flex-col shadow-2xl animate-scale-in overflow-hidden border border-stone-200/80" style="max-height: calc(100vh - 1.5rem); max-height: calc(100dvh - 1.5rem);">
 
     <!-- Modal Header (Fastklistrad högst upp) -->
@@ -578,14 +579,14 @@
         <!-- Faktisk Stämpling (2 kolumner) -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="flex items-center justify-between text-xs font-bold text-stone-700 mb-1">
+            <label class="block text-xs font-bold text-stone-700 mb-1 flex items-center justify-between">
               <span>Faktisk Instämpling</span>
               <span class="text-[10px] text-stone-400 font-normal hidden sm:inline">Klockslag</span>
             </label>
             <input type="time" name="checkInTime" id="editCheckIn" oninput="updateModalLiveCalc()" class="w-full text-sm bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700">
           </div>
           <div>
-            <label class="flex items-center justify-between text-xs font-bold text-stone-700 mb-1">
+            <label class="block text-xs font-bold text-stone-700 mb-1 flex items-center justify-between">
               <span>Faktisk Utstämpling</span>
               <span class="text-[10px] text-stone-400 font-normal hidden sm:inline">Klockslag</span>
             </label>
@@ -688,12 +689,20 @@
       </div>
 
       <!-- Modal Footer (Fastklistrad i botten - alltid synlig även med lång text eller mobiltangentbord) -->
-      <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 px-4 sm:px-6 py-3 border-t border-stone-100 bg-stone-50/90 shrink-0">
-        <button type="button" onclick="closeEditPunchModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-stone-600 hover:bg-stone-200/60 text-xs font-bold transition text-center cursor-pointer">Avbryt</button>
-        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
-          <i class="fa-solid fa-check text-xs"></i>
-          Spara ändringar
+      <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2 px-4 sm:px-6 py-3 border-t border-stone-100 bg-stone-50/90 shrink-0">
+        <button type="button" 
+                onclick="triggerDeleteCurrentPunch()" 
+                class="w-full sm:w-auto px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Ta bort stämpling</span>
         </button>
+        <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2">
+          <button type="button" onclick="closeEditPunchModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-stone-600 hover:bg-stone-200/60 text-xs font-bold transition text-center cursor-pointer">Avbryt</button>
+          <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-check text-xs"></i>
+            Spara ändringar (behåll original)
+          </button>
+        </div>
       </div>
 
     </form>
@@ -701,7 +710,7 @@
 </div>
 
 <!-- Modal 3: Snabb Utstämpling -->
-<div id="quickClockOutModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+<div id="quickClockOutModal" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
   <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl space-y-5 animate-scale-in">
     <div class="flex items-center justify-between border-b border-stone-100 pb-3">
       <div class="flex items-center gap-2.5">
@@ -745,14 +754,10 @@
   function openManualPunchModal() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('manualDate').value = today;
-    const modal = document.getElementById('manualPunchModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    document.getElementById('manualPunchModal').classList.remove('hidden');
   }
   function closeManualPunchModal() {
-    const modal = document.getElementById('manualPunchModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
+    document.getElementById('manualPunchModal').classList.add('hidden');
   }
 
   // Edit Punch Modal
@@ -790,9 +795,7 @@
       adjustedText.textContent = 'Orörd originalstämpling från personal';
     }
 
-    const editModal = document.getElementById('editPunchModal');
-    editModal.classList.remove('hidden');
-    editModal.classList.add('flex');
+    document.getElementById('editPunchModal').classList.remove('hidden');
     updateModalLiveCalc();
   }
 
@@ -979,9 +982,7 @@
   }
 
   function closeEditPunchModal() {
-    const editModal = document.getElementById('editPunchModal');
-    editModal.classList.add('hidden');
-    editModal.classList.remove('flex');
+    document.getElementById('editPunchModal').classList.add('hidden');
   }
 
   // Stäng aktiva modaler med Escape-tangenten
@@ -990,8 +991,32 @@
       closeEditPunchModal();
       closeManualPunchModal();
       closeQuickClockOutModal();
+      closeDeletePunchModal();
     }
   });
+
+  // Delete Punch Confirmation Modal handlers
+  function openConfirmDeletePunchModal(punchId, detailsText) {
+    const modal = document.getElementById('deletePunchModal');
+    const form = document.getElementById('deletePunchForm');
+    const text = document.getElementById('deletePunchDetailsText');
+    if (form) form.action = `/admin/stampling/delete/${punchId}`;
+    if (text) text.textContent = detailsText || 'personalens stämpling';
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeDeletePunchModal() {
+    const modal = document.getElementById('deletePunchModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function triggerDeleteCurrentPunch() {
+    if (!currentEditingEntry) return;
+    const punchId = currentEditingEntry.id;
+    const details = `${currentEditingEntry.fullName || 'Personal'} (${currentEditingEntry.date || ''})`;
+    closeEditPunchModal();
+    openConfirmDeletePunchModal(punchId, details);
+  }
 
   // Quick Clock Out Modal
   function openQuickClockOutModal(id, staffName) {
@@ -1004,13 +1029,38 @@
     const m = String(now.getMinutes()).padStart(2, '0');
     document.getElementById('quickCheckOutTime').value = `${h}:${m}`;
 
-    const quickModal = document.getElementById('quickClockOutModal');
-    quickModal.classList.remove('hidden');
-    quickModal.classList.add('flex');
+    document.getElementById('quickClockOutModal').classList.remove('hidden');
   }
   function closeQuickClockOutModal() {
-    const quickModal = document.getElementById('quickClockOutModal');
-    quickModal.classList.add('hidden');
-    quickModal.classList.remove('flex');
+    document.getElementById('quickClockOutModal').classList.add('hidden');
   }
 </script>
+
+<!-- Delete Punch Confirmation Modal -->
+<div id="deletePunchModal" onclick="if(event.target === this) closeDeletePunchModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-stone-900">Ta bort tidsstämpling?</h3>
+        <p class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
+      </div>
+    </div>
+    <p class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3 rounded-xl border border-stone-100">
+      Är du säker på att du vill ta bort stämplingen för <strong class="text-stone-900" id="deletePunchDetailsText">personal</strong>? Posten och dess arbetade timmar tas bort permanent från systemet.
+    </p>
+    <div class="flex items-center justify-end gap-2.5 pt-2">
+      <button type="button" onclick="closeDeletePunchModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
+        Avbryt
+      </button>
+      <form id="deletePunchForm" action="" method="POST" class="inline m-0 p-0">
+        <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Ja, ta bort stämpling</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

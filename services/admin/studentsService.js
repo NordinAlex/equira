@@ -21,16 +21,24 @@ class StudentsService {
    * 
    * @returns {Promise<Array<Object>>} List of StudentAdminDTOs
    */
-  async getAllStudents() {
+  async getAllStudents(searchQuery = '') {
     const userRepo = await this._getRepository('User');
 
-    const students = await userRepo
+    const query = userRepo
       .createQueryBuilder('u')
       .innerJoinAndSelect('u.studentProfile', 'studentProfile')
       .where('u.role = :role', { role: 'STUDENT' })
-      .orderBy('u.fullName', 'ASC')
-      .getMany();
+      .orderBy('u.fullName', 'ASC');
 
+    if (searchQuery && searchQuery.trim()) {
+      const q = `%${searchQuery.trim().toLowerCase()}%`;
+      query.andWhere(
+        '(LOWER(u.fullName) LIKE :q OR LOWER(u.email) LIKE :q OR LOWER(u.phone) LIKE :q OR LOWER(studentProfile.primaryDiscipline) LIKE :q OR LOWER(studentProfile.ridingLevel) LIKE :q OR LOWER(studentProfile.emergencyContactName) LIKE :q)',
+        { q },
+      );
+    }
+
+    const students = await query.getMany();
     return students.map(s => AdminMapper.toStudentDTO(s));
   }
 
@@ -197,8 +205,10 @@ class StudentsService {
     const userRepo = await this._getRepository('User');
     const profileRepo = await this._getRepository('StudentProfile');
     const bookingRepo = await this._getRepository('LessonBooking');
+    const attemptRepo = await this._getRepository('QuizAttempt');
 
     const parsedId = parseInt(id, 10);
+    await attemptRepo.delete({ studentId: parsedId });
     await bookingRepo.delete({ studentId: parsedId });
     await profileRepo.delete({ userId: parsedId });
     return await userRepo.delete({ id: parsedId });
