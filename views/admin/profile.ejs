@@ -27,7 +27,7 @@
 
       <!-- Identity Card with Multer Avatar Upload -->
       <div class="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-xs text-center space-y-5 relative overflow-hidden">
-        <div class="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-[#1B3B2B] to-[#25523d] opacity-90"></div>
+        <div class="absolute top-0 left-0 right-0 h-24 bg-linear-to-r from-equira-green-800 to-equira-green-700 opacity-90"></div>
 
         <div class="relative pt-6">
           <div class="relative group w-28 h-28 rounded-full overflow-hidden mx-auto border-4 border-white shadow-md bg-stone-100">
@@ -64,7 +64,7 @@
               </span>
             </div>
             
-            <p class="text-sm font-semibold text-[#1B3B2B] mt-2">
+            <p class="text-sm font-semibold text-equira-green-800 mt-2">
               <%= data.title %>
             </p>
             <p class="text-xs text-stone-400 mt-1 flex items-center justify-center gap-1.5">
@@ -78,7 +78,7 @@
           <div class="pt-4 border-t border-stone-100 mt-5 flex justify-center">
             <button type="button" 
                     onclick="document.getElementById('adminAvatarFileInput').click()"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-[#1B3B2B] hover:bg-[#142e21] text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift">
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-equira-green-800 hover:bg-equira-green-900 text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift">
               <i class="fa-solid fa-camera text-xs"></i>
               <span>Ladda upp ny profilbild</span>
             </button>
@@ -157,7 +157,7 @@
                   <i class="fa-regular fa-user text-sm"></i>
                 </span>
                 <input type="text" name="fullName" required value="<%= data.fullName %>"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
 
@@ -188,7 +188,7 @@
                   <i class="fa-regular fa-envelope text-sm"></i>
                 </span>
                 <input type="email" name="email" required value="<%= data.email %>"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
 
@@ -202,7 +202,7 @@
                   <i class="fa-solid fa-phone text-sm"></i>
                 </span>
                 <input type="tel" name="phone" value="<%= data.phone %>" placeholder="070-123 45 67"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
           </div>
@@ -217,7 +217,7 @@
                 <i class="fa-solid fa-id-badge text-sm"></i>
               </span>
               <input type="text" name="title" value="<%= data.title %>" placeholder="t.ex. Ridskolechef & Huvudinstruktör"
-                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
             </div>
           </div>
 
@@ -227,13 +227,13 @@
               Specialiseringar &amp; Ansvarsområden
             </label>
             <textarea name="specializations" rows="2" placeholder="t.ex. Dressyrdomare, Pedagogik, Hopptränare"
-              class="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900"><%= data.specializations %></textarea>
+              class="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900"><%= data.specializations %></textarea>
             <span class="text-[10px] text-stone-400 mt-1 block">Visas i personallistan och instruktörsöversikten.</span>
           </div>
 
           <div class="pt-2 flex justify-end">
             <button type="submit"
-              class="w-full sm:w-auto px-6 py-2.5 bg-[#1B3B2B] hover:bg-[#142e21] text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
+              class="w-full sm:w-auto px-6 py-2.5 bg-equira-green-800 hover:bg-equira-green-900 text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
               <i class="fa-solid fa-check text-xs"></i>
               <span>Spara ändringar</span>
             </button>
@@ -264,7 +264,7 @@
                 <i class="fa-solid fa-lock text-sm"></i>
               </span>
               <input type="password" name="currentPassword" required placeholder="Ditt nuvarande lösenord"
-                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
             </div>
           </div>
 
@@ -279,7 +279,7 @@
                   <i class="fa-solid fa-shield-halved text-sm"></i>
                 </span>
                 <input type="password" id="newPassword" name="newPassword" required minlength="6" placeholder="Minst 6 tecken"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
 
@@ -293,14 +293,14 @@
                   <i class="fa-solid fa-shield-halved text-sm"></i>
                 </span>
                 <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Upprepa nytt lösenord"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
           </div>
 
           <div class="pt-2 flex justify-end">
             <button type="submit"
-              class="w-full sm:w-auto px-6 py-2.5 bg-[#3d2314] hover:bg-[#2c190e] text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
+              class="w-full sm:w-auto px-6 py-2.5 bg-equira-cognac-800 hover:bg-equira-cognac-900 text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
               <i class="fa-solid fa-lock text-xs"></i>
               <span>Uppdatera lösenord</span>
             </button>

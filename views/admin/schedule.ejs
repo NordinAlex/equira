@@ -18,7 +18,7 @@
       </div>
 
       <!-- New Lesson Button -->
-      <a href="/admin/lessons/create" class="inline-flex items-center gap-2 bg-[#3d2314] hover:bg-[#2c190e] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm shadow-sm transition hover-lift">
+      <a href="/admin/lessons/create" class="inline-flex items-center gap-2 bg-equira-cognac-800 hover:bg-equira-cognac-900 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-medium text-xs sm:text-sm shadow-sm transition hover-lift">
         <i class="fa-solid fa-plus text-xs"></i>
         <span>Ny Lektion</span>
       </a>
@@ -61,13 +61,25 @@
       <span class="text-xs font-semibold text-stone-400 mr-1 hidden sm:inline">
         <i class="fa-solid fa-location-dot text-[10px] mr-1"></i>Arena:
       </span>
-      <a href="<%= data.allArenasUrl %>" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition <%= !data.selectedArenaId ? 'bg-[#1B3B2B] text-white shadow-xs' : 'bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100' %>">
-        Alla arenor
-      </a>
-      <% data.arenas.forEach(arena => { %>
-        <a href="<%= arena.filterUrl %>" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition <%= arena.isSelected ? 'bg-[#1B3B2B] text-white shadow-xs' : 'bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100' %>">
-          <%= arena.name %>
+      <% if (!data.selectedArenaId) { %>
+        <a href="<%= data.allArenasUrl %>" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-equira-green-800 text-white shadow-xs">
+          Alla arenor
         </a>
+      <% } else { %>
+        <a href="<%= data.allArenasUrl %>" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100">
+          Alla arenor
+        </a>
+      <% } %>
+      <% data.arenas.forEach(arena => { %>
+        <% if (arena.isSelected) { %>
+          <a href="<%= arena.filterUrl %>" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-equira-green-800 text-white shadow-xs">
+            <%= arena.name %>
+          </a>
+        <% } else { %>
+          <a href="<%= arena.filterUrl %>" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100">
+            <%= arena.name %>
+          </a>
+        <% } %>
       <% }) %>
     </div>
   </div>
@@ -127,13 +139,13 @@
   <% if (data.currentView === 'week') { %>
     <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
       <!-- Mobile Scroll Hint -->
-      <div class="block sm:hidden px-4 py-2.5 bg-stone-50 border-b border-stone-200 text-[11px] text-stone-500 flex items-center justify-between">
+      <div class="flex sm:hidden px-4 py-2.5 bg-stone-50 border-b border-stone-200 text-[11px] text-stone-500 items-center justify-between">
         <span class="flex items-center gap-1.5"><i class="fa-solid fa-arrows-left-right text-stone-400"></i> Svep för att se hela veckan</span>
         <span class="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">V. <%= data.weekInfo.weekNumber %></span>
       </div>
 
       <div class="overflow-x-auto touch-scroll">
-        <div class="min-w-[900px]">
+        <div class="min-w-225">
           <!-- Days Header (8 Columns: Time + Mon-Sun) -->
           <div class="grid grid-cols-8 border-b border-stone-200 text-center text-xs font-bold text-stone-600 bg-stone-50/95">
             <div class="py-3 px-2 border-r border-stone-200 text-stone-400 sticky left-0 bg-stone-50 z-20 shadow-[1px_0_3px_rgba(0,0,0,0.06)] flex items-center justify-center">
@@ -166,7 +178,7 @@
           <!-- Time Slots Grid -->
           <div class="divide-y divide-stone-100 text-xs">
             <% data.timetableGrid.forEach(row => { %>
-              <div class="grid grid-cols-8 min-h-[4.75rem]">
+              <div class="grid grid-cols-8 min-h-19">
                 <!-- Time Column (Sticky) -->
                 <div class="p-2 border-r border-stone-200 text-stone-400 font-mono text-center flex items-center justify-center sticky left-0 bg-white z-10 shadow-[1px_0_3px_rgba(0,0,0,0.06)] text-[11px]">
                   <%= row.time %>
@@ -226,15 +238,37 @@
       <div class="bg-white rounded-2xl border border-stone-200 p-3 shadow-xs">
         <div class="flex items-center gap-2 overflow-x-auto pb-1">
           <% data.days.forEach(day => { %>
-            <a href="<%= day.dayViewUrl %>" class="flex-1 min-w-[100px] text-center p-2.5 rounded-xl border transition <%= day.isSelected ? 'bg-[#1B3B2B] text-white border-emerald-900 shadow-sm font-bold' : (day.isToday ? 'bg-amber-50 text-amber-900 border-amber-300 font-semibold' : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100') %>">
-              <div class="text-[10px] uppercase tracking-wider <%= day.isSelected ? 'text-emerald-200' : 'text-stone-400' %>">
-                <%= day.dayNameShort %> <%= day.isToday ? '(Idag)' : '' %>
-              </div>
-              <div class="text-base font-black mt-0.5"><%= day.dayNumber %></div>
-              <div class="text-[10px] mt-0.5 <%= day.isSelected ? 'text-emerald-100' : 'text-stone-500' %>">
-                <%= day.lessonCount %> <%= day.lessonCount === 1 ? 'pass' : 'pass' %>
-              </div>
-            </a>
+            <% if (day.isSelected) { %>
+              <a href="<%= day.dayViewUrl %>" class="flex-1 min-w-25 text-center p-2.5 rounded-xl border transition bg-equira-green-800 text-white border-emerald-900 shadow-sm font-bold">
+                <div class="text-[10px] uppercase tracking-wider text-emerald-200">
+                  <%= day.dayNameShort %> <%= day.isToday ? '(Idag)' : '' %>
+                </div>
+                <div class="text-base font-black mt-0.5"><%= day.dayNumber %></div>
+                <div class="text-[10px] mt-0.5 text-emerald-100">
+                  <%= day.lessonCount %> <%= day.lessonCount === 1 ? 'pass' : 'pass' %>
+                </div>
+              </a>
+            <% } else if (day.isToday) { %>
+              <a href="<%= day.dayViewUrl %>" class="flex-1 min-w-25 text-center p-2.5 rounded-xl border transition bg-amber-50 text-amber-900 border-amber-300 font-semibold">
+                <div class="text-[10px] uppercase tracking-wider text-stone-400">
+                  <%= day.dayNameShort %> (Idag)
+                </div>
+                <div class="text-base font-black mt-0.5"><%= day.dayNumber %></div>
+                <div class="text-[10px] mt-0.5 text-stone-500">
+                  <%= day.lessonCount %> <%= day.lessonCount === 1 ? 'pass' : 'pass' %>
+                </div>
+              </a>
+            <% } else { %>
+              <a href="<%= day.dayViewUrl %>" class="flex-1 min-w-25 text-center p-2.5 rounded-xl border transition bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100">
+                <div class="text-[10px] uppercase tracking-wider text-stone-400">
+                  <%= day.dayNameShort %>
+                </div>
+                <div class="text-base font-black mt-0.5"><%= day.dayNumber %></div>
+                <div class="text-[10px] mt-0.5 text-stone-500">
+                  <%= day.lessonCount %> <%= day.lessonCount === 1 ? 'pass' : 'pass' %>
+                </div>
+              </a>
+            <% } %>
           <% }) %>
         </div>
       </div>
@@ -246,7 +280,7 @@
             <h3 class="text-lg font-bold text-stone-900"><%= data.selectedDayName %></h3>
             <p class="text-xs text-stone-500 mt-0.5"><%= data.selectedDayLessons.length %> lektionspass inbokade för denna dag.</p>
           </div>
-          <a href="/admin/lessons/create?date=<%= data.selectedDate %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#3d2314] hover:bg-[#2c190e] text-white text-xs font-semibold rounded-xl shadow-xs transition">
+          <a href="/admin/lessons/create?date=<%= data.selectedDate %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-equira-cognac-800 hover:bg-equira-cognac-900 text-white text-xs font-semibold rounded-xl shadow-xs transition">
             <i class="fa-solid fa-plus text-[10px]"></i>
             <span>Ny Lektion denna dag</span>
           </a>
@@ -264,7 +298,7 @@
                 Det finns inga lektionspass inplanerade för <%= data.selectedDayName %>. Du kan lägga till en ny lektion direkt.
               </p>
             </div>
-            <a href="/admin/lessons/create?date=<%= data.selectedDate %>" class="inline-flex items-center gap-2 bg-[#3d2314] hover:bg-[#2c190e] text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition">
+            <a href="/admin/lessons/create?date=<%= data.selectedDate %>" class="inline-flex items-center gap-2 bg-equira-cognac-800 hover:bg-equira-cognac-900 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition">
               <i class="fa-solid fa-plus text-xs"></i>
               <span>Skapa lektion för <%= data.selectedDayName %></span>
             </a>
@@ -318,11 +352,18 @@
 
                   <!-- Actions & Status Badges -->
                   <div class="flex items-center gap-2 self-start sm:self-center">
-                    <span class="px-3 py-1.5 rounded-xl text-xs font-bold border <%= lesson.unassignedCount > 0 ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-emerald-50 text-emerald-800 border-emerald-300' %>">
-                      <i class="fa-solid <%= lesson.unassignedCount > 0 ? 'fa-triangle-exclamation mr-1' : 'fa-check mr-1' %>"></i>
-                      <%= lesson.allocationStatus %>
-                    </span>
-                    <a href="<%= lesson.assignUrl %>" class="px-4 py-2 bg-[#1B3B2B] hover:bg-[#142e21] text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center gap-1.5">
+                    <% if (lesson.unassignedCount > 0) { %>
+                      <span class="px-3 py-1.5 rounded-xl text-xs font-bold border bg-amber-50 text-amber-800 border-amber-300">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                        <%= lesson.allocationStatus %>
+                      </span>
+                    <% } else { %>
+                      <span class="px-3 py-1.5 rounded-xl text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-300">
+                        <i class="fa-solid fa-check mr-1"></i>
+                        <%= lesson.allocationStatus %>
+                      </span>
+                    <% } %>
+                    <a href="<%= lesson.assignUrl %>" class="px-4 py-2 bg-equira-green-800 hover:bg-equira-green-900 text-white text-xs font-semibold rounded-xl shadow-xs transition flex items-center gap-1.5">
                       <i class="fa-solid fa-horseshoe"></i>
                       <span>Tilldela hästar</span>
                     </a>
