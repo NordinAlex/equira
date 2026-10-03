@@ -27,11 +27,11 @@
 
       <!-- Identity Card with Multer Avatar Upload -->
       <div class="bg-white rounded-3xl border border-stone-200 p-6 sm:p-8 shadow-xs text-center space-y-5 relative overflow-hidden">
-        <div class="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-[#1B3B2B] to-[#25523d] opacity-90"></div>
+        <div class="absolute top-0 left-0 right-0 h-24 bg-linear-to-r from-equira-green-800 to-equira-green-700 opacity-90"></div>
 
         <div class="relative pt-6">
           <div class="relative group w-28 h-28 rounded-full overflow-hidden mx-auto border-4 border-white shadow-md bg-stone-100">
-            <img id="adminAvatarPreview" src="<%= data.avatarUrl %>" alt="<%= data.fullName %>" class="w-full h-full object-cover">
+            <img id="adminAvatarPreview" src="<%= data.avatarUrl %>" alt="<%= data.fullName %>" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/images/default-staff.jpg';">
             
             <button type="button" 
                     onclick="document.getElementById('adminAvatarFileInput').click()"
@@ -41,15 +41,6 @@
               <span class="text-[10px] font-bold">Byt bild</span>
             </button>
           </div>
-
-          <!-- Hidden Upload Form -->
-          <form id="adminAvatarUploadForm" action="/admin/profile/avatar" method="POST" enctype="multipart/form-data" class="hidden">
-            <input type="file" 
-                   id="adminAvatarFileInput" 
-                   name="avatar" 
-                   accept="image/jpeg,image/png,image/webp,image/gif" 
-                   onchange="document.getElementById('adminAvatarUploadForm').submit()">
-          </form>
 
           <div class="mt-4">
             <h2 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
@@ -64,25 +55,55 @@
               </span>
             </div>
             
-            <p class="text-sm font-semibold text-[#1B3B2B] mt-2">
+            <p class="text-sm font-semibold text-equira-green-800 mt-2">
               <%= data.title %>
             </p>
-            <p class="text-xs text-stone-400 mt-1 flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-location-dot text-emerald-600"></i>
-              <span>Mälardalen Ridcenter</span>
-              <span>&bull;</span>
+            <p class="text-xs text-stone-400 mt-1 flex items-center justify-center gap-1.5"> 
               <span><%= data.createdAtFormatted %></span>
             </p>
           </div>
 
-          <div class="pt-4 border-t border-stone-100 mt-5 flex justify-center">
-            <button type="button" 
-                    onclick="document.getElementById('adminAvatarFileInput').click()"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-[#1B3B2B] hover:bg-[#142e21] text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift">
-              <i class="fa-solid fa-camera text-xs"></i>
-              <span>Ladda upp ny profilbild</span>
-            </button>
-          </div>
+          <!-- Avatar Upload Form -->
+          <form id="adminAvatarUploadForm" action="/admin/profile/avatar" method="POST" enctype="multipart/form-data" class="pt-4 border-t border-stone-100 mt-5">
+            <input type="file" 
+                   id="adminAvatarFileInput" 
+                   name="avatar" 
+                   accept="image/jpeg,image/png,image/webp,image/gif" 
+                   class="hidden">
+
+            <!-- Default Trigger (when no image is staged) -->
+            <div id="defaultAvatarActionArea" class="flex justify-center">
+              <button type="button" 
+                      id="uploadAvatarBtn"
+                      onclick="document.getElementById('adminAvatarFileInput').click()"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-equira-green-800 hover:bg-equira-green-900 text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift cursor-pointer">
+                <i class="fa-solid fa-camera text-xs"></i>
+                <span id="uploadAvatarBtnText">Ladda upp ny profilbild</span>
+              </button>
+            </div>
+
+            <!-- Staged Upload Actions (Save & Cancel - shown when a new image is selected) -->
+            <div id="stagedAvatarActionArea" class="hidden space-y-3">
+              <div class="inline-flex items-center gap-2 text-xs text-stone-700 bg-stone-50 border border-stone-200 py-1.5 px-3 rounded-xl max-w-full">
+                <i class="fa-solid fa-image text-emerald-700 shrink-0"></i>
+                <span id="stagedFileName" class="truncate font-medium max-w-50">bild.jpg</span>
+              </div>
+              <div class="flex items-center justify-center gap-2">
+                <button type="button" 
+                        id="cancelAvatarBtn"
+                        class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-xmark text-xs"></i>
+                  <span>Avbryt</span>
+                </button>
+                <button type="submit" 
+                        id="saveAvatarBtn"
+                        class="px-5 py-2 bg-equira-green-800 hover:bg-equira-green-900 text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-floppy-disk text-xs"></i>
+                  <span id="saveAvatarBtnText">Spara</span>
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -149,92 +170,92 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Full Name -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="profileFullName" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Fullständigt namn <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-regular fa-user text-sm"></i>
                 </span>
-                <input type="text" name="fullName" required value="<%= data.fullName %>"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                <input type="text" id="profileFullName" name="fullName" required value="<%= data.fullName %>"
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
 
             <!-- Username (Read-only) -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="profileUsername" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Användarnamn
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-solid fa-at text-sm"></i>
                 </span>
-                <input type="text" value="<%= data.username %>" readonly disabled
+                <input type="text" id="profileUsername" value="<%= data.username %>" readonly disabled
                   class="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-sm text-stone-500 cursor-not-allowed">
               </div>
-              <span class="text-[10px] text-stone-400 mt-1 block">Användarnamnet är permanent kopplat till kontot.</span>
+              <span class="text-[10px] text-stone-500 mt-1 block">Användarnamnet är permanent kopplat till kontot.</span>
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Email -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="profileEmail" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 E-postadress <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-regular fa-envelope text-sm"></i>
                 </span>
-                <input type="email" name="email" required value="<%= data.email %>"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                <input type="email" id="profileEmail" name="email" required value="<%= data.email %>"
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
 
             <!-- Phone -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="profilePhone" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Telefonnummer
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-solid fa-phone text-sm"></i>
                 </span>
-                <input type="tel" name="phone" value="<%= data.phone %>" placeholder="070-123 45 67"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                <input type="tel" id="profilePhone" name="phone" value="<%= data.phone %>" placeholder="070-123 45 67"
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
           </div>
 
           <!-- Title / Position -->
           <div>
-            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+            <label for="profileTitle" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
               Befattning / Titel i stallet
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                 <i class="fa-solid fa-id-badge text-sm"></i>
               </span>
-              <input type="text" name="title" value="<%= data.title %>" placeholder="t.ex. Ridskolechef & Huvudinstruktör"
-                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+              <input type="text" id="profileTitle" name="title" value="<%= data.title %>" placeholder="t.ex. Ridskolechef & Huvudinstruktör"
+                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
             </div>
           </div>
 
           <!-- Specializations -->
           <div>
-            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+            <label for="profileSpecializations" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
               Specialiseringar &amp; Ansvarsområden
             </label>
-            <textarea name="specializations" rows="2" placeholder="t.ex. Dressyrdomare, Pedagogik, Hopptränare"
-              class="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900"><%= data.specializations %></textarea>
-            <span class="text-[10px] text-stone-400 mt-1 block">Visas i personallistan och instruktörsöversikten.</span>
+            <textarea id="profileSpecializations" name="specializations" rows="2" placeholder="t.ex. Dressyrdomare, Pedagogik, Hopptränare"
+              class="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900"><%= data.specializations %></textarea>
+            <span class="text-[10px] text-stone-500 mt-1 block">Visas i personallistan och instruktörsöversikten.</span>
           </div>
 
           <div class="pt-2 flex justify-end">
             <button type="submit"
-              class="w-full sm:w-auto px-6 py-2.5 bg-[#1B3B2B] hover:bg-[#142e21] text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
-              <i class="fa-solid fa-check text-xs"></i>
+              class="w-full sm:w-auto px-6 py-2.5 bg-equira-green-800 hover:bg-equira-green-900 text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check text-xs" aria-hidden="true"></i>
               <span>Spara ändringar</span>
             </button>
           </div>
@@ -249,58 +270,58 @@
             <p class="text-xs text-stone-500 mt-0.5">Byt ut ditt lösenord regelbundet för att skydda anläggningsdatan.</p>
           </div>
           <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-sm border border-amber-200">
-            <i class="fa-solid fa-key"></i>
+            <i class="fa-solid fa-key" aria-hidden="true"></i>
           </div>
         </div>
 
         <form action="/admin/profile/password" method="POST" class="space-y-4" id="adminPasswordForm">
           <!-- Current Password -->
           <div>
-            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+            <label for="currentPassword" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
               Nuvarande lösenord <span class="text-rose-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                 <i class="fa-solid fa-lock text-sm"></i>
               </span>
-              <input type="password" name="currentPassword" required placeholder="Ditt nuvarande lösenord"
-                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+              <input type="password" id="currentPassword" name="currentPassword" required placeholder="Ditt nuvarande lösenord"
+                class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- New Password -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="newPassword" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Nytt lösenord <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-solid fa-shield-halved text-sm"></i>
                 </span>
                 <input type="password" id="newPassword" name="newPassword" required minlength="6" placeholder="Minst 6 tecken"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
 
             <!-- Confirm New Password -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="confirmPassword" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Bekräfta nytt lösenord <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-solid fa-shield-halved text-sm"></i>
                 </span>
                 <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Upprepa nytt lösenord"
-                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3B2B] focus:bg-white transition text-stone-900">
+                  class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
           </div>
 
           <div class="pt-2 flex justify-end">
             <button type="submit"
-              class="w-full sm:w-auto px-6 py-2.5 bg-[#3d2314] hover:bg-[#2c190e] text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
+              class="w-full sm:w-auto px-6 py-2.5 bg-equira-cognac-800 hover:bg-equira-cognac-900 text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
               <i class="fa-solid fa-lock text-xs"></i>
               <span>Uppdatera lösenord</span>
             </button>
@@ -323,4 +344,76 @@
       alert('De nya lösenorden matchar inte! Kontrollera båda fälten.');
     }
   });
+
+  const avatarFileInput = document.getElementById('adminAvatarFileInput');
+  const avatarUploadForm = document.getElementById('adminAvatarUploadForm');
+  const avatarPreview = document.getElementById('adminAvatarPreview');
+  const defaultAvatarActionArea = document.getElementById('defaultAvatarActionArea');
+  const stagedAvatarActionArea = document.getElementById('stagedAvatarActionArea');
+  const stagedFileName = document.getElementById('stagedFileName');
+  const cancelAvatarBtn = document.getElementById('cancelAvatarBtn');
+  const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+  const saveAvatarBtnText = document.getElementById('saveAvatarBtnText');
+
+  const originalAvatarSrc = avatarPreview ? avatarPreview.src : '';
+
+  if (avatarFileInput && avatarUploadForm) {
+    avatarFileInput.addEventListener('change', function() {
+      if (this.files && this.files.length > 0) {
+        const file = this.files[0];
+
+        // Validate image file type
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+          alert('Vänligen välj en giltig bildfil (JPG, PNG, WebP eller GIF).');
+          this.value = '';
+          return;
+        }
+
+        // Validate max 5MB
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Bilden är för stor. Maximal filstorlek är 5 MB.');
+          this.value = '';
+          return;
+        }
+
+        // Live preview of the chosen image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          if (avatarPreview) {
+            avatarPreview.src = e.target.result;
+          }
+        };
+        reader.readAsDataURL(file);
+
+        if (stagedFileName) {
+          stagedFileName.textContent = file.name;
+        }
+
+        // Show Spara and Avbryt actions, hide default upload button
+        if (defaultAvatarActionArea) defaultAvatarActionArea.classList.add('hidden');
+        if (stagedAvatarActionArea) stagedAvatarActionArea.classList.remove('hidden');
+      }
+    });
+
+    if (cancelAvatarBtn) {
+      cancelAvatarBtn.addEventListener('click', function() {
+        avatarFileInput.value = '';
+        if (avatarPreview) {
+          avatarPreview.src = originalAvatarSrc;
+        }
+        if (stagedAvatarActionArea) stagedAvatarActionArea.classList.add('hidden');
+        if (defaultAvatarActionArea) defaultAvatarActionArea.classList.remove('hidden');
+      });
+    }
+
+    avatarUploadForm.addEventListener('submit', function() {
+      if (saveAvatarBtn) {
+        saveAvatarBtn.disabled = true;
+        if (saveAvatarBtnText) {
+          saveAvatarBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i><span>Sparar...</span>';
+        }
+      }
+    });
+  }
 </script>

@@ -13,6 +13,12 @@ equira.sqlite
 #Tailwindcss styles.css
 styles.css
 
+# Image files
+*.png
+*.jpg
+*.jpeg
+*.webp
+
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

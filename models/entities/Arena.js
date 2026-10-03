@@ -28,6 +28,10 @@ module.exports = new EntitySchema({
       type: 'text',
       nullable: true,
     },
+    imageUrl: {
+      type: 'varchar',
+      nullable: true,
+    },
   },
   relations: {
     lessons: {

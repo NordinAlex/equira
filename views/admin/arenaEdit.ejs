@@ -1,0 +1,454 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
+  <!-- Sidhuvud med brödsmulor och åtgärdsknappar -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-stone-200 pb-4">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-stone-400 font-medium">
+        <a href="/admin/arenas" class="hover:text-stone-700 transition">Ridbanor</a>
+        <span>&bull;</span>
+        <span class="text-stone-600 font-semibold">Redigera <%= arena.name %></span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-stone-900 tracking-tight mt-1">
+        Redigera Ridbana
+      </h2>
+      <p class="text-xs text-stone-500 mt-0.5">Uppdatera bild, mått, underlag och inställningar för <%= arena.name %>.</p>
+    </div>
+    <div class="flex items-center gap-2 sm:gap-3 self-start sm:self-center">
+      <a href="/admin/arenas" class="px-4 py-2 border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl transition">
+        Avbryt
+      </a>
+      <button type="submit" form="arenaEditForm" class="px-5 py-2 bg-equira-cognac-800 hover:bg-equira-cognac-900 text-white text-xs font-semibold rounded-xl shadow-xs transition hover-lift">
+        <i class="fa-solid fa-check mr-1.5"></i>
+        <span>Spara ändringar</span>
+      </button>
+    </div>
+  </div>
+
+  <% if (error) { %>
+    <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center gap-3">
+      <i class="fa-solid fa-circle-exclamation text-rose-600 text-base shrink-0"></i>
+      <span><%= error %></span>
+    </div>
+  <% } %>
+
+  <!-- Formulär och förhandsgranskning -->
+  <form id="arenaEditForm" action="/admin/arenas/<%= arena.id %>/edit" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Vänster kolumn: Formulärfält (8 kolumner) -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- 1. Grundläggande information -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-5">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-solid fa-warehouse text-stone-400"></i> Grundläggande information
+          </h3>
+
+          <div>
+            <label for="arenaNameInput" class="block text-xs font-semibold text-stone-700 mb-1">
+              Ridbanans namn <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" 
+                   id="arenaNameInput" 
+                   name="name" 
+                   value="<%= arena.name %>" 
+                   required
+                   class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-cognac-800/20 focus:border-equira-cognac-800 focus:bg-white transition">
+            <p class="text-[11px] text-stone-400 mt-1">Det namn som visas för instruktörer och i lektionsschemat.</p>
+          </div>
+
+          <!-- Inomhus vs Utomhus radiokort -->
+          <div>
+            <span class="block text-xs font-semibold text-stone-700 mb-2">Typ av anläggning</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label for="arenaIndoor" class="relative flex items-center gap-3.5 p-3.5 border-2 rounded-xl cursor-pointer transition select-none has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/40 border-stone-200 hover:border-stone-300">
+                <input type="radio" 
+                       id="arenaIndoor"
+                       name="isIndoor" 
+                       value="true" 
+                       <%= arena.isIndoor ? 'checked' : '' %> 
+                       class="w-4 h-4 text-emerald-600 focus:ring-emerald-500 arena-type-radio">
+                <div>
+                  <div class="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-building text-emerald-600" aria-hidden="true"></i> Inomhus / Ridhushall
+                  </div>
+                  <div class="text-[11px] text-stone-500 mt-0.5">Skyddad miljö för lektioner året runt</div>
+                </div>
+              </label>
+
+              <label for="arenaOutdoor" class="relative flex items-center gap-3.5 p-3.5 border-2 rounded-xl cursor-pointer transition select-none has-[:checked]:border-sky-600 has-[:checked]:bg-sky-50/40 border-stone-200 hover:border-stone-300">
+                <input type="radio" 
+                       id="arenaOutdoor"
+                       name="isIndoor" 
+                       value="false" 
+                       <%= !arena.isIndoor ? 'checked' : '' %> 
+                       class="w-4 h-4 text-sky-600 focus:ring-sky-500 arena-type-radio">
+                <div>
+                  <div class="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-sun text-sky-600" aria-hidden="true"></i> Utomhus / Paddock
+                  </div>
+                  <div class="text-[11px] text-stone-500 mt-0.5">Utebana, terräng eller utevolt</div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Bild för Ridbana / Arena -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
+          <div class="flex items-center justify-between border-b border-stone-100 pb-3">
+            <h3 class="text-sm font-bold text-stone-900 flex items-center gap-2">
+              <i class="fa-solid fa-camera text-stone-400"></i> Bild för Ridbana / Arena
+            </h3>
+            <span class="text-[11px] text-stone-400 font-medium">Visas i lektionsplaneringen</span>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div class="w-32 h-24 rounded-xl overflow-hidden bg-stone-100 border border-stone-200 relative shrink-0 shadow-xs">
+                <img id="arenaImageThumb" 
+                     src="<%= arena.imageUrl || (arena.isIndoor ? '/images/arena-preview.jpg' : '/images/arena-outdoor.jpg') %>" 
+                     alt="<%= arena.name %>" 
+                     class="w-full h-full object-cover">
+              </div>
+
+              <div class="flex-1 space-y-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <label for="arenaImageFile" class="inline-flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-xl cursor-pointer transition">
+                    <i class="fa-solid fa-cloud-arrow-up text-stone-500"></i>
+                    <span>Byt till egen bild...</span>
+                  </label>
+                  <input type="file" id="arenaImageFile" name="image" accept="image/*" class="hidden">
+                  <input type="hidden" id="arenaPresetImageUrl" name="imageUrl" value="<%= arena.imageUrl || '' %>">
+                </div>
+                <p class="text-[11px] text-stone-400">JPG, PNG eller WebP. Ersätter aktuell bild i lektionsschemat och planeringen.</p>
+              </div>
+            </div>
+
+            <!-- Snabbval för standardbilder -->
+            <div class="pt-3 border-t border-stone-100 flex flex-wrap items-center gap-2">
+              <span class="text-[11px] text-stone-400 mr-1">Eller välj standardbild:</span>
+              <button type="button" onclick="selectArenaPreset('/images/arena-preview.jpg')" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-xl transition cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-warehouse text-emerald-600"></i> Standard Ridhushall
+              </button>
+              <button type="button" onclick="selectArenaPreset('/images/arena-outdoor.jpg')" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-xl transition cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-sun text-sky-600"></i> Standard Utebana
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Mått och Underlag -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-5">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-solid fa-ruler-combined text-stone-400"></i> Dimensioner och Underlag
+          </h3>
+
+          <div>
+            <label for="dimensionsInput" class="block text-xs font-semibold text-stone-700 mb-1">Mått / Dimensioner</label>
+            <input type="text" 
+                   id="dimensionsInput" 
+                   name="dimensions" 
+                   value="<%= arena.dimensions || '20×60m' %>" 
+                   class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-cognac-800/20 focus:border-equira-cognac-800 focus:bg-white transition">
+            
+            <div class="flex flex-wrap items-center gap-1.5 mt-2">
+              <span class="text-[11px] text-stone-400 mr-1">Vanliga mått:</span>
+              <button type="button" onclick="setDimension('20×60m')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                20×60m (Dressyr)
+              </button>
+              <button type="button" onclick="setDimension('20×40m')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                20×40m (Kortbana)
+              </button>
+              <button type="button" onclick="setDimension('30×70m')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                30×70m (Hoppbana)
+              </button>
+              <button type="button" onclick="setDimension('25×65m')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                25×65m
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label for="surfaceInput" class="block text-xs font-semibold text-stone-700 mb-1">Underlagstyp</label>
+            <input type="text" 
+                   id="surfaceInput" 
+                   name="surfaceType" 
+                   value="<%= arena.surfaceType || 'Fibersand' %>" 
+                   class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-cognac-800/20 focus:border-equira-cognac-800 focus:bg-white transition">
+
+            <div class="flex flex-wrap items-center gap-1.5 mt-2">
+              <span class="text-[11px] text-stone-400 mr-1">Vanliga underlag:</span>
+              <button type="button" onclick="setSurface('Fibersand')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                Fibersand
+              </button>
+              <button type="button" onclick="setSurface('Flis & sand')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                Flis & sand
+              </button>
+              <button type="button" onclick="setSurface('Sand & grus')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                Sand & grus
+              </button>
+              <button type="button" onclick="setSurface('Gräsbana')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                Gräsbana
+              </button>
+              <button type="button" onclick="setSurface('Teorisal / Parkett')" class="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-medium rounded-lg transition cursor-pointer">
+                Teorisal
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Övriga faciliteter och anteckningar -->
+        <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-xs space-y-4">
+          <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3 flex items-center gap-2">
+            <i class="fa-regular fa-note-sticky text-stone-400"></i> Utrustning, Belysning & Anteckningar
+          </h3>
+
+          <div>
+            <label for="notesInput" class="block text-xs font-semibold text-stone-700 mb-1">Beskrivning / Noteringar</label>
+            <textarea id="notesInput" 
+                      name="notes" 
+                      rows="4" 
+                      placeholder="t.ex. LED-belysning med dimmer, speglar på kortsidan, automatiskt bevattningssystem..."
+                      class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-cognac-800/20 focus:border-equira-cognac-800 focus:bg-white transition"><%= arena.notes || '' %></textarea>
+          </div>
+        </div>
+
+        <!-- 5. Farlig zon / Radera ridbana -->
+        <div class="bg-rose-50/50 rounded-2xl border border-rose-200/80 p-6 space-y-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-rose-900">Ta bort denna ridbana</h4>
+              <p class="text-xs text-rose-700/80 mt-0.5">
+                Ridbanan tas bort permanent. Befintliga lektioner kopplade till banan behålls men avlänkas automatiskt så att inget schemainnehåll försvinner.
+              </p>
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button type="button" 
+                    data-delete-action="/admin/arenas/<%= arena.id %>/delete"
+                    data-delete-title="Ta bort ridbana?"
+                    data-delete-item="<%= arena.name %>"
+                    data-delete-prefix="Är du säker på att du vill ta bort ridbanan"
+                    data-delete-warning="Ridbanan raderas permanent. Schemalagda lektioner avlänkas automatiskt."
+                    data-delete-submit="Ja, ta bort ridbana"
+                    onclick="openGlobalDeleteModal('/admin/arenas/<%= arena.id %>/delete', '<%= arena.name %>', 'Ridbanan raderas permanent. Schemalagda lektioner avlänkas automatiskt.', 'Ta bort ridbana?')"
+                    class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-regular fa-trash-can"></i>
+              <span>Ta bort ridbana</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Höger kolumn: Interaktiv Live Förhandsgranskning (4 kolumner) -->
+      <div class="lg:col-span-4 space-y-6">
+        <div class="sticky top-6 space-y-4">
+          <div class="text-xs font-bold text-stone-400 uppercase tracking-wider">Förhandsgranskning</div>
+
+          <!-- Förhandsgranskningskort -->
+          <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm space-y-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <span id="previewBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border <%= arena.isIndoor ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-sky-50 text-sky-800 border-sky-200' %>">
+                  <i id="previewBadgeIcon" class="fa-solid <%= arena.isIndoor ? 'fa-warehouse' : 'fa-sun' %>"></i>
+                  <span id="previewBadgeText"><%= arena.isIndoor ? 'Inomhus' : 'Utomhus' %></span>
+                </span>
+                <h3 id="previewTitle" class="text-lg font-bold text-stone-900 tracking-tight mt-2.5">
+                  <%= arena.name %>
+                </h3>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-stone-50 border border-stone-100 flex items-center justify-center text-stone-500 shrink-0">
+                <i id="previewIcon" class="fa-solid <%= arena.isIndoor ? 'fa-warehouse' : 'fa-sun' %> text-base"></i>
+              </div>
+            </div>
+
+            <!-- Interaktiv Bild i Förhandsgranskningen -->
+            <div class="rounded-xl overflow-hidden h-32 relative shadow-inner bg-stone-100 group">
+              <img id="previewArenaImage" 
+                   src="<%= arena.imageUrl || (arena.isIndoor ? '/images/arena-preview.jpg' : '/images/arena-outdoor.jpg') %>" 
+                   alt="<%= arena.name %>" 
+                   class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                   onerror="this.onerror=null; this.src='/images/arena-preview.jpg';">
+              <div id="previewSurfaceBadge" class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg text-white text-[10px] font-medium flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-layer-group text-[9px] text-amber-300"></i>
+                <span id="previewSurfaceBadgeText">Underlag: <%= arena.surfaceType || 'Fibersand' %></span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-stone-50 border border-stone-100 p-2.5 rounded-xl">
+                <div class="text-[10px] uppercase font-semibold text-stone-400">Mått</div>
+                <div id="previewDimensions" class="font-bold text-stone-800 mt-0.5 truncate">
+                  <%= arena.dimensions || '20×60m' %>
+                </div>
+              </div>
+              <div class="bg-stone-50 border border-stone-100 p-2.5 rounded-xl">
+                <div class="text-[10px] uppercase font-semibold text-stone-400">Underlag</div>
+                <div id="previewSurface" class="font-bold text-stone-800 mt-0.5 truncate">
+                  <%= arena.surfaceType || 'Fibersand' %>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs py-2 px-3 bg-stone-50/70 rounded-xl border border-stone-100 text-stone-600">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-regular fa-calendar-days text-stone-400"></i>
+                <span>Kopplade lektioner</span>
+              </span>
+              <span class="font-bold text-stone-900 bg-white px-2 py-0.5 rounded-lg border border-stone-200">
+                <%= (arena.lessons && arena.lessons.length) || 0 %> st
+              </span>
+            </div>
+
+            <div id="previewNotesWrapper" class="text-xs text-stone-600 bg-amber-50/50 border border-amber-100/70 p-3 rounded-xl space-y-1 <%= arena.notes ? '' : 'hidden' %>">
+              <div class="text-[10px] font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
+                <i class="fa-regular fa-note-sticky"></i> Notering
+              </div>
+              <p id="previewNotes" class="italic text-stone-600">
+                "<%= arena.notes %>"
+              </p>
+            </div>
+          </div>
+
+          <!-- Information om ID och kopplingar -->
+          <div class="bg-stone-100/70 rounded-2xl p-4 border border-stone-200 text-xs text-stone-600 space-y-2">
+            <div class="font-bold text-stone-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-hashtag text-stone-400"></i> Systemdata
+            </div>
+            <div class="space-y-1 text-[11px]">
+              <div><strong>Bana-ID:</strong> <%= arena.id %></div>
+              <div><strong>Status:</strong> Aktiv i lektionsschemat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<script>
+  function setDimension(val) {
+    const input = document.getElementById('dimensionsInput');
+    if (input) {
+      input.value = val;
+      input.dispatchEvent(new Event('input'));
+    }
+  }
+
+  function setSurface(val) {
+    const input = document.getElementById('surfaceInput');
+    if (input) {
+      input.value = val;
+      input.dispatchEvent(new Event('input'));
+    }
+  }
+
+  function selectArenaPreset(url) {
+    const thumb = document.getElementById('arenaImageThumb');
+    const preview = document.getElementById('previewArenaImage');
+    const hiddenUrl = document.getElementById('arenaPresetImageUrl');
+    const fileInput = document.getElementById('arenaImageFile');
+
+    if (thumb) thumb.src = url;
+    if (preview) preview.src = url;
+    if (hiddenUrl) hiddenUrl.value = url;
+    if (fileInput) fileInput.value = ''; // Nollställ ev vald fil
+  }
+
+  // Interaktiv synkronisering av förhandsgranskningen
+  (function() {
+    const nameInput = document.getElementById('arenaNameInput');
+    const dimInput = document.getElementById('dimensionsInput');
+    const surfInput = document.getElementById('surfaceInput');
+    const notesInput = document.getElementById('notesInput');
+    const typeRadios = document.querySelectorAll('.arena-type-radio');
+    const fileInput = document.getElementById('arenaImageFile');
+
+    const previewTitle = document.getElementById('previewTitle');
+    const previewDimensions = document.getElementById('previewDimensions');
+    const previewSurface = document.getElementById('previewSurface');
+    const previewSurfaceBadgeText = document.getElementById('previewSurfaceBadgeText');
+    const previewBadge = document.getElementById('previewBadge');
+    const previewBadgeIcon = document.getElementById('previewBadgeIcon');
+    const previewBadgeText = document.getElementById('previewBadgeText');
+    const previewIcon = document.getElementById('previewIcon');
+    const previewNotes = document.getElementById('previewNotes');
+    const previewNotesWrapper = document.getElementById('previewNotesWrapper');
+    const previewArenaImage = document.getElementById('previewArenaImage');
+    const arenaImageThumb = document.getElementById('arenaImageThumb');
+
+    if (fileInput) {
+      fileInput.addEventListener('change', function(e) {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          if (previewArenaImage) previewArenaImage.src = url;
+          if (arenaImageThumb) arenaImageThumb.src = url;
+        }
+      });
+    }
+
+    if (nameInput) {
+      nameInput.addEventListener('input', () => {
+        previewTitle.textContent = nameInput.value.trim() || 'Ridbanans namn';
+      });
+    }
+
+    if (dimInput) {
+      dimInput.addEventListener('input', () => {
+        previewDimensions.textContent = dimInput.value.trim() || 'Standard';
+      });
+    }
+
+    if (surfInput) {
+      surfInput.addEventListener('input', () => {
+        const val = surfInput.value.trim() || 'Fibersand';
+        previewSurface.textContent = val;
+        if (previewSurfaceBadgeText) {
+          previewSurfaceBadgeText.textContent = `Underlag: ${val}`;
+        }
+      });
+    }
+
+    if (notesInput) {
+      notesInput.addEventListener('input', () => {
+        const val = notesInput.value.trim();
+        if (val) {
+          previewNotes.textContent = `"${val}"`;
+          previewNotesWrapper.classList.remove('hidden');
+        } else {
+          previewNotesWrapper.classList.add('hidden');
+        }
+      });
+    }
+
+    typeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        const isIndoor = radio.value === 'true';
+        if (isIndoor) {
+          previewBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-emerald-50 text-emerald-800 border-emerald-200';
+          previewBadgeIcon.className = 'fa-solid fa-warehouse';
+          previewBadgeText.textContent = 'Inomhus';
+          previewIcon.className = 'fa-solid fa-warehouse text-base';
+          if (!fileInput.files || fileInput.files.length === 0) {
+            selectArenaPreset('/images/arena-preview.jpg');
+          }
+        } else {
+          previewBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-sky-50 text-sky-800 border-sky-200';
+          previewBadgeIcon.className = 'fa-solid fa-sun';
+          previewBadgeText.textContent = 'Utomhus';
+          previewIcon.className = 'fa-solid fa-sun text-base';
+          if (!fileInput.files || fileInput.files.length === 0) {
+            selectArenaPreset('/images/arena-outdoor.jpg');
+          }
+        }
+      });
+    });
+  })();
+</script>

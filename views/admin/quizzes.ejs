@@ -86,11 +86,17 @@
                 <span>Redigera</span>
               </a>
 
-              <form action="/admin/quizzes/<%= quiz.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Är du säker på att du vill ta bort &quot;<%= quiz.title %>&quot; och alla dess frågor? Detta kan inte ångras.');">
-                <button type="submit" title="Ta bort detta quiz" class="px-2.5 py-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition text-xs border border-transparent hover:border-rose-200">
-                  <i class="fa-regular fa-trash-can"></i>
-                </button>
-              </form>
+              <button type="button" 
+                data-delete-action="/admin/quizzes/<%= quiz.id %>/delete"
+                data-delete-title="Ta bort quiz?"
+                data-delete-item="<%= quiz.title %>"
+                data-delete-prefix="Är du säker på att du vill ta bort quizet"
+                data-delete-warning="Alla frågor och registrerade provresultat i detta quiz raderas permanent."
+                data-delete-submit="Ja, ta bort quiz"
+                title="Ta bort detta quiz" 
+                class="px-2.5 py-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition text-xs border border-transparent hover:border-rose-200 cursor-pointer">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
             </div>
           </div>
         </div>

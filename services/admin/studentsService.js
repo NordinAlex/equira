@@ -1,6 +1,7 @@
 const { getDataSource } = require('../../config/database');
 const { hashPassword } = require('../../config/auth');
 const AdminMapper = require('./adminMapper');
+const { removeUploadedFile, uploadDir } = require('../../middleware/uploadMiddleware');
 
 
 class StudentsService {
@@ -157,7 +158,13 @@ class StudentsService {
     user.fullName = data.fullName !== undefined ? data.fullName : user.fullName;
     user.email = data.email !== undefined ? data.email : user.email;
     user.phone = data.phone !== undefined ? data.phone : user.phone;
-    if (data.avatarUrl) user.avatarUrl = data.avatarUrl;
+    if (data.avatarUrl) {
+      const newAvatar = data.avatarUrl.trim();
+      if (user.avatarUrl && user.avatarUrl !== newAvatar) {
+        await removeUploadedFile(user.avatarUrl, uploadDir);
+      }
+      user.avatarUrl = newAvatar;
+    }
 
     if (data.password !== undefined && data.password !== null && data.password.trim().length > 0) {
       const trimmedPassword = data.password.trim();
@@ -208,6 +215,11 @@ class StudentsService {
     const attemptRepo = await this._getRepository('QuizAttempt');
 
     const parsedId = parseInt(id, 10);
+    const user = await userRepo.findOne({ where: { id: parsedId } });
+    if (user && user.avatarUrl) {
+      await removeUploadedFile(user.avatarUrl, uploadDir);
+    }
+
     await attemptRepo.delete({ studentId: parsedId });
     await bookingRepo.delete({ studentId: parsedId });
     await profileRepo.delete({ userId: parsedId });

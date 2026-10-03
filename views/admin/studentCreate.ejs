@@ -40,35 +40,35 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Förnamn *</label>
-              <input type="text" name="firstName" value="<%= typeof formData !== 'undefined' && formData?.firstName ? formData.firstName : '' %>" placeholder="t.ex. Elsa" required
+              <label for="firstName" class="block text-xs font-semibold text-stone-700 mb-1">Förnamn *</label>
+              <input id="firstName" type="text" name="firstName" value="<%= typeof formData !== 'undefined' && formData?.firstName ? formData.firstName : '' %>" placeholder="t.ex. Elsa" required
                 class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Efternamn *</label>
-              <input type="text" name="lastName" value="<%= typeof formData !== 'undefined' && formData?.lastName ? formData.lastName : '' %>" placeholder="t.ex. Lindqvist" required
-                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Användarnamn *</label>
-              <input type="text" name="username" value="<%= typeof formData !== 'undefined' && formData?.username ? formData.username : '' %>" placeholder="elsa.l" required
-                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">E-postadress *</label>
-              <input type="email" name="email" value="<%= typeof formData !== 'undefined' && formData?.email ? formData.email : '' %>" placeholder="elsa@example.se" required
+              <label for="lastName" class="block text-xs font-semibold text-stone-700 mb-1">Efternamn *</label>
+              <input id="lastName" type="text" name="lastName" value="<%= typeof formData !== 'undefined' && formData?.lastName ? formData.lastName : '' %>" placeholder="t.ex. Lindqvist" required
                 class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Personnummer</label>
-              <input type="text" name="personnummer" value="<%= typeof formData !== 'undefined' && formData?.personnummer ? formData.personnummer : '' %>" placeholder="ÅÅÅÅMMDD-XXXX"
+              <label for="username" class="block text-xs font-semibold text-stone-700 mb-1">Användarnamn *</label>
+              <input id="username" type="text" name="username" value="<%= typeof formData !== 'undefined' && formData?.username ? formData.username : '' %>" placeholder="elsa.l" required
                 class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Telefonnummer</label>
-              <input type="tel" name="phone" value="<%= typeof formData !== 'undefined' && formData?.phone ? formData.phone : '' %>" placeholder="070-123 45 67"
+              <label for="email" class="block text-xs font-semibold text-stone-700 mb-1">E-postadress *</label>
+              <input id="email" type="email" name="email" value="<%= typeof formData !== 'undefined' && formData?.email ? formData.email : '' %>" placeholder="elsa@example.se" required
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+
+            <div>
+              <label for="personnummer" class="block text-xs font-semibold text-stone-700 mb-1">Personnummer</label>
+              <input id="personnummer" type="text" name="personnummer" value="<%= typeof formData !== 'undefined' && formData?.personnummer ? formData.personnummer : '' %>" placeholder="ÅÅÅÅMMDD-XXXX"
+                class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+            </div>
+            <div>
+              <label for="phone" class="block text-xs font-semibold text-stone-700 mb-1">Telefonnummer</label>
+              <input id="phone" type="tel" name="phone" value="<%= typeof formData !== 'undefined' && formData?.phone ? formData.phone : '' %>" placeholder="070-123 45 67"
                 class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
             </div>
 
@@ -111,8 +111,8 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Ridnivå *</label>
-              <select name="ridingLevel" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium">
+              <label for="ridingLevel" class="block text-xs font-semibold text-stone-700 mb-1">Ridnivå *</label>
+              <select id="ridingLevel" name="ridingLevel" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium">
                 <option value="Nybörjare">Nybörjare</option>
                 <option value="Nivå 1">Nivå 1</option>
                 <option value="Nivå 2" selected>Nivå 2</option>
@@ -121,8 +121,8 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Erfarenhet (år)</label>
-              <input type="number" step="0.5" name="experienceYears" value="3.5" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+              <label for="experienceYears" class="block text-xs font-semibold text-stone-700 mb-1">Erfarenhet (år)</label>
+              <input id="experienceYears" type="number" step="0.5" name="experienceYears" value="3.5" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
             </div>
           </div>
 
@@ -137,35 +137,35 @@
             </p>
             <div class="grid grid-cols-2 gap-4 pt-1">
               <div>
-                <label class="block text-xs font-semibold text-stone-700 mb-1">Längd (cm)</label>
-                <input type="number" name="heightCm" value="168" required
+                <label for="heightCm" class="block text-xs font-semibold text-stone-700 mb-1">Längd (cm)</label>
+                <input id="heightCm" type="number" name="heightCm" value="168" required
                   class="w-full px-3 py-2 bg-white border border-stone-200 rounded-xl text-sm font-semibold">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-stone-700 mb-1">Vikt (kg) *</label>
-                <input type="number" name="weightKg" value="58" required
+                <label for="weightKg" class="block text-xs font-semibold text-stone-700 mb-1">Vikt (kg) *</label>
+                <input id="weightKg" type="number" name="weightKg" value="58" required
                   class="w-full px-3 py-2 bg-white border border-emerald-400 text-emerald-900 rounded-xl text-sm font-bold">
               </div>
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Primärt inriktningsmål</label>
+            <span class="block text-xs font-semibold text-stone-700 mb-1">Primärt inriktningsmål</span>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-              <label class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
-                <input type="radio" name="primaryDiscipline" value="Allround" checked class="text-[#4a2828]">
+              <label for="discipline_allround" class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
+                <input type="radio" id="discipline_allround" name="primaryDiscipline" value="Allround" checked class="text-[#4a2828]">
                 <span>Allround</span>
               </label>
-              <label class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
-                <input type="radio" name="primaryDiscipline" value="Dressyr" class="text-[#4a2828]">
+              <label for="discipline_dressyr" class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
+                <input type="radio" id="discipline_dressyr" name="primaryDiscipline" value="Dressyr" class="text-[#4a2828]">
                 <span>Dressyr</span>
               </label>
-              <label class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
-                <input type="radio" name="primaryDiscipline" value="Hoppning" class="text-[#4a2828]">
+              <label for="discipline_hoppning" class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
+                <input type="radio" id="discipline_hoppning" name="primaryDiscipline" value="Hoppning" class="text-[#4a2828]">
                 <span>Hoppning</span>
               </label>
-              <label class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
-                <input type="radio" name="primaryDiscipline" value="Hobby / Skog" class="text-[#4a2828]">
+              <label for="discipline_hobby" class="flex items-center gap-2 p-2 border border-stone-200 rounded-xl hover:bg-stone-50 cursor-pointer">
+                <input type="radio" id="discipline_hobby" name="primaryDiscipline" value="Hobby / Skog" class="text-[#4a2828]">
                 <span>Hobby / Skog</span>
               </label>
             </div>
@@ -185,19 +185,19 @@
 
           <div>
             <label class="block text-xs font-semibold text-stone-700 mb-1">Kontaktpersons namn *</label>
-            <input type="text" name="emergencyContactName" placeholder="t.ex. Johan Lindqvist" required
+            <input id="emergencyContactName" type="text" name="emergencyContactName" placeholder="t.ex. Johan Lindqvist" required
               class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Telefonnummer (akut) *</label>
-            <input type="tel" name="emergencyContactPhone" placeholder="073-987 65 43" required
+            <label for="emergencyContactPhone" class="block text-xs font-semibold text-stone-700 mb-1">Telefonnummer (akut) *</label>
+            <input id="emergencyContactPhone" type="tel" name="emergencyContactPhone" placeholder="073-987 65 43" required
               class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Relation till eleven</label>
-            <select name="emergencyContactRelation" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            <label for="emergencyContactRelation" class="block text-xs font-semibold text-stone-700 mb-1">Relation till eleven</label>
+            <select id="emergencyContactRelation" name="emergencyContactRelation" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
               <option value="Målsman / Förälder" selected>Målsman / Förälder</option>
               <option value="Partner">Partner</option>
               <option value="Anhörig">Anhörig</option>
@@ -210,8 +210,8 @@
           <h3 class="text-sm font-bold text-stone-900 border-b border-stone-100 pb-3">Medlemskap & Status</h3>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Medlemskapsstatus</label>
-            <select name="membershipStatus" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+            <label for="membershipStatus" class="block text-xs font-semibold text-stone-700 mb-1">Medlemskapsstatus</label>
+            <select id="membershipStatus" name="membershipStatus" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
               <option value="Aktiv" selected>Aktiv</option>
               <option value="Pröv">Pröv</option>
               <option value="Kö">Kö</option>
@@ -219,8 +219,8 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Särskilda behov / Allergier</label>
-            <textarea name="specialNeeds" rows="2" placeholder="T.ex. Lindrig pälsdjursallergi, tidigare knäskada..."
+            <label for="specialNeeds" class="block text-xs font-semibold text-stone-700 mb-1">Särskilda behov / Allergier</label>
+            <textarea id="specialNeeds" name="specialNeeds" rows="2" placeholder="T.ex. Lindrig pälsdjursallergi, tidigare knäskada..."
               class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm"></textarea>
           </div>
         </div>

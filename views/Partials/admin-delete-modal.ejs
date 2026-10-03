@@ -1,0 +1,249 @@
+<!-- Global Delete Confirmation Modal (Admin Partial) -->
+<div id="globalDeleteModal" onclick="if(event.target === this) closeGlobalDeleteModal()" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs hidden p-4" role="dialog" aria-modal="true" aria-labelledby="globalDeleteModalTitle">
+  <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-stone-200 space-y-4 transform transition-all">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 id="globalDeleteModalTitle" class="text-base font-bold text-stone-900">Ta bort lektion?</h3>
+        <p id="globalDeleteModalSubtitle" class="text-xs text-stone-500">Denna åtgärd kan inte ångras</p>
+      </div>
+    </div>
+    
+    <div class="text-xs text-stone-600 leading-relaxed bg-stone-50 p-3.5 rounded-xl border border-stone-100 space-y-1">
+      <p id="globalDeleteModalMainMessage">
+        <span id="globalDeleteModalPrefix">Är du säker på att du vill ta bort lektionspasset</span>
+        <strong class="text-stone-900 font-bold" id="globalDeleteModalItemTitle">lektionen</strong><span id="globalDeleteModalQuestion">?</span>
+      </p>
+      <p id="globalDeleteModalWarning" class="text-stone-500 font-normal">
+        Alla kopplade elev- och hästbokningar raderas permanent.
+      </p>
+      <!-- Hidden fallback element for legacy script compatibility -->
+      <span id="globalDeleteLessonTitle" class="hidden"></span>
+      <span id="globalDeleteStudentName" class="hidden"></span>
+      <span id="globalDeleteStaffName" class="hidden"></span>
+    </div>
+
+    <div class="flex items-center justify-end gap-2.5 pt-2">
+      <button type="button" id="globalDeleteModalCancelBtn" onclick="closeGlobalDeleteModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
+        Avbryt
+      </button>
+      <form id="globalDeleteModalForm" action="" method="POST" class="inline m-0 p-0">
+        <button type="submit" id="globalDeleteModalSubmitBtn" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5">
+          <i class="fa-regular fa-trash-can"></i>
+          <span id="globalDeleteModalSubmitText">Ja, ta bort lektion</span>
+        </button>
+      </form>
+      <!-- Hidden legacy form mirror if needed -->
+      <form id="globalDeleteLessonForm" action="" method="POST" class="hidden"></form>
+      <form id="globalDeleteStudentForm" action="" method="POST" class="hidden"></form>
+      <form id="globalDeleteStaffForm" action="" method="POST" class="hidden"></form>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    /**
+     * Opens the global delete confirmation modal with customizable parameters
+     * Supports:
+     * 1. Object: openGlobalDeleteModal({ action, title, itemName, prefix, warning, submitText })
+     * 2. URL string: openGlobalDeleteModal('/admin/quizzes/5/delete', 'Quiz Namn', 'Detta raderar...')
+     * 3. Legacy call: openGlobalDeleteModal(id, title)
+     */
+    window.openGlobalDeleteModal = function(optionsOrAction, itemName, warningText, titleText) {
+      const modal = document.getElementById('globalDeleteModal');
+      const titleEl = document.getElementById('globalDeleteModalTitle');
+      const subtitleEl = document.getElementById('globalDeleteModalSubtitle');
+      const prefixEl = document.getElementById('globalDeleteModalPrefix');
+      const itemTitleEl = document.getElementById('globalDeleteModalItemTitle');
+      const warningEl = document.getElementById('globalDeleteModalWarning');
+      const form = document.getElementById('globalDeleteModalForm');
+      const submitTextEl = document.getElementById('globalDeleteModalSubmitText');
+
+      // Legacy fallback mirrors
+      const legacyLessonTitle = document.getElementById('globalDeleteLessonTitle');
+      const legacyStudentName = document.getElementById('globalDeleteStudentName');
+      const legacyStaffName = document.getElementById('globalDeleteStaffName');
+      const legacyLessonForm = document.getElementById('globalDeleteLessonForm');
+      const legacyStudentForm = document.getElementById('globalDeleteStudentForm');
+      const legacyStaffForm = document.getElementById('globalDeleteStaffForm');
+
+      let config = {
+        action: '',
+        title: 'Ta bort post?',
+        subtitle: 'Denna åtgärd kan inte ångras',
+        prefix: 'Är du säker på att du vill ta bort',
+        itemName: '',
+        warning: 'Posten och all dess kopplade data tas bort permanent.',
+        submitText: 'Ja, ta bort'
+      };
+
+      if (typeof optionsOrAction === 'object' && optionsOrAction !== null) {
+        config = { ...config, ...optionsOrAction };
+      } else if (typeof optionsOrAction === 'string' || typeof optionsOrAction === 'number') {
+        const val = String(optionsOrAction).trim();
+        if (val.startsWith('/') || val.startsWith('http')) {
+          config.action = val;
+          if (itemName) config.itemName = itemName;
+          if (warningText) config.warning = warningText;
+          if (titleText) config.title = titleText;
+        } else {
+          // Legacy call with ID: openGlobalDeleteModal(id, title)
+          const id = val;
+          const name = itemName || '';
+          config.itemName = name;
+
+          const currentPath = window.location.pathname;
+          if (currentPath.includes('/lessons')) {
+            config.action = `/admin/lessons/${id}/delete`;
+            config.title = 'Ta bort lektion?';
+            config.prefix = 'Är du säker på att du vill ta bort lektionspasset';
+            config.warning = 'Alla kopplade elev- och hästbokningar raderas permanent.';
+            config.submitText = 'Ja, ta bort lektion';
+          } else if (currentPath.includes('/students')) {
+            config.action = `/admin/students/${id}/delete`;
+            config.title = 'Ta bort elev?';
+            config.prefix = 'Är du säker på att du vill ta bort eleven';
+            config.warning = 'Även profil, relaterade bokningar och provresultat raderas permanent.';
+            config.submitText = 'Ja, ta bort elev';
+          } else if (currentPath.includes('/staff')) {
+            config.action = `/admin/staff/${id}/delete`;
+            config.title = 'Ta bort personal?';
+            config.prefix = 'Är du säker på att du vill ta bort personalen';
+            config.warning = 'Profil och arbetspass raderas permanent. Hänvisningar avlänkas automatiskt.';
+            config.submitText = 'Ja, ta bort personal';
+          } else if (currentPath.includes('/horses')) {
+            config.action = `/admin/horses/${id}/delete`;
+            config.title = 'Ta bort häst?';
+            config.prefix = 'Är du säker på att du vill ta bort hästen';
+            config.warning = 'Hästprofilen och dess historik raderas permanent.';
+            config.submitText = 'Ja, ta bort häst';
+          } else if (currentPath.includes('/tasks')) {
+            config.action = `/admin/tasks/${id}/delete`;
+            config.title = 'Ta bort stalluppgift?';
+            config.prefix = 'Är du säker på att du vill ta bort stalluppgiften';
+            config.warning = 'Uppgiften tas bort från schemat permanent.';
+            config.submitText = 'Ja, ta bort uppgift';
+          } else if (currentPath.includes('/quizzes')) {
+            config.action = `/admin/quizzes/${id}/delete`;
+            config.title = 'Ta bort quiz?';
+            config.prefix = 'Är du säker på att du vill ta bort quizet';
+            config.warning = 'Alla frågor i detta quiz raderas permanent.';
+            config.submitText = 'Ja, ta bort quiz';
+          } else if (currentPath.includes('/arenas')) {
+            config.action = `/admin/arenas/${id}/delete`;
+            config.title = 'Ta bort ridbana?';
+            config.prefix = 'Är du säker på att du vill ta bort ridbanan';
+            config.warning = 'Ridbanan raderas permanent. Schemalagda lektioner avlänkas automatiskt.';
+            config.submitText = 'Ja, ta bort ridbana';
+          } else {
+            config.action = `${currentPath.replace(/\/$/, '')}/${id}/delete`;
+          }
+        }
+      }
+
+      // Update UI elements
+      if (titleEl) titleEl.textContent = config.title;
+      if (subtitleEl) subtitleEl.textContent = config.subtitle;
+      if (prefixEl) prefixEl.textContent = config.prefix;
+      
+      const displayItemName = config.itemName ? `"${config.itemName}"` : 'detta objekt';
+      if (itemTitleEl) itemTitleEl.textContent = displayItemName;
+      if (warningEl) warningEl.textContent = config.warning;
+      if (submitTextEl) submitTextEl.textContent = config.submitText;
+
+      // Update forms
+      if (form) form.action = config.action;
+      if (legacyLessonForm) legacyLessonForm.action = config.action;
+      if (legacyStudentForm) legacyStudentForm.action = config.action;
+      if (legacyStaffForm) legacyStaffForm.action = config.action;
+
+      if (legacyLessonTitle) legacyLessonTitle.textContent = displayItemName;
+      if (legacyStudentName) legacyStudentName.textContent = displayItemName;
+      if (legacyStaffName) legacyStaffName.textContent = displayItemName;
+
+      // Keep track of triggering element to restore focus on close (WCAG 2.4.3)
+      lastTriggerElement = document.activeElement;
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        const cancelBtn = document.getElementById('globalDeleteModalCancelBtn');
+        if (cancelBtn) cancelBtn.focus();
+      }
+    };
+
+    let lastTriggerElement = null;
+
+    /**
+     * Closes the global delete confirmation modal
+     */
+    window.closeGlobalDeleteModal = function() {
+      const modal = document.getElementById('globalDeleteModal');
+      if (modal) modal.classList.add('hidden');
+      if (lastTriggerElement && typeof lastTriggerElement.focus === 'function') {
+        lastTriggerElement.focus();
+      }
+    };
+
+    // Backward-compatible function aliases
+    window.closeDeleteModal = window.closeGlobalDeleteModal;
+    window.closeGlobalDeleteStudentModal = window.closeGlobalDeleteModal;
+    window.closeGlobalDeleteStaffModal = window.closeGlobalDeleteModal;
+    window.closeDeleteStudentModal = window.closeGlobalDeleteModal;
+    window.closeDeleteStaffModal = window.closeGlobalDeleteModal;
+
+    window.confirmDeleteLesson = window.openGlobalDeleteModal;
+    window.openGlobalDeleteStudentModal = window.openGlobalDeleteModal;
+    window.openGlobalDeleteStaffModal = window.openGlobalDeleteModal;
+    window.openDeleteStudentModal = window.openGlobalDeleteModal;
+    window.openDeleteStaffModal = window.openGlobalDeleteModal;
+
+    // Close on Escape key press & trap Tab within modal
+    document.addEventListener('keydown', function(e) {
+      const modal = document.getElementById('globalDeleteModal');
+      if (!modal || modal.classList.contains('hidden')) return;
+
+      if (e.key === 'Escape') {
+        window.closeGlobalDeleteModal();
+      } else if (e.key === 'Tab') {
+        const focusable = modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+
+    // Delegated click handler for declarative elements with data-delete-action
+    document.addEventListener('click', function(e) {
+      const trigger = e.target.closest('[data-delete-action], [data-confirm-delete]');
+      if (!trigger) return;
+      e.preventDefault();
+
+      const action = trigger.dataset.deleteAction || trigger.getAttribute('href') || trigger.getAttribute('action');
+      const title = trigger.dataset.deleteTitle;
+      const itemName = trigger.dataset.deleteName || trigger.dataset.deleteItem || trigger.dataset.deleteTitle || '';
+      const prefix = trigger.dataset.deletePrefix;
+      const warning = trigger.dataset.deleteWarning;
+      const submitText = trigger.dataset.deleteSubmit || trigger.dataset.deleteBtn;
+
+      window.openGlobalDeleteModal({
+        action,
+        title: title || 'Ta bort objekt?',
+        itemName,
+        prefix: prefix || 'Är du säker på att du vill ta bort',
+        warning: warning || 'Denna åtgärd kan inte ångras och raderar informationen permanent.',
+        submitText: submitText || 'Ja, ta bort'
+      });
+    });
+  })();
+</script>

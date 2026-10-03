@@ -1,14 +1,25 @@
+<%
+  const greetingText = (typeof data !== 'undefined' && data.greeting) ? data.greeting : (() => {
+    const h = new Date().getHours();
+    if (h >= 5 && h < 10) return 'God morgon';
+    if (h >= 10 && h < 12) return 'God förmiddag';
+    if (h >= 12 && h < 17) return 'God eftermiddag';
+    if (h >= 17 && h < 23) return 'God kväll';
+    return 'God natt';
+  })();
+  const adminName = currentUser ? (currentUser.fullName ? currentUser.fullName.split(' ')[0] : currentUser.username) : 'Administratör';
+%>
 <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
   <!-- Top Greeting & Action Header -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
       <h2 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-        God morgon, <%= currentUser ? currentUser.fullName.split(' ')[0] : 'Administratör' %>
+        <%= greetingText %>, <%= adminName %>
       </h2>
       <p class="text-xs sm:text-sm text-stone-500 mt-1">Här är en översikt över dagens verksamhet och lektioner.</p>
     </div>
     <div class="flex items-center gap-3">
-      <a href="/admin/lessons/create" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#3d2314] hover:bg-[#2c190e] text-white px-5 py-2.5 rounded-xl font-medium text-sm shadow-sm transition hover-lift">
+      <a href="/admin/lessons/create" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-equira-cognac-800 hover:bg-[#2c190e] text-white px-5 py-2.5 rounded-xl font-medium text-sm shadow-sm transition hover-lift">
         <i class="fa-solid fa-plus text-xs"></i>
         <span>Ny lektion</span>
       </a>
@@ -19,7 +30,7 @@
   <% if (data.urgentWarnings && data.urgentWarnings.length > 0) { %>
     <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shadow-sm">
       <div class="flex items-start sm:items-center gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
           <i class="fa-solid fa-triangle-exclamation text-lg"></i>
         </div>
         <div>
@@ -33,7 +44,7 @@
     </div>
   <% } %>
 
-  <!-- Top 3 KPI Cards (Matching PDF 3 page 13) -->
+  <!-- Övergripande nyckeltal (KPI) för dagens verksamhet -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
     <!-- Card 1: Dagens lektioner -->
     <div class="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200/80 shadow-sm flex items-center justify-between hover-lift">
@@ -72,7 +83,7 @@
     </div>
   </div>
 
-  <!-- Dagens Schema Table Section (Matching PDF 3 page 13) -->
+  <!-- Dagens lektionsschema med status och hästtilldelning -->
   <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
     <div class="p-4 sm:p-6 border-b border-stone-100 flex items-center justify-between">
       <div>
@@ -86,13 +97,13 @@
     </div>
 
     <!-- Mobile Scroll Hint -->
-    <div class="block sm:hidden px-4 py-2 bg-stone-50 border-b border-stone-100 text-[11px] text-stone-500 flex items-center gap-1.5">
+    <div class="sm:hidden px-4 py-2 bg-stone-50 border-b border-stone-100 text-[11px] text-stone-500 flex items-center gap-1.5">
       <i class="fa-solid fa-arrows-left-right text-stone-400"></i>
       <span>Svep i sidled för att se alla lektionsdetaljer</span>
     </div>
 
     <div class="overflow-x-auto touch-scroll">
-      <table class="w-full text-left border-collapse text-sm min-w-[720px]">
+      <table class="w-full text-left border-collapse text-sm min-w-180">
         <thead>
           <tr class="bg-stone-50 text-stone-500 text-xs font-bold uppercase tracking-wider border-b border-stone-200">
             <th class="py-3.5 px-4 sm:px-6">Tid</th>
@@ -153,7 +164,7 @@
 
                 <!-- Åtgärd -->
                 <td class="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
-                  <a href="/admin/assign/<%= lesson.id %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#4a2828] hover:bg-[#381e1e] text-white text-xs font-medium rounded-lg transition shadow-sm">
+                  <a href="/admin/assign/<%= lesson.id %>" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-equira-cognac-700 hover:bg-[#381e1e] text-white text-xs font-medium rounded-lg transition shadow-sm">
                     <span>Tilldela</span>
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                   </a>

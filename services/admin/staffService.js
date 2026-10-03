@@ -1,6 +1,7 @@
 const { getDataSource } = require('../../config/database');
 const { hashPassword } = require('../../config/auth');
 const AdminMapper = require('./adminMapper');
+const { removeUploadedFile, uploadDir } = require('../../middleware/uploadMiddleware');
 
 /**
  * Service for managing staff members and their profiles.
@@ -178,7 +179,13 @@ class StaffService {
     if (data.fullName !== undefined) user.fullName = data.fullName.trim();
     if (data.email !== undefined) user.email = data.email.trim();
     if (data.phone !== undefined) user.phone = data.phone.trim();
-    if (data.avatarUrl) user.avatarUrl = data.avatarUrl.trim();
+    if (data.avatarUrl) {
+      const newAvatar = data.avatarUrl.trim();
+      if (user.avatarUrl && user.avatarUrl !== newAvatar) {
+        await removeUploadedFile(user.avatarUrl, uploadDir);
+      }
+      user.avatarUrl = newAvatar;
+    }
     if (data.role && ['STAFF', 'ADMIN'].includes(data.role)) {
       user.role = data.role;
     }
@@ -231,6 +238,10 @@ class StaffService {
     const user = await userRepo.findOne({ where: { id: parsedId } });
     if (!user) {
       throw new Error('Personalen kunde inte hittas.');
+    }
+
+    if (user.avatarUrl) {
+      await removeUploadedFile(user.avatarUrl, uploadDir);
     }
 
     // Detach from lessons

@@ -9,7 +9,9 @@ const staffService = require('../services/admin/staffService');
 const profileService = require('../services/admin/profileService');
 const timeTrackingService = require('../services/admin/timeTrackingService');
 const staffScheduleService = require('../services/admin/staffScheduleService');
+const arenasService = require('../services/admin/arenasService');
 const AdminViewModel = require('../models/viewModels/admin/AdminViewModel');
+const { removeUploadedFile } = require('../middleware/uploadMiddleware');
 
 /**
  * AdminController (Admin Domain)
@@ -88,6 +90,9 @@ class AdminController {
       res.redirect('/admin/horses');
     } catch (err) {
       console.error('Error creating horse:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       res.render('admin/horseCreate', {
         title: 'Equira - Registrera Häst',
         error: 'Kunde inte spara hästen: ' + err.message,
@@ -152,6 +157,9 @@ class AdminController {
       );
     } catch (err) {
       console.error('Error updating horse:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       const horse = await horsesService.getHorseById(req.params.id);
       res.render('admin/horseEdit', {
         title: 'Equira - Redigera häst',
@@ -332,7 +340,9 @@ class AdminController {
       const { arenas, instructors, students } =
         await lessonsService.getLessonCreateFormData();
 
-      const bookedStudentIds = (lesson.bookings || []).map(b => b.studentId);
+      const bookedStudentIds = (lesson.bookings || [])
+        .filter(b => students.some(s => s.id === b.studentId))
+        .map(b => b.studentId);
 
       res.render('admin/lessonEdit', {
         title: `Equira - Redigera ${lesson.title}`,
@@ -362,7 +372,9 @@ class AdminController {
         const lesson = await lessonsService.getLessonById(req.params.id);
         const { arenas, instructors, students } =
           await lessonsService.getLessonCreateFormData();
-        const bookedStudentIds = (lesson?.bookings || []).map(b => b.studentId);
+        const bookedStudentIds = (lesson?.bookings || [])
+          .filter(b => students.some(s => s.id === b.studentId))
+          .map(b => b.studentId);
 
         res.render('admin/lessonEdit', {
           title: 'Equira - Redigera lektion',
@@ -560,6 +572,9 @@ class AdminController {
       );
     } catch (err) {
       console.error('Error creating staff:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       res.render('admin/staffCreate', {
         title: 'Equira - Lägg till Personal',
         error: err.message,
@@ -604,6 +619,9 @@ class AdminController {
       );
     } catch (err) {
       console.error('Error updating staff:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       const staffMember = await staffService.getStaffById(req.params.id);
       res.render('admin/staffEdit', {
         title: 'Equira - Redigera personal',
@@ -1006,6 +1024,10 @@ class AdminController {
         return res.redirect('/admin/overview');
       }
 
+      if (req.session.user && profileResult.user.avatarUrl) {
+        req.session.user.avatarUrl = profileResult.user.avatarUrl;
+      }
+
       const data = AdminViewModel.formatProfile(
         profileResult.user,
         profileResult.stats,
@@ -1014,6 +1036,8 @@ class AdminController {
       res.render('admin/profile', {
         title: 'Equira - Min Profil (Admin)',
         data,
+        success: req.query.success || null,
+        error: req.query.error || null,
         layout: 'layouts/adminLayout',
       });
     } catch (err) {
@@ -1054,13 +1078,13 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('success', 'Profiluppgifterna har sparats.');
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?success=' + encodeURIComponent('Profiluppgifterna har sparats.'));
     } catch (err) {
       console.error('Error updating admin profile:', err);
       if (req.setFlash) {
         req.setFlash('error', err.message || 'Kunde inte uppdatera profilen.');
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?error=' + encodeURIComponent(err.message || 'Kunde inte uppdatera profilen.'));
     }
   }
 
@@ -1071,12 +1095,13 @@ class AdminController {
   async postProfileAvatar(req, res) {
     try {
       if (req.file && req.session.user) {
-        const avatarUrl = '/uploads/avatars/' + req.file.filename;
+        const avatarUrl = '/images/uploads/avatars/' + req.file.filename;
         await profileService.updateAvatar(req.session.user.id, avatarUrl);
         req.session.user.avatarUrl = avatarUrl;
         if (req.setFlash) {
           req.setFlash('success', 'Profilbilden har uppdaterats!');
         }
+        return res.redirect('/admin/profile?success=' + encodeURIComponent('Profilbilden har uppdaterats!'));
       }
       res.redirect('/admin/profile');
     } catch (err) {
@@ -1084,7 +1109,7 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('error', 'Kunde inte ladda upp bilden: ' + err.message);
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?error=' + encodeURIComponent('Kunde inte ladda upp bilden: ' + err.message));
     }
   }
 
@@ -1101,7 +1126,7 @@ class AdminController {
         if (req.setFlash) {
           req.setFlash('error', 'De nya lösenorden matchar inte.');
         }
-        return res.redirect('/admin/profile');
+        return res.redirect('/admin/profile?error=' + encodeURIComponent('De nya lösenorden matchar inte.'));
       }
 
       await profileService.updatePassword(
@@ -1113,13 +1138,13 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('success', 'Ditt lösenord har uppdaterats framgångsrikt.');
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?success=' + encodeURIComponent('Ditt lösenord har uppdaterats framgångsrikt.'));
     } catch (err) {
       console.error('Error updating admin password:', err);
       if (req.setFlash) {
         req.setFlash('error', err.message || 'Kunde inte ändra lösenordet.');
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?error=' + encodeURIComponent(err.message || 'Kunde inte ändra lösenordet.'));
     }
   }
 
@@ -1400,6 +1425,166 @@ class AdminController {
         req.setFlash('error', err.message || 'Kunde inte ta bort passet.');
       }
       res.redirect('/admin/staff-schedule?error=' + encodeURIComponent(err.message || 'Kunde inte ta bort passet.'));
+    }
+  }
+
+  // ==========================================
+  // ARENA / RIDBANA MANAGEMENT (CRUD)
+  // ==========================================
+
+  /**
+   * GET /admin/arenas
+   * Displays the arena registry overview with KPI cards, indoor/outdoor filters, and search.
+   */
+  async getArenas(req, res) {
+    try {
+      const filter = req.query.filter || 'all';
+      const arenas = await arenasService.getArenas(filter);
+      const kpis = arenasService.getArenaKPIs(arenas);
+
+      res.render('admin/arenas', {
+        title: 'Equira - Ridbanor & Arenor',
+        arenas,
+        kpis,
+        filter,
+        success: req.query.success,
+        error: req.query.error,
+        layout: 'layouts/adminLayout',
+      });
+    } catch (err) {
+      console.error('Error loading arenas:', err);
+      res.status(500).render('error', {
+        message: 'Kunde inte läsa in ridbanorna',
+        error: err,
+      });
+    }
+  }
+
+  /**
+   * GET /admin/arenas/create
+   * Displays the creation form for a new riding arena.
+   */
+  async getArenaCreate(req, res) {
+    res.render('admin/arenaCreate', {
+      title: 'Equira - Skapa Ridbana',
+      arena: {
+        name: '',
+        dimensions: '20×60m',
+        surfaceType: 'Fibersand',
+        isIndoor: true,
+        notes: '',
+      },
+      error: null,
+      layout: 'layouts/adminLayout',
+    });
+  }
+
+  /**
+   * POST /admin/arenas/create
+   * Handles creation submission for a new riding arena.
+   */
+  async postArenaCreate(req, res) {
+    try {
+      if (req.file) {
+        req.body.imageUrl = '/images/uploads/arenas/' + req.file.filename;
+      }
+      const newArena = await arenasService.createArena(req.body);
+      const successMsg = `Ridbanan "${newArena.name}" har skapats!`;
+      if (req.setFlash) {
+        req.setFlash('success', successMsg);
+      }
+      res.redirect('/admin/arenas?success=' + encodeURIComponent(successMsg));
+    } catch (err) {
+      console.error('Error creating arena:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
+      res.render('admin/arenaCreate', {
+        title: 'Equira - Skapa Ridbana',
+        arena: {
+          name: req.body.name || '',
+          dimensions: req.body.dimensions || '',
+          surfaceType: req.body.surfaceType || '',
+          isIndoor: req.body.isIndoor === 'true' || req.body.isIndoor === true || req.body.isIndoor === '1' || req.body.isIndoor === 'on',
+          notes: req.body.notes || '',
+          imageUrl: req.body.imageUrl || '',
+        },
+        error: 'Kunde inte skapa ridbanan: ' + (err.message || 'Okänt fel inträffade.'),
+        layout: 'layouts/adminLayout',
+      });
+    }
+  }
+
+  /**
+   * GET /admin/arenas/:id/edit
+   * Displays the edit form for an existing arena.
+   */
+  async getArenaEdit(req, res) {
+    try {
+      const arena = await arenasService.getArenaById(req.params.id);
+      if (!arena) {
+        return res.redirect(
+          '/admin/arenas?error=' + encodeURIComponent('Ridbanan kunde inte hittas.'),
+        );
+      }
+
+      res.render('admin/arenaEdit', {
+        title: `Equira - Redigera ${arena.name}`,
+        arena,
+        error: null,
+        layout: 'layouts/adminLayout',
+      });
+    } catch (err) {
+      console.error('Error loading arena for edit:', err);
+      res.redirect('/admin/arenas?error=' + encodeURIComponent(err.message));
+    }
+  }
+
+  /**
+   * POST /admin/arenas/:id/edit
+   * Updates an existing arena.
+   */
+  async postArenaEdit(req, res) {
+    try {
+      if (req.file) {
+        req.body.imageUrl = '/images/uploads/arenas/' + req.file.filename;
+      }
+      const updatedArena = await arenasService.updateArena(req.params.id, req.body);
+      const successMsg = `Ridbanan "${updatedArena.name}" har uppdaterats!`;
+      if (req.setFlash) {
+        req.setFlash('success', successMsg);
+      }
+      res.redirect('/admin/arenas?success=' + encodeURIComponent(successMsg));
+    } catch (err) {
+      console.error('Error updating arena:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
+      const arena = await arenasService.getArenaById(req.params.id);
+      res.render('admin/arenaEdit', {
+        title: 'Equira - Redigera ridbana',
+        arena: arena || { id: req.params.id, ...req.body },
+        error: 'Kunde inte uppdatera ridbanan: ' + (err.message || 'Okänt fel inträffade.'),
+        layout: 'layouts/adminLayout',
+      });
+    }
+  }
+
+  /**
+   * POST /admin/arenas/:id/delete
+   * Removes an arena and unlinks any associated lessons.
+   */
+  async postArenaDelete(req, res) {
+    try {
+      await arenasService.deleteArena(req.params.id);
+      const successMsg = 'Ridbanan har tagits bort.';
+      if (req.setFlash) {
+        req.setFlash('success', successMsg);
+      }
+      res.redirect('/admin/arenas?success=' + encodeURIComponent(successMsg));
+    } catch (err) {
+      console.error('Error deleting arena:', err);
+      res.redirect('/admin/arenas?error=' + encodeURIComponent(err.message || 'Kunde inte ta bort ridbanan.'));
     }
   }
 }

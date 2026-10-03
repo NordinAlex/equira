@@ -1,0 +1,284 @@
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
+  <!-- Sidhuvud med brödsmulor och primär åtgärdsknapp -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <div class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Anläggning & Faciliteter</div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight mt-1">Ridbanor & Arenor</h2>
+      <p class="text-xs sm:text-sm text-stone-500 mt-1 max-w-2xl">
+        Hantera anläggningens ridhus, utebanor, paddockar och teorisalar. Se mått, underlag och schemalagda lektionspass.
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/admin/arenas/create" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-equira-cognac-800 hover:bg-equira-cognac-900 text-white px-5 py-2.5 rounded-xl font-medium text-sm shadow-sm transition hover-lift">
+        <i class="fa-solid fa-plus text-xs"></i>
+        <span>Skapa ny ridbana</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI-kort med sammanfattande nyckeltal -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-stone-100 text-stone-700 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-warehouse"></i>
+      </div>
+      <div>
+        <div class="text-xl sm:text-2xl font-bold text-stone-900"><%= kpis.total %></div>
+        <div class="text-xs text-stone-500">Totalt antal banor</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-building"></i>
+      </div>
+      <div>
+        <div class="text-xl sm:text-2xl font-bold text-stone-900"><%= kpis.indoor %></div>
+        <div class="text-xs text-stone-500">Inomhusbanor</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-sun"></i>
+      </div>
+      <div>
+        <div class="text-xl sm:text-2xl font-bold text-stone-900"><%= kpis.outdoor %></div>
+        <div class="text-xs text-stone-500">Utebanor / Paddock</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-xl shrink-0">
+        <i class="fa-solid fa-calendar-check"></i>
+      </div>
+      <div>
+        <div class="text-xl sm:text-2xl font-bold text-stone-900"><%= kpis.totalLessons %></div>
+        <div class="text-xs text-stone-500">Kopplade lektioner</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sök- och filtreringssektion -->
+  <div class="bg-white rounded-2xl border border-stone-200 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <!-- Filterknappar -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+      <% if (filter === 'all') { %>
+        <a href="/admin/arenas?filter=all" class="px-4 py-2 rounded-xl text-xs font-semibold transition bg-equira-cognac-800 text-white shadow-xs">
+          Alla (<%= kpis.total %>)
+        </a>
+      <% } else { %>
+        <a href="/admin/arenas?filter=all" class="px-4 py-2 rounded-xl text-xs font-semibold transition bg-stone-100 text-stone-600 hover:bg-stone-200">
+          Alla (<%= kpis.total %>)
+        </a>
+      <% } %>
+
+      <% if (filter === 'indoor') { %>
+        <a href="/admin/arenas?filter=indoor" class="px-4 py-2 rounded-xl text-xs font-semibold transition bg-emerald-800 text-white shadow-xs">
+          Inomhus (<%= kpis.indoor %>)
+        </a>
+      <% } else { %>
+        <a href="/admin/arenas?filter=indoor" class="px-4 py-2 rounded-xl text-xs font-semibold transition bg-stone-100 text-stone-600 hover:bg-stone-200">
+          Inomhus (<%= kpis.indoor %>)
+        </a>
+      <% } %>
+
+      <% if (filter === 'outdoor') { %>
+        <a href="/admin/arenas?filter=outdoor" class="px-4 py-2 rounded-xl text-xs font-semibold transition bg-sky-800 text-white shadow-xs">
+          Utomhus (<%= kpis.outdoor %>)
+        </a>
+      <% } else { %>
+        <a href="/admin/arenas?filter=outdoor" class="px-4 py-2 rounded-xl text-xs font-semibold transition bg-stone-100 text-stone-600 hover:bg-stone-200">
+          Utomhus (<%= kpis.outdoor %>)
+        </a>
+      <% } %>
+    </div>
+
+    <!-- Direkt sökfält -->
+    <div class="relative w-full sm:w-72">
+      <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+      <input type="text" 
+             id="arenaSearchInput" 
+             placeholder="Sök bana, underlag, mått..." 
+             class="w-full pl-9 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-equira-cognac-800/20 focus:border-equira-cognac-800 transition">
+    </div>
+  </div>
+
+  <!-- Lista med banor / arenor -->
+  <% if (!arenas || arenas.length === 0) { %>
+    <!-- Tom vy om inga banor matchar filtret -->
+    <div class="bg-white rounded-2xl border border-stone-200 p-12 text-center space-y-4 shadow-xs">
+      <div class="w-16 h-16 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto text-2xl">
+        <i class="fa-solid fa-warehouse"></i>
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-stone-800">Inga ridbanor hittades</h3>
+        <p class="text-xs text-stone-500 max-w-md mx-auto mt-1">
+          Det finns inga banor registrerade som matchar ditt valda filter.
+        </p>
+      </div>
+      <a href="/admin/arenas/create" class="inline-flex items-center gap-2 bg-equira-cognac-800 hover:bg-equira-cognac-900 text-white px-5 py-2.5 rounded-xl text-xs font-semibold shadow-xs transition">
+        <i class="fa-solid fa-plus text-xs"></i>
+        <span>Skapa ny bana</span>
+      </a>
+    </div>
+  <% } else { %>
+    <div id="arenasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% arenas.forEach(arena => { %>
+        <div class="arena-card bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-xs flex flex-col justify-between hover:border-stone-300 transition duration-200 hover-lift"
+             data-name="<%= arena.name.toLowerCase() %>"
+             data-surface="<%= arena.surfaceType.toLowerCase() %>"
+             data-dimensions="<%= arena.dimensions.toLowerCase() %>">
+          
+          <!-- Bildhuvud för ridbanan -->
+          <div class="h-36 w-full relative bg-stone-100 overflow-hidden">
+            <img src="<%= arena.imageUrl || (arena.isIndoor ? '/images/arena-preview.jpg' : '/images/arena-outdoor.jpg') %>" 
+                 alt="<%= arena.name %>" 
+                 class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                 onerror="this.onerror=null; this.src='/images/arena-preview.jpg';">
+            <div class="absolute top-3 left-3">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border backdrop-blur-md bg-white/95 <%= arena.typeBadge.class %> shadow-xs">
+                <i class="fa-solid <%= arena.typeBadge.icon %>"></i>
+                <span><%= arena.typeBadge.label %></span>
+              </span>
+            </div>
+            <div class="absolute top-3 right-3">
+              <span class="px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md text-white text-[10px] font-medium shadow-xs">
+                <%= arena.dimensions || 'Standard' %>
+              </span>
+            </div>
+          </div>
+
+          <div class="p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
+            <div class="space-y-4">
+              <!-- Kortrubrik -->
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-lg font-bold text-stone-900 tracking-tight">
+                    <%= arena.name %>
+                  </h3>
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center text-stone-400 shrink-0 text-xs">
+                  <i class="fa-solid <%= arena.isIndoor ? 'fa-warehouse' : 'fa-sun' %>"></i>
+                </div>
+              </div>
+
+            <!-- Egenskaper och specifikationer -->
+            <div class="grid grid-cols-2 gap-2.5 text-xs">
+              <div class="bg-stone-50 border border-stone-100 p-3 rounded-xl">
+                <div class="text-[10px] uppercase font-semibold text-stone-400 tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-ruler-combined text-stone-400"></i> Mått
+                </div>
+                <div class="font-bold text-stone-800 mt-0.5 truncate">
+                  <%= arena.dimensions || 'Standard' %>
+                </div>
+              </div>
+
+              <div class="bg-stone-50 border border-stone-100 p-3 rounded-xl">
+                <div class="text-[10px] uppercase font-semibold text-stone-400 tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-layer-group text-stone-400"></i> Underlag
+                </div>
+                <div class="font-bold text-stone-800 mt-0.5 truncate">
+                  <%= arena.surfaceType || 'Fibersand' %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kopplade lektioner -->
+            <div class="flex items-center justify-between text-xs py-2 px-3 bg-stone-50/70 rounded-xl border border-stone-100 text-stone-600">
+              <span class="flex items-center gap-2">
+                <i class="fa-regular fa-calendar-days text-stone-400"></i>
+                <span>Schemalagda lektioner</span>
+              </span>
+              <span class="font-bold text-stone-900 bg-white px-2 py-0.5 rounded-lg border border-stone-200">
+                <%= arena.lessonCount %> st
+              </span>
+            </div>
+
+            <!-- Anteckningar om det finns -->
+            <% if (arena.notes && arena.notes.trim()) { %>
+              <div class="text-xs text-stone-600 bg-amber-50/50 border border-amber-100/70 p-3 rounded-xl space-y-1">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
+                  <i class="fa-regular fa-note-sticky"></i> Notering
+                </div>
+                <p class="line-clamp-2 italic text-stone-600">
+                  "<%= arena.notes %>"
+                </p>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Kortets åtgärdsknappar -->
+          <div class="pt-5 mt-4 border-t border-stone-100 flex items-center justify-between gap-3">
+            <a href="/admin/arenas/<%= arena.id %>/edit" 
+               class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl transition">
+              <i class="fa-regular fa-pen-to-square"></i>
+              <span>Redigera</span>
+            </a>
+
+            <!-- Ta bort med globala bekräftelsemodalen -->
+            <button type="button" 
+                    data-delete-action="/admin/arenas/<%= arena.id %>/delete"
+                    data-delete-title="Ta bort ridbana?"
+                    data-delete-item="<%= arena.name %>"
+                    data-delete-prefix="Är du säker på att du vill ta bort ridbanan"
+                    data-delete-warning="Ridbanan raderas permanent. Schemalagda lektioner avlänkas automatiskt."
+                    data-delete-submit="Ja, ta bort ridbana"
+                    onclick="openGlobalDeleteModal('/admin/arenas/<%= arena.id %>/delete', '<%= arena.name %>', 'Ridbanan raderas permanent. Schemalagda lektioner avlänkas automatiskt.', 'Ta bort ridbana?')"
+                    class="p-2 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer"
+                    title="Ta bort ridbana">
+              <i class="fa-regular fa-trash-can text-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+
+    <!-- Sökresultat tom-meddelande för direkt sökning -->
+    <div id="noSearchResults" class="hidden bg-white rounded-2xl border border-stone-200 p-8 text-center space-y-2">
+      <div class="text-stone-400 text-2xl"><i class="fa-solid fa-magnifying-glass"></i></div>
+      <h4 class="text-sm font-bold text-stone-800">Inga matchande banor</h4>
+      <p class="text-xs text-stone-500">Prova att söka på ett annat namn, mått eller underlag.</p>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  // Klientbaserad filtrering och sökning i realtid
+  (function() {
+    const searchInput = document.getElementById('arenaSearchInput');
+    const cards = document.querySelectorAll('.arena-card');
+    const noResults = document.getElementById('noSearchResults');
+    const grid = document.getElementById('arenasGrid');
+
+    if (searchInput && cards.length > 0) {
+      searchInput.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          const name = card.getAttribute('data-name') || '';
+          const surface = card.getAttribute('data-surface') || '';
+          const dimensions = card.getAttribute('data-dimensions') || '';
+
+          const matches = name.includes(query) || surface.includes(query) || dimensions.includes(query);
+          if (matches) {
+            card.classList.remove('hidden');
+            visibleCount++;
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+
+        if (noResults) {
+          if (visibleCount === 0) {
+            noResults.classList.remove('hidden');
+          } else {
+            noResults.classList.add('hidden');
+          }
+        }
+      });
+    }
+  })();
+</script>

@@ -1,5 +1,6 @@
 const { getDataSource } = require('../../config/database');
 const AdminMapper = require('./adminMapper');
+const { removeUploadedFile, horseUploadDir } = require('../../middleware/uploadMiddleware');
 
 /**
  * HorsesService (Admin Domain)
@@ -168,7 +169,11 @@ class HorsesService {
     if (body.lastVaccination !== undefined) horse.lastVaccination = body.lastVaccination;
     if (body.lastShoeing !== undefined) horse.lastShoeing = body.lastShoeing;
     if (body.photoUrl && body.photoUrl.trim() !== '') {
-      horse.photoUrl = body.photoUrl.trim();
+      const newPhoto = body.photoUrl.trim();
+      if (horse.photoUrl && horse.photoUrl !== newPhoto) {
+        await removeUploadedFile(horse.photoUrl, horseUploadDir);
+      }
+      horse.photoUrl = newPhoto;
     }
 
     const saved = await horseRepo.save(horse);
@@ -176,13 +181,17 @@ class HorsesService {
   }
 
   /**
-   * Deletes a horse by ID.
+   * Deletes a horse by ID, removing any uploaded photo.
    * 
    * @param {string|number} id - Horse ID
    * @returns {Promise<any>}
    */
   async deleteHorse(id) {
     const horseRepo = await this._getRepository('Horse');
+    const horse = await horseRepo.findOne({ where: { id: parseInt(id, 10) } });
+    if (horse && horse.photoUrl) {
+      await removeUploadedFile(horse.photoUrl, horseUploadDir);
+    }
     return await horseRepo.delete({ id: parseInt(id, 10) });
   }
 }

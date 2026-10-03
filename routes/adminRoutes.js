@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const { requireAuth, requireRole } = require('../middleware/authMiddleware');
-const { uploadAvatar, uploadHorse } = require('../middleware/uploadMiddleware');
+const { uploadAvatar, uploadHorse, uploadArena } = require('../middleware/uploadMiddleware');
 
 router.use(requireAuth, requireRole('ADMIN'));
 
@@ -26,6 +26,14 @@ router.post('/lessons/create', (req, res) => adminController.postLessonCreate(re
 router.get('/lessons/:id/edit', (req, res) => adminController.getLessonEdit(req, res));
 router.post('/lessons/:id/edit', (req, res) => adminController.postLessonEdit(req, res));
 router.post('/lessons/:id/delete', (req, res) => adminController.postLessonDelete(req, res));
+
+// Arenas / Ridbanor Management
+router.get('/arenas', (req, res) => adminController.getArenas(req, res));
+router.get('/arenas/create', (req, res) => adminController.getArenaCreate(req, res));
+router.post('/arenas/create', uploadArena.single('image'), (req, res) => adminController.postArenaCreate(req, res));
+router.get('/arenas/:id/edit', (req, res) => adminController.getArenaEdit(req, res));
+router.post('/arenas/:id/edit', uploadArena.single('image'), (req, res) => adminController.postArenaEdit(req, res));
+router.post('/arenas/:id/delete', (req, res) => adminController.postArenaDelete(req, res));
 
 router.get('/students', (req, res) => adminController.getStudents(req, res));
 router.get('/students/create', (req, res) => adminController.getStudentCreate(req, res));
