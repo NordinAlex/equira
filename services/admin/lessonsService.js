@@ -195,7 +195,9 @@ class LessonsService {
     return {
       arenas,
       instructors,
-      students: students.map(s => AdminMapper.toStudentDTO(s)),
+      students: students
+        .map(s => AdminMapper.toStudentDTO(s))
+        .filter(s => s && s.membershipStatus !== 'Kö'),
     };
   }
 
@@ -233,11 +235,21 @@ class LessonsService {
       ? (Array.isArray(body.studentIds) ? body.studentIds : [body.studentIds])
       : [];
 
+    const userRepo = await this._getRepository('User');
     for (const sid of studentIds) {
       if (!sid) continue;
+      const parsedSid = parseInt(sid, 10);
+      const studentUser = await userRepo.findOne({
+        where: { id: parsedSid },
+        relations: { studentProfile: true },
+      });
+      if (studentUser?.studentProfile?.membershipStatus === 'Kö') {
+        continue;
+      }
+
       const booking = bookingRepo.create({
         lessonId: savedLesson.id,
-        studentId: parseInt(sid, 10),
+        studentId: parsedSid,
         horseId: null,
         status: 'Bokad',
         assignedAt: new Date(),
@@ -321,8 +333,17 @@ class LessonsService {
       }
 
       // Add newly selected bookings
+      const userRepo = await this._getRepository('User');
       for (const sid of selectedStudentIds) {
         if (!existingStudentIds.includes(sid)) {
+          const studentUser = await userRepo.findOne({
+            where: { id: sid },
+            relations: { studentProfile: true },
+          });
+          if (studentUser?.studentProfile?.membershipStatus === 'Kö') {
+            continue;
+          }
+
           const newBooking = bookingRepo.create({
             lessonId: savedLesson.id,
             studentId: sid,

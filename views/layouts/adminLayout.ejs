@@ -16,7 +16,7 @@
 <body class="h-full flex flex-col lg:flex-row overflow-hidden text-slate-800 bg-[#faf9f6]">
 
   <!-- Mobile Top Header (Visible on < lg, hidden on desktop) -->
-  <header class="lg:hidden bg-[#1B3B2B] text-white px-4 py-3 flex items-center justify-between border-b border-emerald-900/50 z-30 shadow-sm shrink-0">
+  <header class="lg:hidden bg-equira-green-800 text-white px-4 py-3 flex items-center justify-between border-b border-emerald-900/50 z-30 shadow-sm shrink-0">
     <div class="flex items-center gap-3">
       <button type="button" id="admin-mobile-menu-btn" aria-label="Öppna navigationsmeny" class="p-2 -ml-1.5 text-emerald-200 hover:text-white hover:bg-white/10 rounded-xl transition">
         <i class="fa-solid fa-bars text-lg"></i>
@@ -26,8 +26,7 @@
           <i class="fa-solid fa-horse-head text-emerald-300 text-sm"></i>
         </div>
         <div>
-          <span class="font-bold text-base tracking-tight text-white block leading-tight">Equira</span>
-          <span class="text-[9px] tracking-widest text-emerald-300 uppercase font-semibold block leading-none">Admin</span>
+          <span class="font-bold text-base tracking-tight text-white block leading-tight">Equira</span>         
         </div>
       </a>
     </div>
@@ -39,7 +38,7 @@
         <a href="/login/quick/student" class="px-1.5 py-0.5 rounded hover:bg-white/15 text-[10px] text-emerald-100">Elev</a>
       </div>
       <a href="/admin/profile" title="Min profil" class="block shrink-0">
-        <img src="<%= (currentUser && currentUser.avatarUrl) ? currentUser.avatarUrl : '/images/default-staff.jpg' %>" alt="Admin" class="w-8 h-8 rounded-full object-cover border border-white/25 hover:border-emerald-300 transition">
+        <img src="<%= (currentUser && currentUser.avatarUrl) ? currentUser.avatarUrl : '/images/default-staff.jpg' %>" alt="Admin" class="w-8 h-8 rounded-full object-cover border border-white/25 hover:border-emerald-300 transition" onerror="this.onerror=null; this.src='/images/default-staff.jpg';">
       </a>
     </div>
   </header>
@@ -48,7 +47,7 @@
   <div id="admin-mobile-drawer-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden transition-opacity duration-300 opacity-0 lg:hidden"></div>
 
   <!-- Mobile Off-Canvas Drawer Navigation -->
-  <aside id="admin-mobile-drawer" class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-[#1B3B2B] text-white z-50 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden">
+  <aside id="admin-mobile-drawer" class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-equira-green-800 text-white z-50 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden">
     <div class="flex-1 flex flex-col min-h-0">
       <!-- Drawer Header with Close Button -->
       <div class="h-16 flex items-center justify-between px-5 border-b border-emerald-900/50">
@@ -57,8 +56,7 @@
             <i class="fa-solid fa-horse-head text-emerald-300 text-base"></i>
           </div>
           <div>
-            <span class="font-bold text-xl tracking-tight text-white block leading-tight">Equira</span>
-            <span class="text-[9px] tracking-widest text-emerald-300 uppercase font-medium">Ridskolesystem</span>
+            <span class="font-bold text-xl tracking-tight text-white block leading-tight">Equira</span>            
           </div>
         </a>
         <button type="button" id="admin-mobile-menu-close" aria-label="Stäng meny" class="p-2 text-emerald-300 hover:text-white hover:bg-white/10 rounded-xl transition">
@@ -141,7 +139,7 @@
           <img src="<%= (currentUser && currentUser.avatarUrl) ? currentUser.avatarUrl : '/images/default-staff.jpg' %>" alt="Admin" class="w-10 h-10 rounded-full object-cover border border-white/20 group-hover:border-emerald-400 transition">
           <div class="overflow-hidden">
             <p class="text-sm font-semibold text-white truncate group-hover:text-emerald-200 transition"><%= currentUser ? currentUser.fullName : 'Admin' %></p>
-            <p class="text-xs text-emerald-300 truncate">Riding School Admin</p>
+           
           </div>
         </a>
         <a href="/logout" title="Logga ut" class="p-2 text-emerald-300 hover:text-white hover:bg-white/10 rounded-lg transition shrink-0 ml-2">
@@ -152,7 +150,7 @@
   </aside>
 
   <!-- Admin Desktop Sidebar (Hidden on < lg, visible on lg and above) -->
-  <aside class="hidden lg:flex lg:w-64 bg-[#1B3B2B] flex-col justify-between flex-shrink-0 text-white z-20 shadow-xl select-none">
+  <aside class="hidden lg:flex lg:w-64 bg-equira-green-800 flex-col justify-between shrink-0 text-white z-20 shadow-xl select-none">
     <div>
       <!-- Brand Logo Header -->
       <div class="h-20 flex items-center px-6 border-b border-emerald-900/50">
@@ -162,7 +160,6 @@
           </div>
           <div>
             <h1 class="font-bold text-2xl tracking-tight text-white">Equira</h1>
-            <p class="text-[10px] tracking-widest text-emerald-300 uppercase font-medium">Ridskolesystem</p>
           </div>
         </a>
       </div>
@@ -238,10 +235,10 @@
     <div class="p-4 border-t border-emerald-900/50 bg-black/10">
       <div class="flex items-center justify-between">
         <a href="/admin/profile" class="flex items-center gap-3 group min-w-0 flex-1 hover:opacity-90 transition">
-          <img src="<%= (currentUser && currentUser.avatarUrl) ? currentUser.avatarUrl : '/images/default-staff.jpg' %>" alt="Admin" class="w-10 h-10 rounded-full object-cover border border-white/20 group-hover:border-emerald-400 transition">
+          <img src="<%= (currentUser && currentUser.avatarUrl) ? currentUser.avatarUrl : '/images/default-staff.jpg' %>" alt="Admin" class="w-10 h-10 rounded-full object-cover border border-white/20 group-hover:border-emerald-400 transition" onerror="this.onerror=null; this.src='/images/default-staff.jpg';">
           <div class="overflow-hidden">
             <p class="text-sm font-semibold text-white truncate group-hover:text-emerald-200 transition"><%= currentUser ? currentUser.fullName : 'Admin' %></p>
-            <p class="text-xs text-emerald-300 truncate">Riding School Admin</p>
+            
           </div>
         </a>
         <a href="/logout" title="Logga ut" class="p-2 text-emerald-300 hover:text-white hover:bg-white/10 rounded-lg transition shrink-0 ml-2">

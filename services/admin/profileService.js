@@ -1,5 +1,8 @@
+const path = require('path');
+const fs = require('fs');
 const { getDataSource } = require('../../config/database');
 const { verifyPassword, hashPassword } = require('../../config/auth');
+const { removeUploadedFile, uploadDir } = require('../../middleware/uploadMiddleware');
 
 /**
  * ProfileService (Admin Domain)
@@ -178,7 +181,7 @@ class ProfileService {
   }
 
   /**
-   * Updates avatar URL for admin user.
+   * Updates avatar URL for admin user, deleting the previous custom avatar from disk if present.
    * 
    * @param {number|string} userId
    * @param {string} avatarUrl
@@ -186,7 +189,16 @@ class ProfileService {
    */
   async updateAvatar(userId, avatarUrl) {
     const userRepo = await this._getRepository('User');
-    await userRepo.update({ id: parseInt(userId, 10) }, { avatarUrl });
+    const parsedUserId = parseInt(userId, 10);
+
+    const existingUser = await userRepo.findOne({ where: { id: parsedUserId } });
+    if (existingUser && existingUser.avatarUrl) {
+      if (existingUser.avatarUrl !== avatarUrl) {
+        await removeUploadedFile(existingUser.avatarUrl, uploadDir);
+      }
+    }
+
+    await userRepo.update({ id: parsedUserId }, { avatarUrl });
   }
 }
 

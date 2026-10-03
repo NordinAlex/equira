@@ -150,6 +150,7 @@ class AdminMapper {
       phone: user.phone || '–',
       avatarUrl: user.avatarUrl || '/images/default-avatar.jpg',
       role: user.role,
+      membershipStatus: profile.membershipStatus || 'Aktiv',
       studentProfile: {
         id: profile.id,
         personnummer: profile.personnummer || '',

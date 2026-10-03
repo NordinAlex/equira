@@ -11,6 +11,7 @@ const timeTrackingService = require('../services/admin/timeTrackingService');
 const staffScheduleService = require('../services/admin/staffScheduleService');
 const arenasService = require('../services/admin/arenasService');
 const AdminViewModel = require('../models/viewModels/admin/AdminViewModel');
+const { removeUploadedFile } = require('../middleware/uploadMiddleware');
 
 /**
  * AdminController (Admin Domain)
@@ -89,6 +90,9 @@ class AdminController {
       res.redirect('/admin/horses');
     } catch (err) {
       console.error('Error creating horse:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       res.render('admin/horseCreate', {
         title: 'Equira - Registrera Häst',
         error: 'Kunde inte spara hästen: ' + err.message,
@@ -153,6 +157,9 @@ class AdminController {
       );
     } catch (err) {
       console.error('Error updating horse:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       const horse = await horsesService.getHorseById(req.params.id);
       res.render('admin/horseEdit', {
         title: 'Equira - Redigera häst',
@@ -333,7 +340,9 @@ class AdminController {
       const { arenas, instructors, students } =
         await lessonsService.getLessonCreateFormData();
 
-      const bookedStudentIds = (lesson.bookings || []).map(b => b.studentId);
+      const bookedStudentIds = (lesson.bookings || [])
+        .filter(b => students.some(s => s.id === b.studentId))
+        .map(b => b.studentId);
 
       res.render('admin/lessonEdit', {
         title: `Equira - Redigera ${lesson.title}`,
@@ -363,7 +372,9 @@ class AdminController {
         const lesson = await lessonsService.getLessonById(req.params.id);
         const { arenas, instructors, students } =
           await lessonsService.getLessonCreateFormData();
-        const bookedStudentIds = (lesson?.bookings || []).map(b => b.studentId);
+        const bookedStudentIds = (lesson?.bookings || [])
+          .filter(b => students.some(s => s.id === b.studentId))
+          .map(b => b.studentId);
 
         res.render('admin/lessonEdit', {
           title: 'Equira - Redigera lektion',
@@ -561,6 +572,9 @@ class AdminController {
       );
     } catch (err) {
       console.error('Error creating staff:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       res.render('admin/staffCreate', {
         title: 'Equira - Lägg till Personal',
         error: err.message,
@@ -605,6 +619,9 @@ class AdminController {
       );
     } catch (err) {
       console.error('Error updating staff:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       const staffMember = await staffService.getStaffById(req.params.id);
       res.render('admin/staffEdit', {
         title: 'Equira - Redigera personal',
@@ -1007,6 +1024,10 @@ class AdminController {
         return res.redirect('/admin/overview');
       }
 
+      if (req.session.user && profileResult.user.avatarUrl) {
+        req.session.user.avatarUrl = profileResult.user.avatarUrl;
+      }
+
       const data = AdminViewModel.formatProfile(
         profileResult.user,
         profileResult.stats,
@@ -1015,6 +1036,8 @@ class AdminController {
       res.render('admin/profile', {
         title: 'Equira - Min Profil (Admin)',
         data,
+        success: req.query.success || null,
+        error: req.query.error || null,
         layout: 'layouts/adminLayout',
       });
     } catch (err) {
@@ -1055,13 +1078,13 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('success', 'Profiluppgifterna har sparats.');
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?success=' + encodeURIComponent('Profiluppgifterna har sparats.'));
     } catch (err) {
       console.error('Error updating admin profile:', err);
       if (req.setFlash) {
         req.setFlash('error', err.message || 'Kunde inte uppdatera profilen.');
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?error=' + encodeURIComponent(err.message || 'Kunde inte uppdatera profilen.'));
     }
   }
 
@@ -1072,12 +1095,13 @@ class AdminController {
   async postProfileAvatar(req, res) {
     try {
       if (req.file && req.session.user) {
-        const avatarUrl = '/uploads/avatars/' + req.file.filename;
+        const avatarUrl = '/images/uploads/avatars/' + req.file.filename;
         await profileService.updateAvatar(req.session.user.id, avatarUrl);
         req.session.user.avatarUrl = avatarUrl;
         if (req.setFlash) {
           req.setFlash('success', 'Profilbilden har uppdaterats!');
         }
+        return res.redirect('/admin/profile?success=' + encodeURIComponent('Profilbilden har uppdaterats!'));
       }
       res.redirect('/admin/profile');
     } catch (err) {
@@ -1085,7 +1109,7 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('error', 'Kunde inte ladda upp bilden: ' + err.message);
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?error=' + encodeURIComponent('Kunde inte ladda upp bilden: ' + err.message));
     }
   }
 
@@ -1102,7 +1126,7 @@ class AdminController {
         if (req.setFlash) {
           req.setFlash('error', 'De nya lösenorden matchar inte.');
         }
-        return res.redirect('/admin/profile');
+        return res.redirect('/admin/profile?error=' + encodeURIComponent('De nya lösenorden matchar inte.'));
       }
 
       await profileService.updatePassword(
@@ -1114,13 +1138,13 @@ class AdminController {
       if (req.setFlash) {
         req.setFlash('success', 'Ditt lösenord har uppdaterats framgångsrikt.');
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?success=' + encodeURIComponent('Ditt lösenord har uppdaterats framgångsrikt.'));
     } catch (err) {
       console.error('Error updating admin password:', err);
       if (req.setFlash) {
         req.setFlash('error', err.message || 'Kunde inte ändra lösenordet.');
       }
-      res.redirect('/admin/profile');
+      res.redirect('/admin/profile?error=' + encodeURIComponent(err.message || 'Kunde inte ändra lösenordet.'));
     }
   }
 
@@ -1472,6 +1496,9 @@ class AdminController {
       res.redirect('/admin/arenas?success=' + encodeURIComponent(successMsg));
     } catch (err) {
       console.error('Error creating arena:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       res.render('admin/arenaCreate', {
         title: 'Equira - Skapa Ridbana',
         arena: {
@@ -1530,6 +1557,9 @@ class AdminController {
       res.redirect('/admin/arenas?success=' + encodeURIComponent(successMsg));
     } catch (err) {
       console.error('Error updating arena:', err);
+      if (req.file) {
+        await removeUploadedFile(req.file.path);
+      }
       const arena = await arenasService.getArenaById(req.params.id);
       res.render('admin/arenaEdit', {
         title: 'Equira - Redigera ridbana',

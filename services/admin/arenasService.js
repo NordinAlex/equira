@@ -1,4 +1,5 @@
 const { getDataSource } = require('../../config/database');
+const { removeUploadedFile, arenaUploadDir } = require('../../middleware/uploadMiddleware');
 
 /**
  * Service for administrative management of Arenas / Ridbanor.
@@ -170,7 +171,11 @@ class ArenasService {
     arena.isIndoor = isIndoor;
     arena.notes = (data.notes || '').trim() || null;
     if (data.imageUrl) {
-      arena.imageUrl = data.imageUrl.trim();
+      const newImage = data.imageUrl.trim();
+      if (arena.imageUrl && arena.imageUrl !== newImage) {
+        await removeUploadedFile(arena.imageUrl, arenaUploadDir);
+      }
+      arena.imageUrl = newImage;
     }
 
     return await arenaRepo.save(arena);
@@ -199,6 +204,10 @@ class ArenasService {
       .set({ arenaId: null })
       .where('arenaId = :id', { id: Number(id) })
       .execute();
+
+    if (arena.imageUrl) {
+      await removeUploadedFile(arena.imageUrl, arenaUploadDir);
+    }
 
     await arenaRepo.remove(arena);
     return true;

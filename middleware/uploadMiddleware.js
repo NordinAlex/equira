@@ -103,6 +103,55 @@ const uploadArena = multer({
   },
 });
 
+/**
+ * Safely removes a previously uploaded file from the disk if it exists
+ * and is within one of our managed upload directories.
+ * 
+ * @param {string} fileUrlOrPath - URL or path of the file to remove (e.g. "/images/uploads/horses/horse-123.jpg")
+ * @param {string} [expectedDir] - optional specific directory to restrict to
+ * @returns {Promise<boolean>} - true if a file was deleted, false otherwise
+ */
+async function removeUploadedFile(fileUrlOrPath, expectedDir = null) {
+  if (!fileUrlOrPath || typeof fileUrlOrPath !== 'string') return false;
+
+  const lower = fileUrlOrPath.toLowerCase();
+  // Never delete default placeholder images
+  if (lower.includes('default') || lower.includes('arena-preview') || lower.includes('arena-outdoor')) {
+    return false;
+  }
+
+  const filename = path.basename(fileUrlOrPath);
+  if (!filename) return false;
+
+  let targetDir = expectedDir;
+  if (!targetDir) {
+    if (fileUrlOrPath.includes('/uploads/horses/') || fileUrlOrPath.includes('\\uploads\\horses\\')) {
+      targetDir = horseUploadDir;
+    } else if (fileUrlOrPath.includes('/uploads/arenas/') || fileUrlOrPath.includes('\\uploads\\arenas\\')) {
+      targetDir = arenaUploadDir;
+    } else if (fileUrlOrPath.includes('/uploads/avatars/') || fileUrlOrPath.includes('\\uploads\\avatars\\')) {
+      targetDir = uploadDir;
+    }
+  }
+
+  if (!targetDir) return false;
+
+  const fullPath = path.isAbsolute(fileUrlOrPath) && fs.existsSync(fileUrlOrPath)
+    ? fileUrlOrPath
+    : path.join(targetDir, filename);
+
+  try {
+    if (fs.existsSync(fullPath)) {
+      await fs.promises.unlink(fullPath);
+      console.log(`Deleted old uploaded file: ${fullPath}`);
+      return true;
+    }
+  } catch (err) {
+    console.warn(`Could not delete uploaded file (${fullPath}):`, err.message);
+  }
+  return false;
+}
+
 module.exports = {
   uploadAvatar: upload,
   uploadHorse,
@@ -110,4 +159,5 @@ module.exports = {
   uploadDir,
   horseUploadDir,
   arenaUploadDir,
+  removeUploadedFile,
 };

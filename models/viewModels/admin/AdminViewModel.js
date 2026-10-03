@@ -60,6 +60,7 @@ class AdminViewModel {
 
     return {
       adminUser: user,
+      greeting: AdminViewModel.getGreeting(),
       kpis: {
         totalLessonsToday: lessons.length,
         activeStudents: students.length,
@@ -71,6 +72,40 @@ class AdminViewModel {
       lessons: formattedLessons,
       urgentWarnings,
     };
+  }
+
+  /**
+   * Returns Swedish time-based greeting (God morgon, God förmiddag, God eftermiddag, God kväll, God natt).
+   * 
+   * @param {Date} [date=new Date()]
+   * @returns {string}
+   */
+  static getGreeting(date = new Date()) {
+    let hour = date.getHours();
+    try {
+      hour = parseInt(
+        new Intl.DateTimeFormat('sv-SE', {
+          timeZone: 'Europe/Stockholm',
+          hour: 'numeric',
+          hour12: false,
+        }).format(date),
+        10
+      );
+    } catch (e) {
+      hour = date.getHours();
+    }
+
+    if (hour >= 5 && hour < 10) {
+      return 'God morgon';
+    } else if (hour >= 10 && hour < 12) {
+      return 'God förmiddag';
+    } else if (hour >= 12 && hour < 17) {
+      return 'God eftermiddag';
+    } else if (hour >= 17 && hour < 23) {
+      return 'God kväll';
+    } else {
+      return 'God natt';
+    }
   }
 
   /**

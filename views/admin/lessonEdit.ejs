@@ -18,7 +18,7 @@
         <i class="fa-solid fa-horseshoe text-stone-500"></i>
         <span>Tilldela hästar</span>
       </a>
-      <button type="submit" form="lessonEditForm" class="px-5 py-2 bg-[#3d2314] hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5">
+      <button type="submit" form="lessonEditForm" class="px-5 py-2 bg-equira-cognac-800 hover:bg-[#2a170c] text-white text-xs font-semibold rounded-xl shadow-sm transition flex items-center gap-1.5">
         <i class="fa-solid fa-floppy-disk text-xs"></i>
         <span>Spara ändringar</span>
       </button>
@@ -53,7 +53,7 @@
           <div>
             <label class="block text-xs font-semibold text-stone-700 mb-1">Lektionens namn / Rubrik *</label>
             <input type="text" id="lessonTitleInput" name="title" value="<%= lesson.title || '' %>" required
-              class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#4a2828] focus:bg-white">
+              class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium text-stone-900 focus:outline-none focus:ring-2 focus:ring-equira-cognac-700 focus:bg-white">
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -150,7 +150,7 @@
           <div>
             <label class="block text-xs font-semibold text-stone-700 mb-1">Stallpersonalens instruktioner</label>
             <textarea name="staffInstructions" rows="2" placeholder="Bygg 4 enkelhinder och en kombination på medellinjen. Framskrittning påbörjas kl 17:20."
-              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#4a2828]"><%= lesson.staffInstructions || '' %></textarea>
+              class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-cognac-700"><%= lesson.staffInstructions || '' %></textarea>
           </div>
         </div>
 
@@ -182,10 +182,20 @@
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-3 bg-stone-50 rounded-xl border border-stone-200">
               <% students.forEach(s => { %>
-                <% const isChecked = bookedStudentIds.includes(s.id); %>
-                <label class="flex items-center gap-2 text-xs text-stone-700 p-1.5 hover:bg-white rounded-lg cursor-pointer transition border border-transparent hover:border-stone-200">
-                  <input type="checkbox" name="studentIds" value="<%= s.id %>" <%= isChecked ? 'checked' : '' %> class="student-checkbox rounded text-[#4a2828] focus:ring-[#4a2828]">
-                  <span class="truncate"><%= s.fullName %></span>
+                <% 
+                  const mStatus = s.membershipStatus || (s.studentProfile && s.studentProfile.membershipStatus) || 'Aktiv';
+                  if (mStatus === 'Kö') return;
+                  const isTrial = mStatus !== 'Aktiv';
+                  const isChecked = bookedStudentIds.includes(s.id); 
+                %>
+                <label class="flex items-center justify-between gap-2 text-xs text-stone-700 p-1.5 hover:bg-white rounded-lg cursor-pointer transition border border-transparent hover:border-stone-200">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <input type="checkbox" name="studentIds" value="<%= s.id %>" <%= isChecked ? 'checked' : '' %> class="student-checkbox rounded text-equira-cognac-700 focus:ring-equira-cognac-700 shrink-0">
+                    <span class="truncate"><%= s.fullName %></span>
+                  </div>
+                  <% if (isTrial) { %>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200 shrink-0" title="Medlemskapsstatus: <%= mStatus %>">Pröv</span>
+                  <% } %>
                 </label>
               <% }); %>
             </div>
@@ -246,13 +256,13 @@
         <!-- Hästtilldelning Quick Card -->
         <div class="bg-[#fcfaf7] rounded-2xl border border-[#ebdccb] p-5 shadow-xs space-y-3">
           <div class="flex items-center gap-2 text-stone-900 font-bold text-sm">
-            <i class="fa-solid fa-horseshoe text-[#4a2828]"></i>
+            <i class="fa-solid fa-horseshoe text-equira-cognac-700"></i>
             <span>Hästtilldelning</span>
           </div>
           <p class="text-xs text-stone-600">
             Klicka nedan för att gå direkt till tilldelningsvyn för att fördela hästar till eleverna.
           </p>
-          <a href="/admin/assign/<%= lesson.id %>" class="w-full py-2 px-4 bg-[#4a2828] hover:bg-[#381e1e] text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 shadow-xs">
+          <a href="/admin/assign/<%= lesson.id %>" class="w-full py-2 px-4 bg-equira-cognac-700 hover:bg-[#381e1e] text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 shadow-xs">
             <span>Öppna tilldelning</span>
             <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </a>

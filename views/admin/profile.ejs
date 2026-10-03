@@ -31,7 +31,7 @@
 
         <div class="relative pt-6">
           <div class="relative group w-28 h-28 rounded-full overflow-hidden mx-auto border-4 border-white shadow-md bg-stone-100">
-            <img id="adminAvatarPreview" src="<%= data.avatarUrl %>" alt="<%= data.fullName %>" class="w-full h-full object-cover">
+            <img id="adminAvatarPreview" src="<%= data.avatarUrl %>" alt="<%= data.fullName %>" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/images/default-staff.jpg';">
             
             <button type="button" 
                     onclick="document.getElementById('adminAvatarFileInput').click()"
@@ -41,15 +41,6 @@
               <span class="text-[10px] font-bold">Byt bild</span>
             </button>
           </div>
-
-          <!-- Hidden Upload Form -->
-          <form id="adminAvatarUploadForm" action="/admin/profile/avatar" method="POST" enctype="multipart/form-data" class="hidden">
-            <input type="file" 
-                   id="adminAvatarFileInput" 
-                   name="avatar" 
-                   accept="image/jpeg,image/png,image/webp,image/gif" 
-                   onchange="document.getElementById('adminAvatarUploadForm').submit()">
-          </form>
 
           <div class="mt-4">
             <h2 class="text-xl sm:text-2xl font-black text-stone-900 tracking-tight">
@@ -67,22 +58,52 @@
             <p class="text-sm font-semibold text-equira-green-800 mt-2">
               <%= data.title %>
             </p>
-            <p class="text-xs text-stone-400 mt-1 flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-location-dot text-emerald-600"></i>
-              <span>Mälardalen Ridcenter</span>
-              <span>&bull;</span>
+            <p class="text-xs text-stone-400 mt-1 flex items-center justify-center gap-1.5"> 
               <span><%= data.createdAtFormatted %></span>
             </p>
           </div>
 
-          <div class="pt-4 border-t border-stone-100 mt-5 flex justify-center">
-            <button type="button" 
-                    onclick="document.getElementById('adminAvatarFileInput').click()"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-equira-green-800 hover:bg-equira-green-900 text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift">
-              <i class="fa-solid fa-camera text-xs"></i>
-              <span>Ladda upp ny profilbild</span>
-            </button>
-          </div>
+          <!-- Avatar Upload Form -->
+          <form id="adminAvatarUploadForm" action="/admin/profile/avatar" method="POST" enctype="multipart/form-data" class="pt-4 border-t border-stone-100 mt-5">
+            <input type="file" 
+                   id="adminAvatarFileInput" 
+                   name="avatar" 
+                   accept="image/jpeg,image/png,image/webp,image/gif" 
+                   class="hidden">
+
+            <!-- Default Trigger (when no image is staged) -->
+            <div id="defaultAvatarActionArea" class="flex justify-center">
+              <button type="button" 
+                      id="uploadAvatarBtn"
+                      onclick="document.getElementById('adminAvatarFileInput').click()"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-equira-green-800 hover:bg-equira-green-900 text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift cursor-pointer">
+                <i class="fa-solid fa-camera text-xs"></i>
+                <span id="uploadAvatarBtnText">Ladda upp ny profilbild</span>
+              </button>
+            </div>
+
+            <!-- Staged Upload Actions (Save & Cancel - shown when a new image is selected) -->
+            <div id="stagedAvatarActionArea" class="hidden space-y-3">
+              <div class="inline-flex items-center gap-2 text-xs text-stone-700 bg-stone-50 border border-stone-200 py-1.5 px-3 rounded-xl max-w-full">
+                <i class="fa-solid fa-image text-emerald-700 shrink-0"></i>
+                <span id="stagedFileName" class="truncate font-medium max-w-50">bild.jpg</span>
+              </div>
+              <div class="flex items-center justify-center gap-2">
+                <button type="button" 
+                        id="cancelAvatarBtn"
+                        class="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-xmark text-xs"></i>
+                  <span>Avbryt</span>
+                </button>
+                <button type="submit" 
+                        id="saveAvatarBtn"
+                        class="px-5 py-2 bg-equira-green-800 hover:bg-equira-green-900 text-white text-xs font-bold rounded-xl shadow-xs transition hover-lift cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-floppy-disk text-xs"></i>
+                  <span id="saveAvatarBtnText">Spara</span>
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -323,4 +344,76 @@
       alert('De nya lösenorden matchar inte! Kontrollera båda fälten.');
     }
   });
+
+  const avatarFileInput = document.getElementById('adminAvatarFileInput');
+  const avatarUploadForm = document.getElementById('adminAvatarUploadForm');
+  const avatarPreview = document.getElementById('adminAvatarPreview');
+  const defaultAvatarActionArea = document.getElementById('defaultAvatarActionArea');
+  const stagedAvatarActionArea = document.getElementById('stagedAvatarActionArea');
+  const stagedFileName = document.getElementById('stagedFileName');
+  const cancelAvatarBtn = document.getElementById('cancelAvatarBtn');
+  const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+  const saveAvatarBtnText = document.getElementById('saveAvatarBtnText');
+
+  const originalAvatarSrc = avatarPreview ? avatarPreview.src : '';
+
+  if (avatarFileInput && avatarUploadForm) {
+    avatarFileInput.addEventListener('change', function() {
+      if (this.files && this.files.length > 0) {
+        const file = this.files[0];
+
+        // Validate image file type
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+          alert('Vänligen välj en giltig bildfil (JPG, PNG, WebP eller GIF).');
+          this.value = '';
+          return;
+        }
+
+        // Validate max 5MB
+        if (file.size > 5 * 1024 * 1024) {
+          alert('Bilden är för stor. Maximal filstorlek är 5 MB.');
+          this.value = '';
+          return;
+        }
+
+        // Live preview of the chosen image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          if (avatarPreview) {
+            avatarPreview.src = e.target.result;
+          }
+        };
+        reader.readAsDataURL(file);
+
+        if (stagedFileName) {
+          stagedFileName.textContent = file.name;
+        }
+
+        // Show Spara and Avbryt actions, hide default upload button
+        if (defaultAvatarActionArea) defaultAvatarActionArea.classList.add('hidden');
+        if (stagedAvatarActionArea) stagedAvatarActionArea.classList.remove('hidden');
+      }
+    });
+
+    if (cancelAvatarBtn) {
+      cancelAvatarBtn.addEventListener('click', function() {
+        avatarFileInput.value = '';
+        if (avatarPreview) {
+          avatarPreview.src = originalAvatarSrc;
+        }
+        if (stagedAvatarActionArea) stagedAvatarActionArea.classList.add('hidden');
+        if (defaultAvatarActionArea) defaultAvatarActionArea.classList.remove('hidden');
+      });
+    }
+
+    avatarUploadForm.addEventListener('submit', function() {
+      if (saveAvatarBtn) {
+        saveAvatarBtn.disabled = true;
+        if (saveAvatarBtnText) {
+          saveAvatarBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i><span>Sparar...</span>';
+        }
+      }
+    });
+  }
 </script>
