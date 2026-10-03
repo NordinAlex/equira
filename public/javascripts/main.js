@@ -162,10 +162,12 @@ function initAdminMobileDrawer() {
   const closeBtn = document.getElementById('admin-mobile-menu-close');
   const drawer = document.getElementById('admin-mobile-drawer');
   const backdrop = document.getElementById('admin-mobile-drawer-backdrop');
+  let lastFocusedElement = null;
 
   if (!drawer || !backdrop) return;
 
-  function openDrawer() {
+  function openDrawer(trigger) {
+    lastFocusedElement = trigger || document.activeElement;
     backdrop.classList.remove('hidden');
     // Force layout reflow before triggering CSS opacity transition
     void backdrop.offsetWidth;
@@ -174,6 +176,10 @@ function initAdminMobileDrawer() {
     drawer.classList.remove('-translate-x-full');
     drawer.classList.add('translate-x-0');
     document.body.classList.add('overflow-hidden');
+    if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+    if (bottomMenuBtn) bottomMenuBtn.setAttribute('aria-expanded', 'true');
+    // Move focus inside drawer for keyboard / screen reader accessibility
+    if (closeBtn) closeBtn.focus();
   }
 
   function closeDrawer() {
@@ -182,15 +188,21 @@ function initAdminMobileDrawer() {
     drawer.classList.remove('translate-x-0');
     drawer.classList.add('-translate-x-full');
     document.body.classList.remove('overflow-hidden');
+    if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
+    if (bottomMenuBtn) bottomMenuBtn.setAttribute('aria-expanded', 'false');
     setTimeout(() => {
       if (drawer.classList.contains('-translate-x-full')) {
         backdrop.classList.add('hidden');
       }
     }, 300);
+    // Return focus to opening button
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+      lastFocusedElement.focus();
+    }
   }
 
-  if (openBtn) openBtn.addEventListener('click', openDrawer);
-  if (bottomMenuBtn) bottomMenuBtn.addEventListener('click', openDrawer);
+  if (openBtn) openBtn.addEventListener('click', () => openDrawer(openBtn));
+  if (bottomMenuBtn) bottomMenuBtn.addEventListener('click', () => openDrawer(bottomMenuBtn));
   if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
   backdrop.addEventListener('click', closeDrawer);
 

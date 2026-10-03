@@ -15,11 +15,14 @@
 </head>
 <body class="h-full flex flex-col lg:flex-row overflow-hidden text-slate-800 bg-[#faf9f6]">
 
+  <!-- WCAG 2.4.1: Skip to main content link -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-emerald-800 focus:text-white focus:font-bold focus:shadow-xl focus:rounded-xl focus:ring-2 focus:ring-white">Hoppa till huvudinnehåll</a>
+
   <!-- Mobile Top Header (Visible on < lg, hidden on desktop) -->
   <header class="lg:hidden bg-equira-green-800 text-white px-4 py-3 flex items-center justify-between border-b border-emerald-900/50 z-30 shadow-sm shrink-0">
     <div class="flex items-center gap-3">
-      <button type="button" id="admin-mobile-menu-btn" aria-label="Öppna navigationsmeny" class="p-2 -ml-1.5 text-emerald-200 hover:text-white hover:bg-white/10 rounded-xl transition">
-        <i class="fa-solid fa-bars text-lg"></i>
+      <button type="button" id="admin-mobile-menu-btn" aria-label="Öppna navigationsmeny" aria-expanded="false" aria-controls="admin-mobile-drawer" class="p-2 -ml-1.5 text-emerald-200 hover:text-white hover:bg-white/10 rounded-xl transition">
+        <i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
       </button>
       <a href="/admin/overview" class="flex items-center gap-2.5 group">
         <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/20">
@@ -47,7 +50,7 @@
   <div id="admin-mobile-drawer-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden transition-opacity duration-300 opacity-0 lg:hidden"></div>
 
   <!-- Mobile Off-Canvas Drawer Navigation -->
-  <aside id="admin-mobile-drawer" class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-equira-green-800 text-white z-50 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden">
+  <aside id="admin-mobile-drawer" aria-label="Mobil huvudmeny" class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-equira-green-800 text-white z-50 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden">
     <div class="flex-1 flex flex-col min-h-0">
       <!-- Drawer Header with Close Button -->
       <div class="h-16 flex items-center justify-between px-5 border-b border-emerald-900/50">
@@ -150,7 +153,7 @@
   </aside>
 
   <!-- Admin Desktop Sidebar (Hidden on < lg, visible on lg and above) -->
-  <aside class="hidden lg:flex lg:w-64 bg-equira-green-800 flex-col justify-between shrink-0 text-white z-20 shadow-xl select-none">
+  <aside aria-label="Huvudmeny" class="hidden lg:flex lg:w-64 bg-equira-green-800 flex-col justify-between shrink-0 text-white z-20 shadow-xl select-none">
     <div>
       <!-- Brand Logo Header -->
       <div class="h-20 flex items-center px-6 border-b border-emerald-900/50">
@@ -249,35 +252,35 @@
   </aside>
 
   <!-- Main Content Wrapper (scrollable, responsive padding) -->
-  <main class="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[#faf9f6] pb-20 lg:pb-0">
+  <main id="main-content" tabindex="-1" class="flex-1 flex flex-col min-w-0 overflow-y-auto bg-[#faf9f6] pb-20 lg:pb-0 focus:outline-none">
     <%- include('../partials/admin-alert.ejs') %>
     <%- body %>
   </main>
 
   <!-- Mobile Bottom Quick Navigation (Visible on < lg screens) -->
-  <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-stone-200 px-2 py-1.5 flex justify-around items-center z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
-    <a href="/admin/overview" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath === '/admin/overview' ? 'text-emerald-800 font-bold' : 'text-stone-400 hover:text-stone-700' %>">
-      <i class="fa-solid fa-table-cells-large text-base"></i>
+  <nav aria-label="Snabbnavigering mobil" class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-stone-200 px-2 py-1.5 flex justify-around items-center z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+    <a href="/admin/overview" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath === '/admin/overview' ? 'text-emerald-800 font-bold' : 'text-stone-600 hover:text-stone-900' %>">
+      <i class="fa-solid fa-table-cells-large text-base" aria-hidden="true"></i>
       <span class="text-[10px]">Översikt</span>
     </a>
 
-    <a href="/admin/schedule" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/schedule') ? 'text-emerald-800 font-bold' : 'text-stone-400 hover:text-stone-700' %>">
-      <i class="fa-regular fa-calendar text-base"></i>
+    <a href="/admin/schedule" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/schedule') ? 'text-emerald-800 font-bold' : 'text-stone-600 hover:text-stone-900' %>">
+      <i class="fa-regular fa-calendar text-base" aria-hidden="true"></i>
       <span class="text-[10px]">Schema</span>
     </a>
 
-    <a href="/admin/lessons" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/lessons') ? 'text-emerald-800 font-bold' : 'text-stone-400 hover:text-stone-700' %>">
-      <i class="fa-solid fa-book-open text-base"></i>
+    <a href="/admin/lessons" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/lessons') ? 'text-emerald-800 font-bold' : 'text-stone-600 hover:text-stone-900' %>">
+      <i class="fa-solid fa-book-open text-base" aria-hidden="true"></i>
       <span class="text-[10px]">Lektioner</span>
     </a>
 
-    <a href="/admin/horses" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/horses') ? 'text-emerald-800 font-bold' : 'text-stone-400 hover:text-stone-700' %>">
-      <i class="fa-solid fa-horseshoe text-base"></i>
+    <a href="/admin/horses" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl transition <%= currentPath.startsWith('/admin/horses') ? 'text-emerald-800 font-bold' : 'text-stone-600 hover:text-stone-900' %>">
+      <i class="fa-solid fa-horseshoe text-base" aria-hidden="true"></i>
       <span class="text-[10px]">Hästar</span>
     </a>
 
-    <button type="button" id="admin-bottom-menu-btn" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl text-stone-400 hover:text-emerald-800 transition">
-      <i class="fa-solid fa-bars text-base"></i>
+    <button type="button" id="admin-bottom-menu-btn" aria-label="Öppna navigationsmeny" aria-expanded="false" aria-controls="admin-mobile-drawer" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl text-stone-600 hover:text-emerald-800 transition">
+      <i class="fa-solid fa-bars text-base" aria-hidden="true"></i>
       <span class="text-[10px]">Meny</span>
     </button>
   </nav>

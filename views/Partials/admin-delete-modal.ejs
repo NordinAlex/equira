@@ -7,7 +7,7 @@
       </div>
       <div>
         <h3 id="globalDeleteModalTitle" class="text-base font-bold text-stone-900">Ta bort lektion?</h3>
-        <p id="globalDeleteModalSubtitle" class="text-xs text-stone-400">Denna åtgärd kan inte ångras</p>
+        <p id="globalDeleteModalSubtitle" class="text-xs text-stone-500">Denna åtgärd kan inte ångras</p>
       </div>
     </div>
     
@@ -26,7 +26,7 @@
     </div>
 
     <div class="flex items-center justify-end gap-2.5 pt-2">
-      <button type="button" onclick="closeGlobalDeleteModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
+      <button type="button" id="globalDeleteModalCancelBtn" onclick="closeGlobalDeleteModal()" class="px-4 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition cursor-pointer">
         Avbryt
       </button>
       <form id="globalDeleteModalForm" action="" method="POST" class="inline m-0 p-0">
@@ -164,8 +164,17 @@
       if (legacyStudentName) legacyStudentName.textContent = displayItemName;
       if (legacyStaffName) legacyStaffName.textContent = displayItemName;
 
-      if (modal) modal.classList.remove('hidden');
+      // Keep track of triggering element to restore focus on close (WCAG 2.4.3)
+      lastTriggerElement = document.activeElement;
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        const cancelBtn = document.getElementById('globalDeleteModalCancelBtn');
+        if (cancelBtn) cancelBtn.focus();
+      }
     };
+
+    let lastTriggerElement = null;
 
     /**
      * Closes the global delete confirmation modal
@@ -173,6 +182,9 @@
     window.closeGlobalDeleteModal = function() {
       const modal = document.getElementById('globalDeleteModal');
       if (modal) modal.classList.add('hidden');
+      if (lastTriggerElement && typeof lastTriggerElement.focus === 'function') {
+        lastTriggerElement.focus();
+      }
     };
 
     // Backward-compatible function aliases
@@ -188,10 +200,26 @@
     window.openDeleteStudentModal = window.openGlobalDeleteModal;
     window.openDeleteStaffModal = window.openGlobalDeleteModal;
 
-    // Close on Escape key press
+    // Close on Escape key press & trap Tab within modal
     document.addEventListener('keydown', function(e) {
+      const modal = document.getElementById('globalDeleteModal');
+      if (!modal || modal.classList.contains('hidden')) return;
+
       if (e.key === 'Escape') {
         window.closeGlobalDeleteModal();
+      } else if (e.key === 'Tab') {
+        const focusable = modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     });
 

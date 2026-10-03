@@ -170,59 +170,59 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Full Name -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="profileFullName" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Fullständigt namn <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-regular fa-user text-sm"></i>
                 </span>
-                <input type="text" name="fullName" required value="<%= data.fullName %>"
+                <input type="text" id="profileFullName" name="fullName" required value="<%= data.fullName %>"
                   class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
 
             <!-- Username (Read-only) -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="profileUsername" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Användarnamn
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-solid fa-at text-sm"></i>
                 </span>
-                <input type="text" value="<%= data.username %>" readonly disabled
+                <input type="text" id="profileUsername" value="<%= data.username %>" readonly disabled
                   class="w-full pl-10 pr-4 py-2.5 bg-stone-100 border border-stone-200 rounded-xl text-sm text-stone-500 cursor-not-allowed">
               </div>
-              <span class="text-[10px] text-stone-400 mt-1 block">Användarnamnet är permanent kopplat till kontot.</span>
+              <span class="text-[10px] text-stone-500 mt-1 block">Användarnamnet är permanent kopplat till kontot.</span>
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Email -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="profileEmail" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 E-postadress <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-regular fa-envelope text-sm"></i>
                 </span>
-                <input type="email" name="email" required value="<%= data.email %>"
+                <input type="email" id="profileEmail" name="email" required value="<%= data.email %>"
                   class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
 
             <!-- Phone -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="profilePhone" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Telefonnummer
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-solid fa-phone text-sm"></i>
                 </span>
-                <input type="tel" name="phone" value="<%= data.phone %>" placeholder="070-123 45 67"
+                <input type="tel" id="profilePhone" name="phone" value="<%= data.phone %>" placeholder="070-123 45 67"
                   class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
               </div>
             </div>
@@ -230,32 +230,32 @@
 
           <!-- Title / Position -->
           <div>
-            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+            <label for="profileTitle" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
               Befattning / Titel i stallet
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                 <i class="fa-solid fa-id-badge text-sm"></i>
               </span>
-              <input type="text" name="title" value="<%= data.title %>" placeholder="t.ex. Ridskolechef & Huvudinstruktör"
+              <input type="text" id="profileTitle" name="title" value="<%= data.title %>" placeholder="t.ex. Ridskolechef & Huvudinstruktör"
                 class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
             </div>
           </div>
 
           <!-- Specializations -->
           <div>
-            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+            <label for="profileSpecializations" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
               Specialiseringar &amp; Ansvarsområden
             </label>
-            <textarea name="specializations" rows="2" placeholder="t.ex. Dressyrdomare, Pedagogik, Hopptränare"
+            <textarea id="profileSpecializations" name="specializations" rows="2" placeholder="t.ex. Dressyrdomare, Pedagogik, Hopptränare"
               class="w-full p-3 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900"><%= data.specializations %></textarea>
-            <span class="text-[10px] text-stone-400 mt-1 block">Visas i personallistan och instruktörsöversikten.</span>
+            <span class="text-[10px] text-stone-500 mt-1 block">Visas i personallistan och instruktörsöversikten.</span>
           </div>
 
           <div class="pt-2 flex justify-end">
             <button type="submit"
               class="w-full sm:w-auto px-6 py-2.5 bg-equira-green-800 hover:bg-equira-green-900 text-white font-bold rounded-xl shadow-xs transition hover-lift text-sm flex items-center justify-center gap-2">
-              <i class="fa-solid fa-check text-xs"></i>
+              <i class="fa-solid fa-check text-xs" aria-hidden="true"></i>
               <span>Spara ändringar</span>
             </button>
           </div>
@@ -270,21 +270,21 @@
             <p class="text-xs text-stone-500 mt-0.5">Byt ut ditt lösenord regelbundet för att skydda anläggningsdatan.</p>
           </div>
           <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-sm border border-amber-200">
-            <i class="fa-solid fa-key"></i>
+            <i class="fa-solid fa-key" aria-hidden="true"></i>
           </div>
         </div>
 
         <form action="/admin/profile/password" method="POST" class="space-y-4" id="adminPasswordForm">
           <!-- Current Password -->
           <div>
-            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+            <label for="currentPassword" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
               Nuvarande lösenord <span class="text-rose-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                 <i class="fa-solid fa-lock text-sm"></i>
               </span>
-              <input type="password" name="currentPassword" required placeholder="Ditt nuvarande lösenord"
+              <input type="password" id="currentPassword" name="currentPassword" required placeholder="Ditt nuvarande lösenord"
                 class="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-equira-green-800 focus:bg-white transition text-stone-900">
             </div>
           </div>
@@ -292,11 +292,11 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- New Password -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="newPassword" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Nytt lösenord <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-solid fa-shield-halved text-sm"></i>
                 </span>
                 <input type="password" id="newPassword" name="newPassword" required minlength="6" placeholder="Minst 6 tecken"
@@ -306,11 +306,11 @@
 
             <!-- Confirm New Password -->
             <div>
-              <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
+              <label for="confirmPassword" class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1.5">
                 Bekräfta nytt lösenord <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400" aria-hidden="true">
                   <i class="fa-solid fa-shield-halved text-sm"></i>
                 </span>
                 <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Upprepa nytt lösenord"
