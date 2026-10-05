@@ -4,11 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link rel="stylesheet" href="/stylesheets/styles.css" />
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
   <title>Stämpling</title>
 </head>
 
@@ -16,373 +13,150 @@
 
   <div class="flex min-h-screen">
 
-    <!-- DESKTOP SIDEBAR -->
     <div class="hidden md:block">
       <%- include("../Partials/sidebar-staff.ejs") %>
     </div>
 
-
     <div class="flex flex-1 flex-col">
-
-      <!-- TOPBAR -->
       <%- include("../Partials/topbar-staff.ejs") %>
 
+      <main class="flex-1 px-4 md:px-8 pb-24 md:pb-8">
+        <div class="max-w-3xl mx-auto pt-6 md:pt-10">
 
-        <main class="flex-1 px-4 md:px-8 pb-24 md:pb-8">
+          <p class="text-xs text-gray-400 mb-1">Checka in</p>
 
-          <div class="max-w-3xl mx-auto pt-6 md:pt-10">
+          <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
 
-            <!-- LITEN RUBRIK -->
-            <p class="text-xs text-gray-400 mb-1">
-              Checka in
-            </p>
-
-
-            <!-- HUVUDKORT -->
-            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-
-
-              <!-- HÄLSNING -->
-              <div class="px-6 pt-6 md:px-8 md:pt-8">
-
-                <div class="flex items-center gap-4">
-
-                  <img src="<%= user.avatarUrl || '/images/avatar.jpg' %>" class="size-16 rounded-full object-cover"
-                    alt="Profilbild" />
-                  <div>
-                    <h2 class="text-xl font-bold">
-                      <%= user.fullName || user.username || 'Personal' %>
-                    </h2>
-
+            <!-- HÄLSNING -->
+            <div class="px-6 pt-6 md:px-8 md:pt-8">
+              <div class="flex items-center gap-4">
+                <img src="<%= user.avatarUrl || '/images/avatar.jpg' %>" class="size-16 rounded-full object-cover" alt="Profilbild" />
+                <div>
+                  <h2 class="text-xl font-bold">
+                    <%= user.fullName || user.username || 'Personal' %>
+                  </h2>
                 </div>
-
               </div>
-
-
-
-              <!-- DATUM + KLOCKA -->
-              <div class="text-center px-6 pt-8 pb-5">
-
-                <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase mb-2">
-                  <%= dateString || 'Lördag 26 sep' %>
-                </p>
-
-
-                <div id="live-clock" class="text-4xl md:text-5xl font-bold text-[#3b2721]">
-                  <%= currentTime || '06:55' %>
-                </div>
-
-
-                <div class="flex items-center justify-center gap-2 mt-3 text-sm text-gray-600">
-
-                  <i class="fa-regular fa-sun text-gray-500"></i>
-
-                  <span>
-                    Morgonpass börjar <%= plannedStartTime || '07:00' %>
-                  </span>
-
-                </div>
-
-              </div>
-
-
-
-              <!-- STATUS -->
-              <div class="px-4 pb-5 md:px-6 md:pb-6">
-
-                <div class="border border-gray-100 rounded-xl p-4 bg-white shadow-sm">
-
-
-                  <!-- STATUS HEADER -->
-                  <div class="flex items-center justify-between mb-4">
-
-                    <span class="text-xs font-bold tracking-wide text-gray-500 uppercase">
-                      Aktuell status
-                    </span>
-
-
-                    <% if (isClockedIn) { %>
-
-                      <span
-                        class="bg-green-100 text-green-700 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5">
-
-                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
-
-                        Instämplad
-
-                      </span>
-
-                      <% } else { %>
-
-                        <span
-                          class="bg-[#f1eee8] text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5">
-
-                          <span class="w-2 h-2 rounded-full bg-[#8b765e]"></span>
-
-                          Ej instämplad
-
-                        </span>
-
-                        <% } %>
-
-                  </div>
-
-
-
-                  <!-- PLANERAT PASS -->
-                  <div class="flex items-center justify-between mb-3">
-
-                    <div class="flex items-center gap-2 text-sm text-gray-600">
-
-                      <i class="fa-regular fa-clock text-gray-500"></i>
-
-                      <span>
-                        Planerat pass
-                      </span>
-
-                    </div>
-
-
-                    <div class="text-sm font-semibold text-gray-800">
-
-                      <%= plannedStartTime || '07:00' %>
-                        –
-                        <%= plannedEndTime || '16:00' %>
-
-                          <span class="font-normal text-gray-400 ml-1">
-                            (8h)
-                          </span>
-
-                    </div>
-
-                  </div>
-
-
-
-                  <!-- PROGRESS BAR -->
-                  <div class="h-1.5 bg-gray-100 rounded-full mb-5 overflow-hidden">
-
-                    <div class="h-full bg-[#b9dfc0] rounded-full" style="width: <%= Number(progress || 0) %>%;"></div>
-
-                  </div>
-
-
-
-                  <!-- ARBETAD TID -->
-                  <div class="flex items-center justify-between mb-5">
-
-                    <div class="flex items-center gap-2 text-sm text-gray-600">
-
-                      <i class="fa-solid fa-clock-rotate-left text-gray-500"></i>
-
-                      <span>
-                        Arbetad tid idag
-                      </span>
-
-                    </div>
-
-
-                    <span id="worked-time" class="text-lg font-bold text-gray-800">
-                      <%= workedTime || '0h 00m' %>
-                    </span>
-
-                  </div>
-
-
-
-                  <!-- STÄMPLA IN -->
-                  <% if (!isClockedIn) { %>
-
-                    <form action="/staff/time-tracking/clock-in" method="POST">
-
-                      <button type="submit"
-                        class="w-full bg-[#4a2b24] hover:bg-[#3b211c] text-white rounded-xl py-3.5 px-4 font-semibold text-sm flex items-center justify-center gap-2 transition">
-
-                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
-
-                        Stämpla in för dagen
-
-                      </button>
-
-                    </form>
-
-
-                    <% } else { %>
-
-
-                      <!-- STÄMPLA UT -->
-                      <form action="/staff/time-tracking/clock-out" method="POST">
-
-                        <button type="submit"
-                          class="w-full bg-[#4a2b24] hover:bg-[#3b211c] text-white rounded-xl py-3.5 px-4 font-semibold text-sm flex items-center justify-center gap-2 transition">
-
-                          <i class="fa-solid fa-arrow-right-from-bracket"></i>
-
-                          Stämpla ut
-
-                        </button>
-
-                      </form>
-
-                      <% } %>
-
-
-                </div>
-
-              </div>
-
             </div>
 
+            <!-- DATUM + KLOCKA -->
+            <div class="text-center px-6 pt-8 pb-5">
+              <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase mb-2">
+                <%= dateString %>
+              </p>
+              <div id="live-clock" class="text-4xl md:text-5xl font-bold text-[#3b2721]">
+                <%= currentTime %>
+              </div>
+              <div class="flex items-center justify-center gap-2 mt-3 text-sm text-gray-600">
+                <i class="fa-regular fa-sun text-gray-500"></i>
+                <span>Morgonpass börjar <%= plannedStartTime %></span>
+              </div>
+            </div>
+
+            <!-- STATUS -->
+            <div class="px-4 pb-5 md:px-6 md:pb-6">
+              <div class="border border-gray-100 rounded-xl p-4 bg-white shadow-sm">
+
+                <!-- STATUS HEADER -->
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-xs font-bold tracking-wide text-gray-500 uppercase">Aktuell status</span>
+                  <% if (isClockedIn) { %>
+                    <span class="bg-green-100 text-green-700 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                      Instämplad
+                    </span>
+                  <% } else { %>
+                    <span class="bg-[#f1eee8] text-gray-600 text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-[#8b765e]"></span>
+                      Ej instämplad
+                    </span>
+                  <% } %>
+                </div>
+
+                <!-- PLANERAT PASS -->
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2 text-sm text-gray-600">
+                    <i class="fa-regular fa-clock text-gray-500"></i>
+                    <span>Planerat pass</span>
+                  </div>
+                  <div class="text-sm font-semibold text-gray-800">
+                    <%= plannedStartTime %> – <%= plannedEndTime %>
+                    <span class="font-normal text-gray-400 ml-1">(8h)</span>
+                  </div>
+                </div>
+
+                <!-- PROGRESS BAR -->
+                <div class="h-1.5 bg-gray-100 rounded-full mb-5 overflow-hidden">
+                  <div class="h-full bg-[#b9dfc0] rounded-full" style="width: <%= Number(progress || 0) %>%;"></div>
+                </div>
+
+                <!-- ARBETAD TID -->
+                <div class="flex items-center justify-between mb-5">
+                  <div class="flex items-center gap-2 text-sm text-gray-600">
+                    <i class="fa-solid fa-clock-rotate-left text-gray-500"></i>
+                    <span>Arbetad tid idag</span>
+                  </div>
+                  <span id="worked-time" class="text-lg font-bold text-gray-800">0h 00m</span>
+                </div>
+
+                <!-- STÄMPLA IN / UT -->
+                <% if (!isClockedIn) { %>
+                  <form action="/staff/time-tracking/clock-in" method="POST">
+                    <button type="submit" class="w-full bg-[#4a2b24] hover:bg-[#3b211c] text-white rounded-xl py-3.5 px-4 font-semibold text-sm flex items-center justify-center gap-2 transition">
+                      <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                      Stämpla in för dagen
+                    </button>
+                  </form>
+                <% } else { %>
+                  <form action="/staff/time-tracking/clock-out" method="POST">
+                    <button type="submit" class="w-full bg-[#4a2b24] hover:bg-[#3b211c] text-white rounded-xl py-3.5 px-4 font-semibold text-sm flex items-center justify-center gap-2 transition">
+                      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                      Stämpla ut
+                    </button>
+                  </form>
+                <% } %>
+
+              </div>
+            </div>
           </div>
-
-        </main>
-
+        </div>
+      </main>
     </div>
-
   </div>
 
-
-
-  <!-- MOBILE BOTTOM NAV -->
   <%- include("../Partials/bottomnav-staff.ejs") %>
 
+  <script>
+    // LEVANDE KLOCKA
+    function updateClock() {
+      const clock = document.getElementById('live-clock');
+      if (!clock) return;
+      const now = new Date();
+      clock.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
 
+    // ARBETAD TID
+    const isClockedIn = <%= isClockedIn ? 'true' : 'false' %>;
+    const checkInTime = <%- JSON.stringify(checkInTime ?? null) %>;
 
-    <!-- =========================
-       JAVASCRIPT
-       ========================= -->
+    function updateWorkedTime() {
+      const element = document.getElementById('worked-time');
+      if (!element) return;
+      if (!isClockedIn || !checkInTime) return;
 
-    <script>
+      const checkIn = new Date(checkInTime);
+      const now = new Date();
+      const elapsedMinutes = Math.max(0, Math.floor((now.getTime() - checkIn.getTime()) / 60000));
+      const hours = Math.floor(elapsedMinutes / 60);
+      const minutes = elapsedMinutes % 60;
+      element.textContent = `${hours}h ${String(minutes).padStart(2, '0')}m`;
+    }
 
-      // =========================
-      // LEVANDE KLOCKA
-      // =========================
-
-      function updateClock() {
-
-        const clock =
-          document.getElementById('live-clock');
-
-        if (!clock) return;
-
-
-        const now =
-          new Date();
-
-
-        const hours =
-          String(
-            now.getHours()
-          ).padStart(2, '0');
-
-
-        const minutes =
-          String(
-            now.getMinutes()
-          ).padStart(2, '0');
-
-
-        clock.textContent =
-          `${hours}:${minutes}`;
-
-      }
-
-
-      // Kör direkt
-      updateClock();
-
-
-      // Uppdatera varje sekund
-      setInterval(
-        updateClock,
-        1000
-      );
-
-
-
-      // =========================
-      // ARBETAD TID
-      // =========================
-
-      const isClockedIn = <%= isClockedIn ? 'true' : 'false' %>;
-
-
-      const checkInTime = <%- JSON.stringify(checkInTime ?? null) %>;
-
-      function updateWorkedTime() {
-
-        const element =
-          document.getElementById(
-            'worked-time'
-          );
-
-
-        if (!element) {
-          return;
-        }
-
-
-        if (
-          !isClockedIn ||
-          !checkInTime
-        ) {
-
-          return;
-
-        }
-
-
-        const checkIn =
-          new Date(checkInTime);
-
-
-        const now =
-          new Date();
-
-
-        const elapsedMilliseconds =
-          now.getTime() -
-          checkIn.getTime();
-
-
-        const elapsedMinutes =
-          Math.max(
-            0,
-            Math.floor(
-              elapsedMilliseconds / 60000
-            )
-          );
-
-
-        const hours =
-          Math.floor(
-            elapsedMinutes / 60
-          );
-
-
-        const minutes =
-          elapsedMinutes % 60;
-
-
-        element.textContent =
-          `${hours}h ${String(minutes).padStart(2, '0')}m`;
-
-      }
-
-
-      // Kör direkt när sidan laddas
-      updateWorkedTime();
-
-
-      // Uppdatera varje sekund
-      // så att minuterna ändras automatiskt
-      setInterval(
-        updateWorkedTime,
-        1000
-      );
-
-    </script>
+    updateWorkedTime();
+    setInterval(updateWorkedTime, 1000);
+  </script>
 
 </body>
-
 </html>
