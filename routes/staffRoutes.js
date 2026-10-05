@@ -82,4 +82,13 @@ router.get('/profile', (req, res) => {
 });
 
 
+// ============================================================
+// STAFF - SCHEMA
+// ============================================================
+
+router.get('/schedule', (req, res) => {
+  staffController.getSchedule(req, res);
+});
+
+
 module.exports = router;

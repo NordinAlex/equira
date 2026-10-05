@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/stylesheets/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <title>Schema</title>
+</head>
+
+<body class="bg-[#f5f0eb]">
+  <div class="flex">
+    <div class="hidden md:block">
+      <%- include("../Partials/sidebar-staff.ejs") %>
+    </div>
+
+    <div class="flex flex-1 flex-col">
+      <%- include("../Partials/topbar-staff.ejs") %>
+
+      <main class="p-4 md:p-8 pb-20 md:pb-8">
+
+        <!-- Header -->
+        <h1 class="text-2xl font-bold">Mitt Schema</h1>
+        <p class="text-gray-400 mb-6"><%= dateString %></p>
+
+        <!-- Månadsnavigering -->
+        <div class="flex items-center justify-between mb-6">
+          <p class="text-sm text-gray-500">
+            Månad: <span class="font-semibold text-gray-800"><%= mondayStr %> – <%= sundayStr %></span>
+          </p>
+        </div>
+
+        <!-- Pass den här månaden -->
+        <% if (entries && entries.length > 0) { %>
+          <div class="flex flex-col gap-4">
+            <% entries.forEach(entry => { %>
+            <div class="bg-white rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="font-bold text-lg"><%= entry.shiftName || 'Arbetspass' %></p>
+                  <p class="text-sm text-gray-400"><%= entry.date %></p>
+                </div>
+                <% if (entry.status === 'INSTAMPLAD') { %>
+                  <span class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span> Instämplad
+                  </span>
+                <% } else if (entry.checkInTime && entry.checkOutTime) { %>
+                  <span class="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full font-semibold">
+                    <i class="fa-solid fa-check mr-1"></i> Avklarat
+                  </span>
+                <% } else { %>
+                  <span class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full font-semibold">
+                    Planerat
+                  </span>
+                <% } %>
+              </div>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <p class="text-xs text-gray-400 uppercase font-semibold mb-1">Planerat pass</p>
+                  <p class="font-semibold"><%= entry.plannedStartTime %> – <%= entry.plannedEndTime %></p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400 uppercase font-semibold mb-1">Instämplad</p>
+                  <p class="font-semibold">
+                    <% if (entry.checkInTime) { %>
+                      <%= new Date(entry.checkInTime).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Stockholm' }) %>
+                    <% } else { %>
+                      –
+                    <% } %>
+                  </p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400 uppercase font-semibold mb-1">Utstämplad</p>
+                  <p class="font-semibold">
+                    <% if (entry.checkOutTime) { %>
+                      <%= new Date(entry.checkOutTime).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Stockholm' }) %>
+                    <% } else { %>
+                      –
+                    <% } %>
+                  </p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400 uppercase font-semibold mb-1">Arbetad tid</p>
+                  <p class="font-semibold">
+                    <% if (entry.durationMinutes > 0) { %>
+                      <%= Math.floor(entry.durationMinutes / 60) %>h <%= entry.durationMinutes % 60 %>m
+                    <% } else { %>
+                      –
+                    <% } %>
+                  </p>
+                </div>
+              </div>
+
+              <% if (entry.location) { %>
+              <div class="mt-3 pt-3 border-t text-sm text-gray-400">
+                <i class="fa-solid fa-location-dot mr-1"></i> <%= entry.location %>
+              </div>
+              <% } %>
+            </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="bg-white rounded-2xl p-8 shadow-sm text-center">
+            <i class="fa-regular fa-calendar text-gray-300 text-4xl mb-3"></i>
+            <p class="text-gray-400">Inga schemalagda pass den här månaden.</p>
+          </div>
+        <% } %>
+
+      </main>
+    </div>
+  </div>
+
+  <%- include("../Partials/bottomnav-staff.ejs") %>
+</body>
+</html>
