@@ -184,6 +184,8 @@ const staffController = {
     const user = getCurrentUser(req);
     if (!user) return res.redirect('/login');
 
+    stableTaskService.resetCompletedTasks();
+
     const allTasks = db.prepare(`
       SELECT stable_tasks.*, horses.name as horseName, horses.paddockNumber, horses.photoUrl
       FROM stable_tasks
@@ -193,8 +195,10 @@ const staffController = {
     const todoCount = allTasks.filter(t => t.status !== 'Klar').length;
     const doneCount = allTasks.filter(t => t.status === 'Klar').length;
 
+    const activeTasks = allTasks.filter(t => t.status !== 'Klar');
+
     const grouped = {};
-    allTasks.forEach(task => {
+    activeTasks.forEach(task => {
       const key = task.taskType || 'Övrigt';
       if (!grouped[key]) grouped[key] = [];
       grouped[key].push(task);
@@ -273,41 +277,43 @@ const staffController = {
     res.redirect(req.headers.referer || '/staff/tasks');
   },
 
- getSchedule: (req, res) => {
-  const userId = req.session?.user?.id;
-  if (!userId) return res.redirect('/login');
-  const user = getCurrentUser(req);
+  getSchedule: (req, res) => {
+    const userId = req.session?.user?.id;
+    if (!userId) return res.redirect('/login');
+    const user = getCurrentUser(req);
 
-  const now = new Date();
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
-  const entries = db.prepare(`
-    SELECT * FROM time_entries
-    WHERE userId = ?
-    AND date >= ? AND date <= ?
-    ORDER BY date ASC
-  `).all(userId, firstDay, lastDay);
+    const entries = db.prepare(`
+      SELECT * FROM time_entries
+      WHERE userId = ?
+      AND date >= ? AND date <= ?
+      ORDER BY date ASC
+    `).all(userId, firstDay, lastDay);
 
-  res.render('Staff/schedule', {
-    title: 'Schema',
-    currentPage: 'schedule',
-    layout: false,
-    dateString: getDateString(),
-    user,
-    entries,
-    mondayStr: firstDay,
-    sundayStr: lastDay
-  });
-},
-
+    res.render('Staff/schedule', {
+      title: 'Schema',
+      currentPage: 'schedule',
+      layout: false,
+      dateString: getDateString(),
+      user,
+      entries,
+      mondayStr: firstDay,
+      sundayStr: lastDay
+    });
+  },
 
   getHorses: (req, res) => {
     const user = getCurrentUser(req);
     if (!user) return res.redirect('/login');
 
     const horses = db.prepare(`SELECT * FROM horses WHERE status = 'Aktiv & Tjänstbar'`).all();
-    const tasks = db.prepare(`SELECT * FROM stable_tasks WHERE horseId IS NOT NULL`).all();
+    const tasks = db.prepare(`
+      SELECT * FROM stable_tasks
+      WHERE horseId IS NOT NULL AND status != 'Klar'
+    `).all();
 
     const horsesWithTasks = horses.map(horse => ({
       ...horse,
