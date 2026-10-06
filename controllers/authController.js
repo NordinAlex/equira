@@ -6,16 +6,21 @@ const authService = require('../services/authService');
  */
 class AuthController {
   getLogin(req, res) {
-    if (req.session && req.session.user) {
-      return this._redirectByRole(req.session.user.role, res);
+    try{
+       if (req.session && req.session.user) {
+        return this._redirectByRole(req.session.user.role, res);
+      }
+      const returnUrl = req.query.returnUrl || '';
+      res.render('auth/login', {
+        title: 'Equira - Logga in',
+        returnUrl,
+        error:null,
+        layout: false,
+      });
+    } catch(err){
+      console.error('getLogin error:', err);
+      res.status(500).send('Ett fel uppstod vid inloggning.');
     }
-    const returnUrl = req.query.returnUrl || '';
-    res.render('auth/login', {
-      title: 'Equira - Logga in',
-      returnUrl,
-      error: null,
-      layout: false,
-    });
   }
 
   async postLogin(req, res) {
@@ -27,6 +32,8 @@ class AuthController {
         return res.render('auth/login', {
           title: 'Equira - Logga in',
           returnUrl,
+          username,
+          remember,
           error: 'Felaktigt användarnamn eller lösenord.',
           layout: false,
         });
@@ -45,6 +52,8 @@ class AuthController {
       return res.render('auth/login', {
         title: 'Equira - Logga in',
         returnUrl,
+        username,
+        remember,
         error: 'Ett oväntat fel uppstod vid inloggning.',
         layout: false,
       });

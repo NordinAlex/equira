@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "./views/**/*.ejs";
+@source "./public/**/*.js";
 
 @theme {
   --color-equira-green-950: #0f241a;

@@ -10,75 +10,173 @@
     <title>Equira | Logga in</title>
 </head>
 
-<body>
-    <header class="relative h-65 overflow-hidden">
-        <img src="/images/login-background.jpg" alt="Häst" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-white"></div>
-    </header>
+<body class="min-h-screen bg-[#FAF7F2] sm:bg-[#F4EFEA] flex flex-col justify-center items-center p-0 sm:p-6 text-stone-800 antialiased font-sans">
 
-    <!-- Login -->
-    <main>
-        <div class="flex flex-col items-center gap-3">
-            <h1 class="text-3xl font-semibold">Equira</h1>
-            <h2 class="text-lg">Välkommen tillbaka</h2>
-        </div>
+    <!-- Card Container: Fullscreen on mobile, centered card on desktop -->
+    <div class="w-full sm:max-w-md bg-white sm:rounded-3xl sm:shadow-xl sm:border sm:border-[#ECE2CF] overflow-hidden flex flex-col my-auto min-h-screen sm:min-h-0">
+        
+        <header class="relative h-56 sm:h-52 overflow-hidden shrink-0">
+            <img src="/images/login-background.jpg" alt="Häst" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-white"></div>
+        </header>
 
-        <!-- Username input -->
-        <form action="/login" method="POST" class="flex flex-col
-        m-12
-        gap-5">
-            <div class="flex flex-col gap-2">
-                <label for="username" class="font-semibold">Användarnamn</label>
-                <div class="relative">
-                    <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8C806E]"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a8.25 8.25 0 0 1 15 0" />
-                    </svg>
-                    <input placeholder="Användarnamn" type="text" id="username" name="username" required
-                        class="w-full pl-8 bg-[#FAF7F2] border border-[#ECE2CF] h-10 rounded autofill:bg-[#FAF7F2]">
-                </div>
+        <!-- Login -->
+        <main class="flex-1 flex flex-col justify-between px-6 sm:px-10 pb-8">
+            <div class="flex flex-col items-center gap-1.5 pt-2 pb-1 text-center">
+                <h1 class="text-3xl font-semibold text-[#4A3226] tracking-tight">Equira</h1>
+                <h2 class="text-base text-[#8C806E]">Välkommen tillbaka</h2>
             </div>
 
-            <!-- Password input -->
-            <div class="flex flex-col gap-2">
-                <label for="password" class="font-semibold">Lösenord</label>
-                <div class="relative">
-                    <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8C806E]"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16.5 10.5V7.5a4.5 4.5 0 0 0-9 0v3M6 10.5h12a1.5 1.5 0 0 1 1.5 1.5v7.5A1.5 1.5 0 0 1 18 21H6a1.5 1.5 0 0 1-1.5-1.5V12A1.5 1.5 0 0 1 6 10.5Z" />
-                    </svg>
-                    <input placeholder="Lösenord" type="password" id="password" name="password" required
-                        class="w-full pl-8 bg-[#FAF7F2] border border-[#ECE2CF] h-10 rounded autofill:bg-[#FAF7F2]">
-                </div>
-            </div>
+            <!-- Login form -->
+            <form action="/login" method="POST" id="loginForm" class="flex flex-col gap-5 mt-4">
+                <input type="hidden" name="returnUrl" value="<%= typeof returnUrl !== 'undefined' ? returnUrl : '' %>">
 
-            <!-- Remember me toggle -->
-            <div class="flex items-center justify-between">
-                <label for="remember" class="font-semibold">Kom ihåg mig</label>
-
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="remember" name="remember"  value="1" class="sr-only peer">
-                    <div class="w-11 h-6 bg-[#ECE2CF] rounded-full peer
-                    peer-checked:bg-[#4A3226]
-                    after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                    after:bg-white after:rounded-full after:h-5 after:w-5
-                    after:transition-all
-                    peer-checked:after:translate-x-full">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div id="errorBanner" class="p-3.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl flex items-center justify-between gap-3 shadow-xs transition-opacity duration-200">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <i class="fa-solid fa-circle-exclamation text-red-600 text-base shrink-0"></i>
+                            <span class="font-medium wrap-break-word"><%= error %></span>
+                        </div>
+                        <button type="button" id="closeErrorBannerBtn" aria-label="Stäng felmeddelande" title="Stäng"
+                            class="text-red-400 hover:text-red-700 p-1 -mr-1 rounded-lg hover:bg-red-100/60 cursor-pointer transition-colors focus:outline-none shrink-0">
+                            <i class="fa-solid fa-xmark text-base"></i>
+                        </button>
                     </div>
-                </label>
+                <% } %>
+
+                <!-- Username input -->
+                <div class="flex flex-col gap-2">
+                    <label for="username" class="font-semibold text-sm text-[#4A3226]">Användarnamn</label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8C806E]"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a8.25 8.25 0 0 1 15 0" />
+                        </svg>
+                        <input placeholder="Användarnamn" type="text" id="username" name="username" value="<%= typeof username !== 'undefined' && username ? username : '' %>" required
+                            class="w-full pl-10 pr-4 bg-[#FAF7F2] border border-[#ECE2CF] h-11 rounded-xl focus:outline-none focus:border-[#4A3226] focus:ring-1 focus:ring-[#4A3226] transition-all autofill:bg-[#FAF7F2]">
+                    </div>
+                </div>
+
+                <!-- Password input with Show/Hide toggle -->
+                <div class="flex flex-col gap-2">
+                    <label for="password" class="font-semibold text-sm text-[#4A3226]">Lösenord</label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8C806E]"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16.5 10.5V7.5a4.5 4.5 0 0 0-9 0v3M6 10.5h12a1.5 1.5 0 0 1 1.5 1.5v7.5A1.5 1.5 0 0 1 18 21H6a1.5 1.5 0 0 1-1.5-1.5V12A1.5 1.5 0 0 1 6 10.5Z" />
+                        </svg>
+                        <input placeholder="Lösenord" type="password" id="password" name="password" required
+                            class="w-full pl-10 pr-11 bg-[#FAF7F2] border border-[#ECE2CF] h-11 rounded-xl focus:outline-none focus:border-[#4A3226] focus:ring-1 focus:ring-[#4A3226] transition-all autofill:bg-[#FAF7F2]">
+                        <button type="button" id="togglePasswordBtn" aria-label="Visa lösenord" title="Visa eller dölj lösenord"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C806E] hover:text-[#4A3226] p-1 cursor-pointer transition-colors focus:outline-none">
+                            <i id="togglePasswordIcon" class="fa-regular fa-eye text-base"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Remember me toggle -->
+                <div class="flex items-center justify-between">
+                    <label for="remember" class="font-semibold text-sm text-[#4A3226] cursor-pointer select-none">Kom ihåg mig</label>
+
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="remember" name="remember" value="1" <%= (typeof remember !== 'undefined' && remember) ? 'checked' : '' %> class="sr-only peer">
+                        <div class="w-11 h-6 bg-[#ECE2CF] rounded-full peer
+                        peer-checked:bg-[#4A3226]
+                        after:content-[''] after:absolute after:top-0.5 after:left-0.5
+                        after:bg-white after:rounded-full after:h-5 after:w-5
+                        after:transition-all
+                        peer-checked:after:translate-x-full">
+                        </div>
+                    </label>
+                </div>
+
+                <button type="submit"
+                    class="bg-[#4A3226] hover:bg-equira-cognac-800 active:scale-[0.99] text-white px-8 py-3 rounded-xl font-semibold cursor-pointer mt-2 shadow-xs transition-all duration-150">
+                    Logga in
+                </button>
+            </form>
+
+            <div class="mt-6 text-center space-y-2">
+                <p class="text-sm text-stone-600">Inget konto? <span class="font-semibold text-[#4A3226]">Kontakta administratör.</span></p>
+                <a href="#" class="block text-sm font-semibold underline text-[#4A3226] hover:text-equira-cognac-800 transition-colors">Glömt lösenord?</a>
             </div>
+        </main>
+    </div>
 
-            <button type="submit"
-            class="bg-[#4A3226] text-white px-8 py-3 rounded font-semibold cursor-pointer mt-4">Logga in</button>
-        </form>
+    <!-- Client-side script: Password toggle, close toast banner, and reload reset -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Check if page was reloaded (F5 / Refresh)
+            const navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+            const isReload = (navEntries && navEntries[0] && navEntries[0].type === 'reload') ||
+                             (performance.navigation && performance.navigation.type === 1);
 
-        <p class="text-center">Inget konto? <span class="font-semibold">Kontakta administratör.</span></p>
-        <a href="#"
-        class="block text-center mt-2 font-semibold underline text-[#4A3226]">Glömt lösenord?</a>
-    </main>
+            if (isReload) {
+                // Check if an error banner is present in the DOM
+                const errorBanner = document.getElementById('errorBanner');
+                const hadError = Boolean(errorBanner);
 
+                if (errorBanner) {
+                    errorBanner.remove();
+                }
+
+                const usernameInput = document.getElementById('username');
+                const passwordInput = document.getElementById('password');
+                const rememberInput = document.getElementById('remember');
+                if (usernameInput) usernameInput.value = '';
+                if (passwordInput) passwordInput.value = '';
+                if (rememberInput) rememberInput.checked = false;
+
+                const loginForm = document.getElementById('loginForm');
+                if (loginForm) loginForm.reset();
+
+                if (hadError) {
+                    // If reload was triggered on a POST error, cleanly redirect to GET /login
+                    window.location.replace('/login');
+                    return;
+                }
+            }
+
+            // 2. Dismiss / close error toast banner
+            const closeErrorBtn = document.getElementById('closeErrorBannerBtn');
+            const errorBanner = document.getElementById('errorBanner');
+            if (closeErrorBtn && errorBanner) {
+                closeErrorBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    errorBanner.style.opacity = '0';
+                    setTimeout(() => {
+                        errorBanner.remove();
+                    }, 180);
+                });
+            }
+
+            // 3. Password visibility toggle
+            const toggleBtn = document.getElementById('togglePasswordBtn');
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+
+            if (toggleBtn && passwordInput && toggleIcon) {
+                toggleBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const isPassword = passwordInput.getAttribute('type') === 'password';
+                    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                    
+                    if (isPassword) {
+                        toggleIcon.classList.remove('fa-eye');
+                        toggleIcon.classList.add('fa-eye-slash');
+                        toggleBtn.setAttribute('aria-label', 'Dölj lösenord');
+                    } else {
+                        toggleIcon.classList.remove('fa-eye-slash');
+                        toggleIcon.classList.add('fa-eye');
+                        toggleBtn.setAttribute('aria-label', 'Visa lösenord');
+                    }
+                    passwordInput.focus();
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
